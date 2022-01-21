@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <RootNamespace>OCompiler</RootNamespace>
+    <OutputPath>$(SolutionDir)\build\$(Configuration)\$(ProjectName)\bin\</OutputPath>
+    <IntermediateOutputPath>$(SolutionDir)\build\$(Configuration)\$(ProjectName)\obj\</IntermediateOutputPath>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+  </PropertyGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="rd &quot;$(ProjectDir)obj&quot; /s /q" />
+  </Target>
+
+</Project>
