@@ -1,4 +1,4 @@
-﻿using System;
+﻿using OCompiler.Pipeline;
 
 namespace OCompiler
 {
@@ -6,7 +6,7 @@ namespace OCompiler
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Welcome to HELL!");
+            new Compiler(sourceFilePath: args[0]).Run();
         }
     }
 }
