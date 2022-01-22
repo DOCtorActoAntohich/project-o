@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <RootNamespace>OCompiler</RootNamespace>
     <OutputPath>$(SolutionDir)\build\$(Configuration)\$(ProjectName)\bin\</OutputPath>
     <IntermediateOutputPath>$(SolutionDir)\build\$(Configuration)\$(ProjectName)\obj\</IntermediateOutputPath>
