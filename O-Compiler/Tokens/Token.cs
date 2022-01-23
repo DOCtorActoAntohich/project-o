@@ -19,5 +19,10 @@
             Literal = literal;
             Type = type;
         }
+
+        public static Token EndOfFile(int offset)
+        {
+            return new Token(offset, offset, "", TokenType.EndOfFile);
+        }
     }
 }

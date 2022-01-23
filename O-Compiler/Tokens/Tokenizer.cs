@@ -9,107 +9,129 @@ namespace OCompiler.Tokens
     class Tokenizer
     {
         public readonly string SourcePath;
-        private int charsRead = 0;
+        private int СharsRead;
 
         public Tokenizer(string sourcePath)
         {
             SourcePath = sourcePath;
         }
 
-        public List<Token> GetTokens()
+        public IEnumerable<Token> GetTokens()
         {
-            var tokens = new List<Token>();
+            СharsRead = 0;
             using (var file = new StreamReader(SourcePath, Encoding.UTF8))
             {
                 while (!file.EndOfStream)
                 {
-                    string literal;
-                    Token token;
-                    int tokenStart = charsRead;
-                    char symbol = (char)file.Peek();
-                    if (char.IsWhiteSpace(symbol))
-                    {
-                        literal = ReadWhile(file, char.IsWhiteSpace);
-                        token = new Token(tokenStart, charsRead, literal, TokenType.Whitespace);
-                        tokens.Add(token);
-                    }
-                    else if (IsValidIdentifier(symbol, isFirstChar: true))
-                    {
-                        literal = ReadWhile(file, c => IsValidIdentifier(c, isFirstChar: false));
-                        var entity = CodeEntity.GetByLiteral(literal);
-                        TokenType tokenType;
-                        switch (entity)
-                        {
-                            case BooleanLiteral _:
-                                tokenType = TokenType.BooleanLiteral;
-                                break;
-                            case Delimiter _:
-                                tokenType = TokenType.Delimiter;
-                                break;
-                            case ReservedWord _:
-                                tokenType = TokenType.ReservedWord;
-                                break;
-                            case CodeEntity e when e == CodeEntity.Empty:
-                                tokenType = TokenType.Identifier;
-                                break;
-                            default:
-                                tokenType = TokenType.Unknown;
-                                break;
-                        }
-                        tokens.Add(new Token(tokenStart, charsRead, literal, tokenType, entity));
-                    }
-                    else if (char.IsDigit(symbol))
-                    {
-                        literal = ReadWhile(file, char.IsDigit);
-                        tokens.Add(new Token(tokenStart, charsRead, literal, TokenType.IntegerLiteral));
+                    foreach (var token in ReadNextToken(file)) {
+                        yield return token;
+                    };
+                }
+            }
+            yield return Token.EndOfFile(СharsRead);
+        }
 
-                        var lastThreeTokens = tokens.TakeLast(3);
-                        if (TokensRepresentReal(lastThreeTokens))
+        private IEnumerable<Token> ReadNextToken(StreamReader stream)
+        {
+            string literal;
+            int tokenStart = СharsRead;
+            char symbol = (char)stream.Peek();
+            if (char.IsWhiteSpace(symbol))
+            {
+                literal = ReadWhile(stream, char.IsWhiteSpace);
+                yield return new Token(tokenStart, СharsRead, literal, TokenType.Whitespace);
+            }
+            else if (IsValidIdentifier(symbol, isFirstChar: true))
+            {
+                literal = ReadWhile(stream, c => IsValidIdentifier(c, isFirstChar: false));
+                var entity = CodeEntity.GetByLiteral(literal);
+                TokenType tokenType;
+                switch (entity)
+                {
+                    case BooleanLiteral _:
+                        tokenType = TokenType.BooleanLiteral;
+                        break;
+                    case Delimiter _:
+                        tokenType = TokenType.Delimiter;
+                        break;
+                    case ReservedWord _:
+                        tokenType = TokenType.ReservedWord;
+                        break;
+                    case CodeEntity e when e == CodeEntity.Empty:
+                        tokenType = TokenType.Identifier;
+                        break;
+                    default:
+                        tokenType = TokenType.Unknown;
+                        break;
+                }
+                yield return new Token(tokenStart, СharsRead, literal, tokenType, entity);
+            }
+            else if (char.IsDigit(symbol))
+            {
+                literal = ReadWhile(stream, char.IsDigit);
+
+                // ToList here prevents from further file reading
+                var tokens = (IEnumerable<Token>)(
+                    ReadNextToken(stream)
+                        .Concat(ReadNextToken(stream))
+                        .Prepend(new Token(tokenStart, СharsRead, literal, TokenType.IntegerLiteral))
+                ).ToList();
+
+                var remaining = tokens.Skip(3);
+                tokens = tokens.Take(3);
+
+                if (TokensRepresentReal(tokens))
+                {
+                    // Replace the three tokens (Integer, Dot, Integer) with a Real
+                    literal = tokens.Aggregate("", (buffer, token) => buffer + token.Literal);
+                    yield return new Token(tokenStart, СharsRead, literal, TokenType.RealLiteral);
+                }
+                else
+                {
+                    foreach (var token in tokens)
+                    {
+                        yield return token;
+                    }
+                }
+                foreach (var token in remaining)
+                {
+                    yield return token;
+                }
+            }
+            else
+            {
+                literal = ReadWhile(stream, c => !(char.IsWhiteSpace(c) || IsValidIdentifier(c, false)));
+                if (literal == Delimiter.Assign.Value)
+                {
+                    yield return new Token(tokenStart, СharsRead, literal, TokenType.Delimiter, Delimiter.Assign);
+                }
+                else
+                {
+                    // There might be multiple tokens at once (e.g. multiple brackets)
+                    int len = 0;
+                    do
+                    {
+                        // Take more and more symbols until a valid delimiter is found
+                        var entityLiteral = literal[..++len];
+                        var entity = CodeEntity.GetByLiteral(entityLiteral);
+                        if (entity != CodeEntity.Empty)
                         {
-                            // Replace the last three tokens (Integer, Dot, Integer) with a Real
-                            tokenStart = lastThreeTokens.First().StartOffset;
-                            var realNumber = lastThreeTokens.Aggregate("", (s, token) => s + token.Literal);
-                            var realToken = new Token(tokenStart, charsRead, realNumber, TokenType.IntegerLiteral);
-                            tokens = tokens.SkipLast(3).Append(realToken).ToList();
+                            yield return new Token(tokenStart, tokenStart + len, entityLiteral, TokenType.Delimiter, entity);
+                            tokenStart += len;
+                            // Trim the beginning and go to the start
+                            literal = literal[len..];
+                            len = 0;
                         }
                     }
-                    else
-                    {
-                        literal = ReadWhile(file, c => !(char.IsWhiteSpace(c) || IsValidIdentifier(c, false)));
-                        if (literal == Delimiter.Assign.Value)
-                        {
-                            tokens.Add(new Token(tokenStart, charsRead, literal, TokenType.Delimiter, Delimiter.Assign));
-                        }
-                        else
-                        {
-                            // There might be multiple tokens at once (e.g. multiple brackets)
-                            int len = 0;
-                            do
-                            {
-                                // Take more and more symbols until a valid delimiter is found
-                                var entityLiteral = literal[..++len];
-                                var entity = CodeEntity.GetByLiteral(entityLiteral);
-                                if (entity != CodeEntity.Empty)
-                                {
-                                    tokens.Add(new Token(tokenStart, tokenStart + len, entityLiteral, TokenType.Delimiter, entity));
-                                    tokenStart += len;
-                                    // Trim the beginning and go to the start
-                                    literal = literal[len..];
-                                    len = 0;
-                                }
-                            }
-                            while (len < literal.Length);
+                    while (len < literal.Length);
 
-                            if (literal.Length > 0)
-                            {
-                                // If there's something left unparsed, throw the error
-                                throw new Exception($"Parse error at offset {tokenStart}, the literal is {literal}");
-                            }
-                        }
+                    if (literal.Length > 0)
+                    {
+                        // If there's something left unparsed, throw the error
+                        throw new Exception($"Parse error at offset {tokenStart}, the literal is {literal}");
                     }
                 }
             }
-            return tokens;
         }
 
         private string ReadWhile(StreamReader stream, Func<char, bool> condition)
@@ -118,7 +140,7 @@ namespace OCompiler.Tokens
             while (condition((char)stream.Peek()))
             {
                 word += (char)stream.Read();
-                charsRead++;
+                СharsRead++;
             }
             return word;
         }

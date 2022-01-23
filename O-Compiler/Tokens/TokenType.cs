@@ -3,6 +3,7 @@
     enum TokenType
     {
         Whitespace, Identifier, ReservedWord, Delimiter,
-        IntegerLiteral, RealLiteral, BooleanLiteral, Unknown
+        IntegerLiteral, RealLiteral, BooleanLiteral,
+        EndOfFile, Unknown
     }
 }
