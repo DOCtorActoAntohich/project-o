@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "O-Compiler": {
+      "commandName": "Project",
+      "commandLineArgs": ".\\examples\\main.ol",
+      "workingDirectory": "$(SolutionDir)"
+    }
+  }
+}
