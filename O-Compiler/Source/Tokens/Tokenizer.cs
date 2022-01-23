@@ -54,7 +54,7 @@ namespace OCompiler.Tokens
                     case Delimiter _:
                         tokenType = TokenType.Delimiter;
                         break;
-                    case ReservedWord _:
+                    case Keyword _:
                         tokenType = TokenType.ReservedWord;
                         break;
                     case CodeEntity e when e == CodeEntity.Empty:

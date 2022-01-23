@@ -16,7 +16,7 @@ namespace OCompiler.Pipeline
         {
             // This is the only reference to ReservedWord for now
             // Required to prevent skipping the constructor of the class
-            ReservedWord.Loop.ToString();
+            Keyword.Loop.ToString();
 
             var tokenizer = new Tokenizer(SourceFilePath);
             var tokens = tokenizer.GetTokens();
