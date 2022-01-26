@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-namespace OCompiler.Tokens
+namespace OCompiler.Analyze.Lexical
 {
     sealed class Delimiter : CodeEntity
     {

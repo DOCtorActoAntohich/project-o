@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-using OCompiler.Tokens;
+using OCompiler.Analyze.Lexical;
 
 namespace OCompiler.Pipeline
 {

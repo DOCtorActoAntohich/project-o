@@ -1,4 +1,4 @@
-﻿namespace OCompiler.Tokens
+﻿namespace OCompiler.Analyze.Lexical
 {
     enum TokenType
     {

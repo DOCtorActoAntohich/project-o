@@ -4,7 +4,7 @@ using System.Text;
 using System.Linq;
 using System.Collections.Generic;
 
-namespace OCompiler.Tokens
+namespace OCompiler.Analyze.Lexical
 {
     class Tokenizer
     {

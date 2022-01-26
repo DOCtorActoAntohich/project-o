@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using OCompiler.Generics;
 
-namespace OCompiler.Tokens
+namespace OCompiler.Analyze.Lexical
 {
     internal class CodeEntity : TypeSafeEnum<string>
     {
