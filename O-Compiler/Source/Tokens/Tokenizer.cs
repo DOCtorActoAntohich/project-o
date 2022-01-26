@@ -8,8 +8,8 @@ namespace OCompiler.Tokens
 {
     class Tokenizer
     {
-        public readonly string SourcePath;
-        private int СharsRead;
+        public string SourcePath { get; }
+        private int _charsRead;
 
         public Tokenizer(string sourcePath)
         {
@@ -18,7 +18,7 @@ namespace OCompiler.Tokens
 
         public IEnumerable<Token> GetTokens()
         {
-            СharsRead = 0;
+            _charsRead = 0;
             using (var file = new StreamReader(SourcePath, Encoding.UTF8))
             {
                 while (!file.EndOfStream)
@@ -28,43 +28,32 @@ namespace OCompiler.Tokens
                     };
                 }
             }
-            yield return Token.EndOfFile(СharsRead);
+            yield return Token.EndOfFile(_charsRead);
         }
 
         private IEnumerable<Token> ReadNextToken(StreamReader stream)
         {
             string literal;
-            int tokenStart = СharsRead;
+            int tokenStart = _charsRead;
             char symbol = (char)stream.Peek();
             if (char.IsWhiteSpace(symbol))
             {
                 literal = ReadWhile(stream, char.IsWhiteSpace);
-                yield return new Token(tokenStart, СharsRead, literal, TokenType.Whitespace);
+                yield return new Token(tokenStart, _charsRead, literal, TokenType.Whitespace);
             }
             else if (IsValidIdentifier(symbol, isFirstChar: true))
             {
                 literal = ReadWhile(stream, c => IsValidIdentifier(c, isFirstChar: false));
                 var entity = CodeEntity.GetByLiteral(literal);
-                TokenType tokenType;
-                switch (entity)
+                var tokenType = entity switch
                 {
-                    case BooleanLiteral _:
-                        tokenType = TokenType.BooleanLiteral;
-                        break;
-                    case Delimiter _:
-                        tokenType = TokenType.Delimiter;
-                        break;
-                    case Keyword _:
-                        tokenType = TokenType.ReservedWord;
-                        break;
-                    case CodeEntity e when e == CodeEntity.Empty:
-                        tokenType = TokenType.Identifier;
-                        break;
-                    default:
-                        tokenType = TokenType.Unknown;
-                        break;
-                }
-                yield return new Token(tokenStart, СharsRead, literal, tokenType, entity);
+                    BooleanLiteral _ => TokenType.BooleanLiteral,
+                    Delimiter _      => TokenType.Delimiter,
+                    Keyword _        => TokenType.ReservedWord,
+                    CodeEntity e when e == CodeEntity.Empty => TokenType.Identifier,
+                    _ => TokenType.Unknown,
+                };
+                yield return new Token(tokenStart, _charsRead, literal, tokenType, entity);
             }
             else if (char.IsDigit(symbol))
             {
@@ -74,7 +63,7 @@ namespace OCompiler.Tokens
                 var tokens = (IEnumerable<Token>)(
                     ReadNextToken(stream)
                         .Concat(ReadNextToken(stream))
-                        .Prepend(new Token(tokenStart, СharsRead, literal, TokenType.IntegerLiteral))
+                        .Prepend(new Token(tokenStart, _charsRead, literal, TokenType.IntegerLiteral))
                 ).ToList();
 
                 var remaining = tokens.Skip(3);
@@ -84,7 +73,7 @@ namespace OCompiler.Tokens
                 {
                     // Replace the three tokens (Integer, Dot, Integer) with a Real
                     literal = tokens.Aggregate("", (buffer, token) => buffer + token.Literal);
-                    yield return new Token(tokenStart, СharsRead, literal, TokenType.RealLiteral);
+                    yield return new Token(tokenStart, _charsRead, literal, TokenType.RealLiteral);
                 }
                 else
                 {
@@ -103,7 +92,7 @@ namespace OCompiler.Tokens
                 literal = ReadWhile(stream, c => !(char.IsWhiteSpace(c) || IsValidIdentifier(c, false)));
                 if (literal == Delimiter.Assign.Value)
                 {
-                    yield return new Token(tokenStart, СharsRead, literal, TokenType.Delimiter, Delimiter.Assign);
+                    yield return new Token(tokenStart, _charsRead, literal, TokenType.Delimiter, Delimiter.Assign);
                 }
                 else
                 {
@@ -140,7 +129,7 @@ namespace OCompiler.Tokens
             while (condition((char)stream.Peek()))
             {
                 word += (char)stream.Read();
-                СharsRead++;
+                ++_charsRead;
             }
             return word;
         }
