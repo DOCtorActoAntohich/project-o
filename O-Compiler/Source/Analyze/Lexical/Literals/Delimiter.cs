@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-namespace OCompiler.Analyze.Lexical
+﻿namespace OCompiler.Analyze.Lexical.Literals
 {
-    sealed class Delimiter : CodeEntity
+    sealed class Delimiter : ReservedLiteral
     {
         public static Delimiter Dot    { get; } = new(".");
         public static Delimiter Comma  { get; } = new(",");
