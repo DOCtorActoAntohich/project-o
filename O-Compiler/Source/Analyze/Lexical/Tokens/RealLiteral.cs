@@ -7,14 +7,11 @@ namespace OCompiler.Analyze.Lexical.Tokens
         public double Value { get; }
         public RealLiteral(long startOffset, string literal) : base(startOffset, literal)
         {
-            if (literal.ToDouble(out double result))
-            {
-                Value = result;
-            }
-            else
+            if (!literal.ToDouble(out double result))
             {
                 throw new System.ArgumentException("The literal specified cannot be cast to Real type");
             }
+            Value = result;
         }
     }
 }

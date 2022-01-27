@@ -7,14 +7,11 @@ namespace OCompiler.Analyze.Lexical.Tokens
         public int Value { get; }
         public IntegerLiteral(long startOffset, string literal) : base(startOffset, literal)
         {
-            if (literal.ToInteger(out int result))
-            {
-                Value = result;
-            }
-            else
+            if (!literal.ToInteger(out int result))
             {
                 throw new System.ArgumentException("The literal specified cannot be cast to Integer type");
             }
+            Value = result;
         }
     }
 }
