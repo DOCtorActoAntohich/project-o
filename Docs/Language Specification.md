@@ -105,65 +105,87 @@ Nested comments are not allowed:
  * And on this line there is a syntax error. */
 ```
 
-## Input/Output mechanisms.
+## Language constructs
 
-[Not yet implemented].
+The language defines the minimum set of operators necessary for real programming: assignment, loop, conditional operator, and return operator from a method.
 
-## Formal Grammar
+### Expressions
+
+Expressions in Project O are intentionally simplified, and can be built out of two things:
+  - Access to class member.
+  - Method call.
+
+Access to a class member is done via dot notation:
+  - Fields: `class_instance.field`
+  - Methods: `class_instance.method(param_1, param_2)`
+
+As visible from the previous example, methods calls are done via accessing methods as members and invoking them by putting a comma-separated list of parameters in parentheses.
+
+### Assignment
+
+Assignment operator `:=` can be used to write a value to a variable.
+
+Left hand side of the assignment operator must be a class field. Right hand side of the assignment operator must be any expression.
+
+### Conditional operators
+
+The language defines operators for conditional execution as follows:
 
 ```
-Program : { ClassDeclaration }
-
-ClassDeclaration
-    : class ClassName [ extends ClassName ] is
-    { MemberDeclaration }
-    end
-
-ClassName : Identifier [ '[' ClassName ']' ]
-
-MemberDeclaration
-    : VariableDeclaration
-    | MethodDeclaration
-    | ConstructorDeclaration
-
-VariableDeclaration
-    : var Identifier ':' Expression
-
-MethodDeclaration
-    : method Identifier [ Parameters ] [ : Identifier ]
-    is Body end
-
-Parameters : ( ParameterDeclaration { , ParameterDeclaration } )
-
-ParameterDeclaration
-    : Identifier : ClassName
-
-Body : { VariableDeclaration | Statement }
-
-ConstructorDeclaration
-    : this [ Parameters ] is Body end
-
-Statement : Assignment
-    | WhileLoop
-    | IfStatement
-    | ReturnStatement
-
-Assignment : Identifier ':=' Expression
-
-WhileLoop : while Expression loop Body end
-
-IfStatement : if Expression then Body [ else Body ] end
-
-ReturnStatement
-    : return [ Expression ]
-
-Expression : Primary { '.' Identifier [ Arguments ] }
-
-Arguments : '(' Expression { ',' Expression } ')'
-
-Primary : IntegerLiteral
-    | RealLiteral
-    | BooleanLiteral
-    | this
-    | ClassName
+if <expression> then
+    // Body 1.
+else
+    // Body 2.
+end
 ```
+
+Notes:
+  - `expression` after `if` statement can only be of a boolean type.
+  - `Body 1` will be executed if the `<expression>` is `true`, otherwise the control will be transferred to `Body 2`.
+  - `end` closes the `if` block to avoid ambiguities for nested conditional execution blocks, and marks the textual completion of the statement.
+
+### Loops
+
+The language has only `while` loop which continues execution as long as the `expression` is `true`:
+
+```
+while <expression> loop
+    // Body
+end
+```
+
+Notes:
+  - The type of expression can only be boolean.
+  - The expression is evaluated each time before the body of the loop.
+  - The loop can execute zero or more times.
+
+### Return statement
+
+The `return` statement marks the end of execution for a method. After `return` is executed, the control will be transferred to a caller method.
+
+If the callee can return a value of some time, it must be specified after `return` statement. In this case, the method call will be "replaced" in caller with the return value of a callee.
+
+```
+return [expression]
+```
+
+## Standard library
+
+Standard library includes a number of classes that are present in any program by default (so there is no need to explicitly import them).
+
+### List of types for storage and algorithms
+
+```
+class Class is ... end
+class AnyValue extends Class is ... end
+class Integer extends AnyValue is ... end
+class Real extends AnyValue is ... end
+class Boolean extends AnyValue is ... end
+class AnyRef extends Class is ... end
+class Array extends AnyRef is ... end
+class List extends AnyRef is ... end
+```
+
+### Input/Output mechanisms.
+
+I/O is implemented via `class IO is ... end`
