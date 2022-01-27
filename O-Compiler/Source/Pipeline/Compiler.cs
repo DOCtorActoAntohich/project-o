@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-using OCompiler.Tokens;
+﻿using OCompiler.Analyze.Lexical;
 
 namespace OCompiler.Pipeline
 {
@@ -14,10 +12,6 @@ namespace OCompiler.Pipeline
 
         public void Run()
         {
-            // This is the only reference to ReservedWord for now
-            // Required to prevent skipping the constructor of the class
-            Keyword.Loop.ToString();
-
             var tokenizer = new Tokenizer(SourceFilePath);
             var tokens = tokenizer.GetTokens();
             Formatter.ShowHighlightedCode(tokens);

@@ -1,6 +1,6 @@
-﻿namespace OCompiler.Tokens
+﻿namespace OCompiler.Analyze.Lexical.Literals
 {
-    sealed class Keyword : CodeEntity
+    sealed class Keyword : ReservedLiteral
     {
 
         public static Keyword If      { get; } = new("if");
