@@ -5,14 +5,13 @@ namespace OCompiler.Analyze.Lexical.Tokens
     abstract class Token
     {
         public long StartOffset { get; }
-        public int Length { get; }
+        public int Length { get => Literal.Length; }
 
         public string Literal { get; }
 
         public Token(long startOffset, string literal)
         {
             StartOffset = startOffset;
-            Length = literal.Length;
             Literal = literal;
         }
 
@@ -26,40 +25,29 @@ namespace OCompiler.Analyze.Lexical.Tokens
 
         public static bool TryParse(long position, string literal, out Token token)
         {
-            var reservedLiteral = Literals.ReservedLiteral.GetByValue(literal);
-            if (reservedLiteral == Literals.ReservedLiteral.Empty)
-            {
-                // Might be an identifier or Integer/Real literal
-                if (literal[0].IsIdentifierOrNumber())
-                {
-                    if (char.IsDigit(literal[0]) && int.TryParse(literal, out int _))
-                    {
-                        token = new IntegerLiteral(position, literal);
-                        return true;
-                    }
-                    else if (literal.Contains('.'))
-                    {
-                        if (literal.ToDouble(out double _))
-                        {
-                            token = new RealLiteral(position, literal);
-                            return true;
-                        }
-                    }
-                    else
-                    {
-                        token = new Identifier(position, literal);
-                        return true;
-                    }
-                }
-                else if (string.IsNullOrWhiteSpace(literal))
-                {
-                    token = new Whitespace(position, literal);
-                    return true;
-                }
-            }
-            else
+            if (literal.TryGetReservedLiteral(out var reservedLiteral))
             {
                 token = FromReserved(position, reservedLiteral);
+                return true;
+            }
+            else if (literal.CanBeInteger())
+            {
+                token = new IntegerLiteral(position, literal);
+                return true;
+            }
+            else if (literal.CanBeDouble())
+            {
+                token = new RealLiteral(position, literal);
+                return true;
+            }
+            else if (literal.CanBeIdentifier())
+            {
+                token = new Identifier(position, literal);
+                return true;
+            }
+            else if (literal.IsWhitespace())
+            {
+                token = new Whitespace(position, literal);
                 return true;
             }
             token = null;

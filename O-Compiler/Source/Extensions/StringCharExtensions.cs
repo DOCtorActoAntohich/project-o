@@ -1,16 +1,54 @@
 ﻿using System.Globalization;
+using OCompiler.Analyze.Lexical.Literals;
 
 namespace OCompiler.Extensions
 {
     internal static class StringCharExtensions
     {
+        public static bool TryGetReservedLiteral(this string literal, out ReservedLiteral result)
+        {
+            result = ReservedLiteral.GetByValue(literal);
+            return result != ReservedLiteral.Empty;
+        }
+
         public static bool IsIdentifierOrNumber(this char c)
         {
             // '.' is included for Real numbers
             return char.IsLetterOrDigit(c) || c == '.' || c == '_';
         }
+        public static bool IsIdentifierOrNumber(this string s)
+        {
+            foreach (char c in s)
+            {
+                if (!c.IsIdentifierOrNumber())
+                    return false;
+            }
+            return true;
+        }
+        public static bool CanBeIdentifier(this string s)
+        {
+            if (!s[0].CanStartIdentifier())
+            {
+                return false;
+            }
+            foreach (char c in s)
+            {
+                if (!c.CanBePartOfIdentifier())
+                    return false;
+            }
+            return true;
+        }
 
-        public static bool ToDouble(this string literal, out double result)
+        public static bool CanStartIdentifier(this char c)
+        {
+            return char.IsLetter(c) || c == '_';
+        }
+        public static bool CanBePartOfIdentifier(this char c)
+        {
+            return char.IsLetterOrDigit(c) || c == '_';
+        }
+
+        public static bool TryCastToDouble(this string literal, out double result)
         {
             return double.TryParse(
                 literal, result: out result,
@@ -18,10 +56,23 @@ namespace OCompiler.Extensions
                 provider: CultureInfo.InvariantCulture
             );
         }
-
-        public static bool ToInteger(this string literal, out int result)
+        public static bool CanBeDouble(this string literal)
         {
-            return int.TryParse(literal, out result);
+            return literal.TryCastToDouble(out double _);
+        }
+
+        public static bool TryCastToInteger(this string literal, out int conversion_result)
+        {
+            return int.TryParse(literal, out conversion_result);
+        }
+        public static bool CanBeInteger(this string literal)
+        {
+            return literal.TryCastToInteger(out int _);
+        }
+
+        public static bool IsWhitespace(this string literal)
+        {
+            return string.IsNullOrWhiteSpace(literal);
         }
 
         public static int Count(this string haystack, char needle)
