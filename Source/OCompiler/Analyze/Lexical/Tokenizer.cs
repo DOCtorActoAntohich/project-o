@@ -59,10 +59,13 @@ namespace OCompiler.Analyze.Lexical
         private static string ReadWhile(StreamReader stream, Func<char, bool> condition)
         {
             string word = "";
-            while (condition((char)stream.Peek()))
+            int symbol;
+
+            while ((symbol = stream.Peek()) != -1 && condition((char)symbol))
             {
                 word += (char)stream.Read();
             }
+            
             return word;
         }
     }
