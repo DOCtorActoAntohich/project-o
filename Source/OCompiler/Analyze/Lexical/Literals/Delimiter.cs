@@ -7,10 +7,12 @@
         public static Delimiter Colon  { get; } = new(":");
         public static Delimiter Assign { get; } = new(":=");
 
-        public static Delimiter LeftParenthesis    { get; } = new("(");
-        public static Delimiter RightParenthesis   { get; } = new(")");
-        public static Delimiter LeftSquareBracket  { get; } = new("[");
+        public static Delimiter LeftParenthesis { get; } = new("(");
+        public static Delimiter RightParenthesis { get; } = new(")");
+        public static Delimiter LeftSquareBracket { get; } = new("[");
         public static Delimiter RightSquareBracket { get; } = new("]");
+
+        public static Delimiter StringQuote { get; } = new("\"");
 
         private Delimiter(string literal) : base(literal) { }
     }

@@ -11,6 +11,7 @@ namespace OCompiler.Analyze.Lexical
         public string SourcePath { get; }
         private long _tokenBeginning;
         private long _newlines;
+        private bool _inComment;
 
         public Tokenizer(string sourcePath)
         {
@@ -21,6 +22,7 @@ namespace OCompiler.Analyze.Lexical
         {
             _tokenBeginning = 0;
             _newlines = 0;
+            _inComment = false;
             using var file = new StreamReader(SourcePath, Encoding.UTF8);
             while (!file.EndOfStream)
             {
@@ -40,9 +42,27 @@ namespace OCompiler.Analyze.Lexical
             do
             {
                 var possibleToken = term[..len];
-                if (Tokens.Token.TryParse(_tokenBeginning, possibleToken, out Tokens.Token token))
+                bool parseSuccess = Tokens.Token.TryParse(_tokenBeginning, possibleToken, out Tokens.Token token);
+                if (parseSuccess)
                 {
-                    yield return token;
+                    if (token is Tokens.CommentDelimiter delimiter) {
+                        if (delimiter.IsLineCommentStart)
+                        {
+                            ReadWhile(stream, c => c != '\n');
+                        }
+                        else if (delimiter.IsBlockCommentStart)
+                        {
+                            _inComment = true;
+                        }
+                        else if (_inComment && delimiter.IsBlockCommentEnd)
+                        {
+                            _inComment = false;
+                        }
+                        break;
+                    }
+                    if (!_inComment) { 
+                        yield return token;
+                    }
                     _tokenBeginning += len;
                     _newlines += token.Literal.Count('\n');
                     term = term[len..];
@@ -50,7 +70,14 @@ namespace OCompiler.Analyze.Lexical
                 }
                 else if (--len <= 0)
                 {
-                    throw new Exception($"Unable to parse token '{possibleToken}' at line {_newlines+1}");
+                    if (_inComment)
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        throw new Exception($"Unable to parse token '{possibleToken}' at line {_newlines + 1}");
+                    }
                 }
             }
             while (term.Length > 0);

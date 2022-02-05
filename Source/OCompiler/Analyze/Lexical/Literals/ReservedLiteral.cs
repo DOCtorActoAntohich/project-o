@@ -32,6 +32,7 @@ namespace OCompiler.Analyze.Lexical.Literals
             Keyword.Loop.ToString();
             Delimiter.Dot.ToString();
             Boolean.True.ToString();
+            CommentDelimiter.BlockEnd.ToString();
         }
     }
 }
