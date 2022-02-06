@@ -11,7 +11,6 @@ namespace OCompiler.Analyze.Lexical
         public string SourcePath { get; }
         private long _tokenBeginning;
         private long _newlines;
-        private bool _inComment;
 
         public Tokenizer(string sourcePath)
         {
@@ -22,7 +21,6 @@ namespace OCompiler.Analyze.Lexical
         {
             _tokenBeginning = 0;
             _newlines = 0;
-            _inComment = false;
             using var file = new StreamReader(SourcePath, Encoding.UTF8);
             while (!file.EndOfStream)
             {
@@ -54,55 +52,52 @@ namespace OCompiler.Analyze.Lexical
 
             var stringBoundary = Literals.Delimiter.StringQuote.Value;
             var stringEscape = Literals.Delimiter.StringQuoteEscape.Value;
-            if (!_inComment)
+            if (!parseSuccess)
             {
-                if (!parseSuccess)
+                throw new Exception($"Unable to parse token '{possibleToken}' at line {_newlines + 1}");
+            }
+            if (token.Literal == stringBoundary)
+            {
+                var stringContent = "";
+                // Read in a loop since a quote might be not an actual end of string
+                do
                 {
-                    throw new Exception($"Unable to parse token '{possibleToken}' at line {_newlines + 1}");
+                    stringContent += ReadUntilSuffix(stream, stringBoundary);
                 }
-                if (token.Literal == stringBoundary)
+                while (stringContent.EndsWith(stringEscape));
+                stringContent = stringContent.RemoveSuffix(stringBoundary);
+
+                var stringNewLines = stringContent.Count('\n');
+                token = new Tokens.StringLiteral(_tokenBeginning, stringContent.Replace(stringEscape, stringBoundary));
+
+                // Note: _tokenBeginning will be increased by the amount of the quote escapes,
+                //       even though they're not passed to the token itself
+                _tokenBeginning += stringContent.Length + stringBoundary.Length;
+                _newlines += stringNewLines;
+
+                if (stream.EndOfStream)
                 {
-                    var stringContent = "";
-                    // Read in a loop since a quote might be not an actual end of string
-                    do
-                    {
-                        stringContent += ReadUntilSuffix(stream, stringBoundary);
-                    }
-                    while (stringContent.EndsWith(stringEscape));
-                    stringContent = stringContent.RemoveSuffix(stringBoundary);
-
-                    var stringNewLines = stringContent.Count('\n');
-                    token = new Tokens.StringLiteral(_tokenBeginning, stringContent.Replace(stringEscape, stringBoundary));
-
-                    // Note: _tokenBeginning will be increased by the amount of the quote escapes,
-                    // even though they're not passed to the token itself
-                    _tokenBeginning += stringContent.Length;
-                    _newlines += stringNewLines;
-
-                    if (stream.EndOfStream)
-                    {
-                        throw new Exception($"Unterminated string at line {_newlines + 1} (started at line {_newlines + 1 - stringNewLines})");
-                    }
-                    return token;
+                    throw new Exception($"Unterminated string at line {_newlines + 1} (started at line {_newlines + 1 - stringNewLines})");
                 }
-                else if (token is not Tokens.CommentDelimiter)
-                {
-                    return token;
-                }
+                return token;
+            }
+            else if (token is not Tokens.CommentDelimiter)
+            {
+                return token;
             }
 
-            while (parseSuccess && token is Tokens.CommentDelimiter)
+            while (parseSuccess && token is Tokens.CommentDelimiter delimiter)
             {
-                if (token.Literal == Literals.CommentDelimiter.LineStart.Value)
+                if (delimiter.IsLineCommentStart)
                 {
                     var comment = ReadWhile(stream, term => term[^1] != '\n');
-                    _tokenBeginning += comment.Length + 1;
+                    _tokenBeginning += comment.Length;
                     _newlines += comment.Count('\n');
                 }
-                else if (token.Literal == Literals.CommentDelimiter.BlockStart.Value)
+                else if (delimiter.IsBlockCommentStart)
                 {
                     var blockEnd = Literals.CommentDelimiter.BlockEnd.Value;
-                    var comment = ReadUntilSuffix(stream, blockEnd).RemoveSuffix(blockEnd);
+                    var comment = ReadUntilSuffix(stream, blockEnd);
                     _tokenBeginning += comment.Length;
                     _newlines += comment.Count('\n');
 
@@ -111,7 +106,7 @@ namespace OCompiler.Analyze.Lexical
                         throw new Exception($"Unterminated block comment at line {_newlines + 1} (reached end of file)");
                     }
                 }
-                else if (token.Literal == Literals.CommentDelimiter.BlockEnd.Value)
+                else if (delimiter.IsBlockCommentEnd)
                 {
                     throw new Exception($"Unexpected end of comment at line {_newlines + 1}");
                 }

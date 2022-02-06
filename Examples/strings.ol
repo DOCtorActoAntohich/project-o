@@ -1,3 +1,4 @@
+/*/* Comment /**/ /**/
 /*
   Example with strings and comments
   (both multiline and single-line)
