@@ -13,6 +13,7 @@
         public static Delimiter RightSquareBracket { get; } = new("]");
 
         public static Delimiter StringQuote { get; } = new("\"");
+        public static Delimiter StringQuoteEscape { get; } = new("\\\"");
 
         private Delimiter(string literal) : base(literal) { }
     }

@@ -27,7 +27,7 @@ namespace OCompiler.Extensions
         }
         public static bool CanBeIdentifier(this string s)
         {
-            if (!s[0].CanStartIdentifier())
+            if (s.Length == 0 || !s[0].CanStartIdentifier())
             {
                 return false;
             }
@@ -58,6 +58,11 @@ namespace OCompiler.Extensions
         }
         public static bool CanBeDouble(this string literal)
         {
+            foreach (char c in literal)
+            {
+                if (!(char.IsDigit(c) || c == '.'))
+                    return false;
+            }
             return literal.TryCastToDouble(out double _);
         }
 
@@ -67,12 +72,17 @@ namespace OCompiler.Extensions
         }
         public static bool CanBeInteger(this string literal)
         {
+            foreach (char c in literal)
+            {
+                if (!char.IsDigit(c))
+                    return false;
+            }
             return literal.TryCastToInteger(out int _);
         }
 
         public static bool IsWhitespace(this string literal)
         {
-            return string.IsNullOrWhiteSpace(literal);
+            return literal.Length > 0 && string.IsNullOrWhiteSpace(literal);
         }
 
         public static int Count(this string haystack, char needle)
@@ -86,6 +96,11 @@ namespace OCompiler.Extensions
                 }
             }
             return occurences;
+        }
+
+        public static string RemoveSuffix(this string s, string suffix)
+        {
+            return s.EndsWith(suffix) ? s[..^suffix.Length] : s;
         }
     }
 }
