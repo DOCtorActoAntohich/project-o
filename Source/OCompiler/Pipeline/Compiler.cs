@@ -1,4 +1,5 @@
 ﻿using OCompiler.Analyze.Lexical;
+using System.Linq;
 
 namespace OCompiler.Pipeline
 {
@@ -13,7 +14,7 @@ namespace OCompiler.Pipeline
         public void Run()
         {
             var tokenizer = new Tokenizer(SourceFilePath);
-            var tokens = tokenizer.GetTokens();
+            var tokens = tokenizer.GetTokens().ToList();
             Formatter.ShowHighlightedCode(tokens);
             Formatter.ShowTokens(tokens);
         }
