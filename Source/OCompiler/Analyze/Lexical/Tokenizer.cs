@@ -21,16 +21,23 @@ namespace OCompiler.Analyze.Lexical
         {
             _position = 0;
             _newlines = 0;
+            Tokens.Token token;
             using var file = new StreamReader(SourcePath, Encoding.UTF8);
-            while (!file.EndOfStream)
+            do
             {
-                yield return GetNextToken(file);
+                token = GetNextToken(file);
+                yield return token;
             }
-            yield return new Tokens.EndOfFile(_position);
+            while (token is not Tokens.EndOfFile);
         }
 
         private Tokens.Token ParseNextToken(StreamReader stream)
         {
+            if (stream.EndOfStream)
+            {
+                return new Tokens.EndOfFile(_position);
+            }
+
             // Read until we find a valid token or whitespace
             var currentTerm = ReadWhile(stream, term => (
                 !Tokens.Token.TryParse(_position, term, out var _) &&
@@ -65,9 +72,9 @@ namespace OCompiler.Analyze.Lexical
                 {
                     stringContent += ReadUntilSuffix(stream, stringBoundary);
                 }
-                while (stringContent.EndsWith(stringEscape));
+                while (!stream.EndOfStream && stringContent.EndsWith(stringEscape));
 
-                if (stream.EndOfStream)
+                if (stream.EndOfStream && (!stringContent.EndsWith(stringBoundary) || stringContent.EndsWith(stringEscape)))
                 {
                     throw new Exception($"Unterminated string started at line {_newlines + 1}, reached end of file");
                 }
@@ -93,7 +100,7 @@ namespace OCompiler.Analyze.Lexical
                     var blockEnd = Literals.CommentDelimiter.BlockEnd.Value;
                     var comment = ReadUntilSuffix(stream, blockEnd);
 
-                    if (stream.EndOfStream)
+                    if (stream.EndOfStream && !comment.EndsWith(blockEnd))
                     {
                         throw new Exception($"Unterminated block comment started at line {_newlines + 1}, reached end of file");
                     }
@@ -128,7 +135,10 @@ namespace OCompiler.Analyze.Lexical
                 !term.EndsWith(suffix)
             ));
             // Extract the last suffix char from the stream
-            result += (char)stream.Read();
+            if (!stream.EndOfStream)
+            {
+                result += (char)stream.Read();
+            }
             return result;
         }
     }
