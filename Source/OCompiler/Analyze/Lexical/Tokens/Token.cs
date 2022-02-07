@@ -17,9 +17,10 @@ namespace OCompiler.Analyze.Lexical.Tokens
 
         public static Token FromReserved(long position, Literals.ReservedLiteral literal) => literal switch
         {
-            Literals.Boolean   => new BooleanLiteral(position, literal.Value),
-            Literals.Delimiter => new Delimiter(position, literal.Value),
-            Literals.Keyword   => new Keyword(position, literal.Value),
+            Literals.Boolean          => new BooleanLiteral(position, literal.Value),
+            Literals.Delimiter        => new Delimiter(position, literal.Value),
+            Literals.Keyword          => new Keyword(position, literal.Value),
+            Literals.CommentDelimiter => new CommentDelimiter(position, literal.Value),
             _ => throw new System.ArgumentException("Argument passed is not a reserved literal")
         };
 

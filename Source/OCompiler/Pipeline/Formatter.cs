@@ -12,7 +12,8 @@ namespace OCompiler.Pipeline
             foreach (var token in tokens)
             {
                 Console.ForegroundColor = GetConsoleColor(token);
-                Console.Write(token.Literal);
+                var tokenOutput = token is StringLiteral stringToken ? $"\"{stringToken.EscapedLiteral}\"" : token.Literal;
+                Console.Write(tokenOutput);
             }
             Console.WriteLine();
         }
@@ -21,15 +22,12 @@ namespace OCompiler.Pipeline
         {
             foreach (var token in tokens)
             {
-                Console.Write($"{token.StartOffset}-{token.StartOffset + token.Length}:\t");
+                Console.Write($"{token.StartOffset}-{token.StartOffset + token.Length}:".PadLeft(10));
                 Console.ForegroundColor = GetConsoleColor(token);
-                if (token is not Whitespace)
-                {
-                    Console.Write(token.Literal);
-                }
+                var tokenOutput = token is Whitespace or EndOfFile ? "" : $" '{token.Literal}'";
+                Console.Write(tokenOutput.PadRight(15));
                 Console.ForegroundColor = ConsoleColor.Gray;
-                Console.Write("\t");
-                Console.WriteLine(token.GetType().Name);
+                Console.WriteLine(token.GetType().Name.PadRight(15));
             }
         }
 
@@ -40,6 +38,7 @@ namespace OCompiler.Pipeline
             RealLiteral    => ConsoleColor.White,
             IntegerLiteral => ConsoleColor.White,
             BooleanLiteral => ConsoleColor.Cyan,
+            StringLiteral  => ConsoleColor.Magenta,
             Delimiter      => ConsoleColor.Gray,
             Whitespace     => ConsoleColor.Gray,
             EndOfFile      => ConsoleColor.Gray,

@@ -1,0 +1,21 @@
+{
+  "$schema": "http://json.schemastore.org/launchsettings.json",
+  "profiles": {
+    "Simple example": {
+      "commandName": "Project",
+      "commandLineArgs": "$(SolutionDir)/Examples/main.ol"
+    },
+	"String and comments": {
+      "commandName": "Project",
+      "commandLineArgs": "$(SolutionDir)/Examples/strings.ol"
+    },
+    "Unterminated comment": {
+      "commandName": "Project",
+      "commandLineArgs": "$(SolutionDir)/Examples/wrong_comment.ol"
+    },
+    "Unterminated string": {
+      "commandName": "Project",
+      "commandLineArgs": "$(SolutionDir)/Examples/wrong_string.ol"
+    }
+  }
+}

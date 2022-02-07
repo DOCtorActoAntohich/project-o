@@ -1,0 +1,13 @@
+<Project>
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+    </PropertyGroup>
+    
+    <PropertyGroup>
+        <BaseOutputPath>$(SolutionDir)/Build/bin</BaseOutputPath>
+        <ProjectAssetsFile>$(SolutionDir)/Build/obj/project.assets.json</ProjectAssetsFile>
+        <BaseIntermediateOutputPath>$(SolutionDir)/Build/obj</BaseIntermediateOutputPath>
+        <_InitialBaseIntermediateOutputPath>$(SolutionDir)/Build/obj</_InitialBaseIntermediateOutputPath>
+    </PropertyGroup>
+
+</Project>
