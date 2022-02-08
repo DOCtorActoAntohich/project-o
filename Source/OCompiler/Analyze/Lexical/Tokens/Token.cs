@@ -5,7 +5,7 @@ namespace OCompiler.Analyze.Lexical.Tokens
     abstract class Token
     {
         public long StartOffset { get; }
-        public int Length { get => Literal.Length; }
+        public int Length => Literal.Length;
 
         public string Literal { get; }
 
@@ -15,20 +15,12 @@ namespace OCompiler.Analyze.Lexical.Tokens
             Literal = literal;
         }
 
-        public static Token FromReserved(long position, Literals.ReservedLiteral literal) => literal switch
-        {
-            Literals.Boolean          => new BooleanLiteral(position, literal.Value),
-            Literals.Delimiter        => new Delimiter(position, literal.Value),
-            Literals.Keyword          => new Keyword(position, literal.Value),
-            Literals.CommentDelimiter => new CommentDelimiter(position, literal.Value),
-            _ => throw new System.ArgumentException("Argument passed is not a reserved literal")
-        };
-
         public static bool TryParse(long position, string literal, out Token token)
         {
-            if (literal.TryGetReservedLiteral(out var reservedLiteral))
+            if (ReservedTokens.IsReserved(literal))
             {
-                token = FromReserved(position, reservedLiteral);
+                var tokenConstructor = ReservedTokens.GetByLiteral(literal);
+                token = tokenConstructor(position);
                 return true;
             }
             else if (literal.CanBeInteger())
@@ -51,7 +43,7 @@ namespace OCompiler.Analyze.Lexical.Tokens
                 token = new Whitespace(position, literal);
                 return true;
             }
-            token = null;
+            token = new UnexistingToken(position);
             return false;
         }
     }

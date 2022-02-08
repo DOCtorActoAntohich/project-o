@@ -1,15 +1,12 @@
-﻿using OCompiler.Analyze.Lexical.Literals;
-
-namespace OCompiler.Analyze.Lexical.Tokens
+﻿namespace OCompiler.Analyze.Lexical.Tokens
 {
     internal class StringLiteral : Token
     {
-        public string EscapedLiteral {
-            get => Literal.Replace(
-                Literals.Delimiter.StringQuote.Value,
-                Literals.Delimiter.StringQuoteEscape.Value
-            );
-        }
+        public string EscapedLiteral => Literal.Replace(
+            Delimiters.StringQuote.Literal,
+            Delimiters.StringQuoteEscape.Literal
+        );
+
         public StringLiteral(long startOffset, string literal) : base(startOffset, literal) { }
     }
 }

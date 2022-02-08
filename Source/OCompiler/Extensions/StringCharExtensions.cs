@@ -1,16 +1,11 @@
-﻿using System.Globalization;
-using OCompiler.Analyze.Lexical.Literals;
+﻿using System;
+using System.Globalization;
+using OCompiler.Analyze.Lexical.Tokens;
 
 namespace OCompiler.Extensions
 {
     internal static class StringCharExtensions
     {
-        public static bool TryGetReservedLiteral(this string literal, out ReservedLiteral result)
-        {
-            result = ReservedLiteral.GetByValue(literal);
-            return result != ReservedLiteral.Empty;
-        }
-
         public static bool IsIdentifierOrNumber(this char c)
         {
             // '.' is included for Real numbers
