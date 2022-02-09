@@ -169,6 +169,16 @@ If the callee can return a value of some time, it must be specified after `retur
 return [expression]
 ```
 
+## Strings
+
+String literals are denoted by wrapping any text with double quote symbol `"` as follows:
+
+```
+var text : "This is a string literal"
+```
+
+Strings are mutable because technically they are arrays of Integers, which allows for built-in unicode support.
+
 ## Standard library
 
 Standard library includes a number of classes that are present in any program by default (so there is no need to explicitly import them).
