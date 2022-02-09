@@ -6,23 +6,23 @@ For the language syntax, please refer to formal grammar or code examples.
 
 ## Program
 
-The program is a set of class declarations, i.e. in the global scope there can only be class declarations.
+The program is a set of class declarations, i.e., in the global scope, there can only be class declarations.
 
-The entry point of the program is any constructor of any class. A user must specify the entry point of a program (the name of the class) as the first command-line argument. Parameters for constructor should also be supplied.
+The entry point of the program is any constructor of any class. A user must specify the entry point of a program (the name of the class) as the first command-line argument. Parameters for the constructor should also be supplied.
 
-The program will create an unnamed instance of this class with this constructor and and transfer control to it. The program finishes executing when the specified constructor returns (finishes).
+The program will create an unnamed instance of this class with this constructor and transfer control to it. The program finishes executing when the specified constructor returns (finishes).
 
 ## Object-oriented programming rules
 
 ### About types
 
-The only concept of type system in Project O is class ("a class is a type").
-Therefore, to define a new type, a programmer has to declare an new class.
+The only concept of the type system in Project O is class ("a class is a type").
+Therefore, to define a new type, a programmer has to declare a new class.
 
 Simply put, every type is a class (including base types). Thus, every object is an instance of some class.
 Every type is a descendant of a base class (called `Class`).
 
-O Language is typed, so the type of every variable is uniquely determined by its initial value.
+O Language is typed, so the type of every variable is uniquely determined by its initial value and type keyword.
 
 Class is a collection of logically related resources (**fields**) and some action on them (**methods**). Fields define the current state of object, and methods define its behavior.
 
@@ -30,7 +30,7 @@ Class is a collection of logically related resources (**fields**) and some actio
 
 ### Class declarations
 
-At compile time a compiler should know (i.e. a programmer should define):
+At compile time, a compiler should know (i.e. a programmer should define):
   - Name, the type of **fields**, and their initial values.
   - Names of **methods**, possibly followed by a list of parameters (which obey the rules for fields), and a return value if it's not void.
   - Special methods - **Constructors**.
@@ -47,17 +47,17 @@ Moreover, a developer can extend a child class by adding new fields and methods.
 
 Formally speaking, inheritance relationship is transitive: `C -> A` iff `B -> A` and `C -> B` (where `->` operator defines `inherits from` relationship).
 
-Multiple inheritance is evil, and is thus strictly prohibited.
+Multiple inheritances are evil and are thus strictly prohibited.
 
 ### Polymorphism
 
-Objects of a child class can always be casted to a parent class type. However, the inverse cast (from parent to child) is allowed only when the object was created with type of a child class and previously casted to a parent class type.
+Objects of a child class can always be cast to a parent class type. However, the inverse cast (from parent to child) is allowed only when the object was created with type of a child class and previously cast to a parent class type.
 
-Within a single class, a programmer is allowed to define **multiple methods** with **identical name and return type**, but **different input parameters**. Such case is called **method overloading**, and these methods are treated as different entities. Note that fields cannot be overloaded.
+Within a single class, a programmer is allowed to define **multiple methods** with **identical name and return type**, but **different input parameters**. Such a case is called **method overloading**, and these methods are treated as different entities. Note that fields cannot be overloaded.
 
-In a child class, a programmer can define methods with **fully identical signature** to a parent class. In this case, the method of the parent will be **overriden** by the method of the child.
+In a child class, a programmer can define methods with **fully identical signature** to a parent class. In this case, the method of the parent will be **overridden** by the method of the child.
 
-When an object is casted to a parent type, and then an overriden method is called, the method of the child type will be chosen.
+When an object is cast to a parent type, and then an overridden  method is called, the method of the child type will be chosen.
 
 Methods with identical parameters but different return types are **not** allowed.
 
@@ -66,9 +66,9 @@ Methods with identical parameters but different return types are **not** allowed
 There is no explicit mechanism of `public`, `protected`, and `private` fields or methods. However, they are implicitly implemented as follows:
   - Every field is public.
   - Fields do not support write operations from outside the class. New values can be written only in methods of this class.
-  - However, reading fields is allowed from anywhere.
+  - However, reading fields are allowed from anywhere.
   - All methods are public.
-  - Calling methods of read-only fields is allowed. The programmer is responsible for side-effects.
+  - Calling methods of read-only fields are allowed. The programmer is responsible for side-effects.
 
 ### Abstraction
 
@@ -177,11 +177,11 @@ String literals are denoted by wrapping any text with double quote symbol `"` as
 var text : "This is a string literal"
 ```
 
-Strings are mutable because technically they are arrays of Integers, which allows for built-in unicode support.
+Strings are mutable because technically they are arrays of Integers, which allows for built-in Unicode support.
 
 ## Standard library
 
-Standard library includes a number of classes that are present in any program by default (so there is no need to explicitly import them).
+The tandard library includes a number of classes that are present in any program by default (so there is no need to explicitly import them).
 
 ### List of types for storage and algorithms
 
