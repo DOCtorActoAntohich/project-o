@@ -61,8 +61,8 @@ namespace OCompiler.Analyze.Lexical
         {
             var token = ParseNextToken(stream);
 
-            var stringBoundary = Literals.Delimiter.StringQuote.Value;
-            var stringEscape = Literals.Delimiter.StringQuoteEscape.Value;
+            var stringBoundary = Tokens.Delimiters.StringQuote.Literal;
+            var stringEscape = Tokens.Delimiters.StringQuoteEscape.Literal;
 
             if (token.Literal == stringBoundary)
             {
@@ -90,14 +90,14 @@ namespace OCompiler.Analyze.Lexical
 
             while (token is Tokens.CommentDelimiter delimiter)
             {
-                if (delimiter.IsLineCommentStart)
+                if (delimiter is Tokens.CommentDelimiters.LineStart)
                 {
                     var comment = ReadWhile(stream, term => term[^1] != '\n');
                     _position += comment.Length;
                 }
-                else if (delimiter.IsBlockCommentStart)
+                else if (delimiter is Tokens.CommentDelimiters.BlockStart)
                 {
-                    var blockEnd = Literals.CommentDelimiter.BlockEnd.Value;
+                    var blockEnd = Tokens.CommentDelimiters.BlockEnd.Literal;
                     var comment = ReadUntilSuffix(stream, blockEnd);
 
                     if (stream.EndOfStream && !comment.EndsWith(blockEnd))
@@ -108,7 +108,7 @@ namespace OCompiler.Analyze.Lexical
                     _position += comment.Length;
                     _newlines += comment.Count('\n');
                 }
-                else if (delimiter.IsBlockCommentEnd)
+                else if (delimiter is Tokens.CommentDelimiters.BlockEnd)
                 {
                     throw new Exception($"Unexpected end of comment at line {_newlines + 1}");
                 }
