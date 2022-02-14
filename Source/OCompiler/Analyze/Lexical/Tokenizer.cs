@@ -10,7 +10,7 @@ namespace OCompiler.Analyze.Lexical
     {
         public string SourcePath { get; }
         private long _position;
-        private long _newlines;
+        private long _currentLine;
 
         public Tokenizer(string sourcePath)
         {
@@ -20,7 +20,7 @@ namespace OCompiler.Analyze.Lexical
         public IEnumerable<Tokens.Token> GetTokens()
         {
             _position = 0;
-            _newlines = 0;
+            _currentLine = 1;
             Tokens.Token token;
             using var file = new StreamReader(SourcePath, Encoding.UTF8);
             do
@@ -31,7 +31,7 @@ namespace OCompiler.Analyze.Lexical
             while (token is not Tokens.EndOfFile);
         }
 
-        private Tokens.Token ParseNextToken(StreamReader stream)
+        private Tokens.Token GetTokenCandidate(StreamReader stream)
         {
             if (stream.EndOfStream)
             {
@@ -42,41 +42,70 @@ namespace OCompiler.Analyze.Lexical
             var currentTerm = ReadWhile(stream, term => (
                 !Tokens.Token.TryParse(_position, term, out var _) &&
                 (term.Length == 0 || !char.IsWhiteSpace(term[^1]))
-            ));
+            ), strict: false);
 
             // Proceed reading while it still represents a valid token
-            currentTerm += ReadWhile(stream, suffix => Tokens.Token.TryParse(_position, currentTerm + suffix, out var _));
+            currentTerm += ReadWhile(stream, suffix => Tokens.Token.TryParse(_position, currentTerm + suffix, out var _), strict: false);
 
             bool parseSuccess = Tokens.Token.TryParse(_position, currentTerm, out var token);
             if (!parseSuccess)
             {
-                throw new Exception($"Unable to parse token '{currentTerm}' at line {_newlines + 1}");
+                throw new Exception($"Unable to parse token '{currentTerm}' at line {_currentLine}");
             }
             _position += currentTerm.Length;
-            _newlines += currentTerm.Count('\n');
+            _currentLine += currentTerm.Count('\n');
             return token;
         }
 
         private Tokens.Token GetNextToken(StreamReader stream)
         {
-            var token = ParseNextToken(stream);
+            var token = GetTokenCandidate(stream);
 
-            var stringBoundary = Tokens.Delimiters.StringQuote.Literal;
-            var stringEscape = Tokens.Delimiters.StringQuoteEscape.Literal;
-
-            if (token.Literal == stringBoundary)
+            while (token is Tokens.CommentDelimiter startDelimiter)
             {
-                var stringContent = "";
-                // Read in a loop since a quote might be not an actual end of string
-                do
+                // Read and skip all the comments
+                var commentEnd = startDelimiter switch
                 {
-                    stringContent += ReadUntilSuffix(stream, stringBoundary);
+                    Tokens.CommentDelimiters.LineStart => "\n",
+                    Tokens.CommentDelimiters.BlockStart => Tokens.CommentDelimiters.BlockEnd.Literal,
+                    Tokens.CommentDelimiters.BlockEnd => throw new Exception($"Unexpected end of comment at line {_currentLine}"),
+                    _ => throw new Exception($"Unknown comment delimiter at line {_currentLine}")
+                };
+                try
+                {
+                    var comment = ReadUntilSuffix(stream, commentEnd);
+                    _position += comment.Length;
+                    _currentLine += comment.Count('\n');
                 }
-                while (!stream.EndOfStream && stringContent.EndsWith(stringEscape));
-
-                if (stream.EndOfStream && (!stringContent.EndsWith(stringBoundary) || stringContent.EndsWith(stringEscape)))
+                catch (EndOfStreamException)
                 {
-                    throw new Exception($"Unterminated string started at line {_newlines + 1}, reached end of file");
+                    if (startDelimiter is Tokens.CommentDelimiters.BlockStart)
+                    {
+                        throw new Exception($"Unterminated block comment started at line {_currentLine}, reached end of file");
+                    }
+                }
+
+                token = GetTokenCandidate(stream);
+            }
+
+            if (token is Tokens.Delimiters.StringQuote)
+            {
+                // Read and return the whole string
+                var stringBoundary = Tokens.Delimiters.StringQuote.Literal;
+                var stringEscape = Tokens.Delimiters.StringQuoteEscape.Literal;
+                var stringContent = "";
+                try
+                {
+                    // Read in a loop since a quote might be not an actual end of string
+                    do
+                    {
+                        stringContent += ReadUntilSuffix(stream, stringBoundary);
+                    }
+                    while (stringContent.EndsWith(stringEscape));
+                }
+                catch (EndOfStreamException)
+                {
+                    throw new Exception($"Unterminated string started at line {_currentLine}, reached end of file");
                 }
 
                 token = new Tokens.StringLiteral(
@@ -85,48 +114,29 @@ namespace OCompiler.Analyze.Lexical
                 );
 
                 _position += stringContent.Length;
-                _newlines += stringContent.Count('\n');
-            }
-
-            while (token is Tokens.CommentDelimiter delimiter)
-            {
-                if (delimiter is Tokens.CommentDelimiters.LineStart)
-                {
-                    var comment = ReadWhile(stream, term => term[^1] != '\n');
-                    _position += comment.Length;
-                }
-                else if (delimiter is Tokens.CommentDelimiters.BlockStart)
-                {
-                    var blockEnd = Tokens.CommentDelimiters.BlockEnd.Literal;
-                    var comment = ReadUntilSuffix(stream, blockEnd);
-
-                    if (stream.EndOfStream && !comment.EndsWith(blockEnd))
-                    {
-                        throw new Exception($"Unterminated block comment started at line {_newlines + 1}, reached end of file");
-                    }
-
-                    _position += comment.Length;
-                    _newlines += comment.Count('\n');
-                }
-                else if (delimiter is Tokens.CommentDelimiters.BlockEnd)
-                {
-                    throw new Exception($"Unexpected end of comment at line {_newlines + 1}");
-                }
-
-                token = ParseNextToken(stream);
+                _currentLine += stringContent.Count('\n');
             }
 
             return token;
         }
 
-        private static string ReadWhile(StreamReader stream, Func<string, bool> term_condition)
+        private static string ReadWhile(StreamReader stream, Func<string, bool> term_condition, bool strict = true)
         {
             string term = "";
-            while (!stream.EndOfStream && term_condition(term + (char)stream.Peek()))
+            while (AssertNotEnd(stream, strict) && term_condition(term + (char)stream.Peek()))
             {
                 term += (char)stream.Read();
             }
             return term;
+        }
+
+        private static bool AssertNotEnd(StreamReader stream, bool strict)
+        {
+            if (stream.EndOfStream && strict)
+            {
+                throw new EndOfStreamException();
+            }
+            return !stream.EndOfStream;
         }
 
         private static string ReadUntilSuffix(StreamReader stream, string suffix)
