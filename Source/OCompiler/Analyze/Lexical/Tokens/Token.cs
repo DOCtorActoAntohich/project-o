@@ -4,14 +4,13 @@ namespace OCompiler.Analyze.Lexical.Tokens
 {
     abstract class Token
     {
-        public long StartOffset { get; }
+        public long StartOffset { get; protected set; }
         public int Length => Literal.Length;
 
         public string Literal { get; }
 
-        public Token(long startOffset, string literal)
+        protected Token(string literal)
         {
-            StartOffset = startOffset;
             Literal = literal;
         }
 
@@ -20,31 +19,30 @@ namespace OCompiler.Analyze.Lexical.Tokens
             if (ReservedTokens.IsReserved(literal))
             {
                 var tokenConstructor = ReservedTokens.GetByLiteral(literal);
-                token = tokenConstructor(position);
-                return true;
+                token = tokenConstructor();
             }
             else if (literal.CanBeInteger())
             {
-                token = new IntegerLiteral(position, literal);
-                return true;
+                token = new IntegerLiteral(literal);
             }
             else if (literal.CanBeDouble())
             {
-                token = new RealLiteral(position, literal);
-                return true;
+                token = new RealLiteral(literal);
             }
             else if (literal.CanBeIdentifier())
             {
-                token = new Identifier(position, literal);
-                return true;
+                token = new Identifier(literal);
             }
             else if (literal.IsWhitespace())
             {
-                token = new Whitespace(position, literal);
-                return true;
+                token = new Whitespace(literal);
             }
-            token = new UnexistingToken(position);
-            return false;
+            else {
+                token = new UnexistingToken();
+            }
+
+            token.StartOffset = position;
+            return token is not UnexistingToken;
         }
     }
 }

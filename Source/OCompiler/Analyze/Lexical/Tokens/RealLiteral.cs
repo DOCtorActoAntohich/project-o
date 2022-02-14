@@ -5,7 +5,7 @@ namespace OCompiler.Analyze.Lexical.Tokens
     internal class RealLiteral : Token
     {
         public double Value { get; }
-        public RealLiteral(long startOffset, string literal) : base(startOffset, literal)
+        public RealLiteral(string literal) : base(literal)
         {
             if (!literal.TryCastToDouble(out double result))
             {

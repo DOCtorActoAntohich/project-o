@@ -2,6 +2,6 @@
 {
     internal class Keyword : Token
     {
-        protected Keyword(long startOffset, string literal) : base(startOffset, literal) { }
+        protected Keyword(string literal) : base(literal) { }
     }
 }

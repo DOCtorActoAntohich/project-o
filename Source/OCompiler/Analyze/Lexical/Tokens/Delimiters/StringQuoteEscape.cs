@@ -4,8 +4,6 @@
     {
         new public static string Literal => "\\\"";
 
-        public StringQuoteEscape(long startOffset) : base(startOffset, Literal) { }
-
-        static StringQuoteEscape() => ReservedTokens.RegisterToken(Literal, (pos) => new StringQuoteEscape(pos));
+        public StringQuoteEscape() : base(Literal) { }
     }
 }

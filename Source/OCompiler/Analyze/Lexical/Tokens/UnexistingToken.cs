@@ -2,6 +2,6 @@
 {
     internal class UnexistingToken : Token
     {
-        public UnexistingToken(long position) : base(position, "") { }
+        public UnexistingToken() : base("") { }
     }
 }

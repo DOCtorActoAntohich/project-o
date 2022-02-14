@@ -4,8 +4,6 @@
     {
         new public static string Literal => "/*";
 
-        public BlockStart(long startOffset) : base(startOffset, Literal) { }
-
-        static BlockStart() => ReservedTokens.RegisterToken(Literal, (pos) => new BlockStart(pos));
+        public BlockStart() : base(Literal) { }
     }
 }

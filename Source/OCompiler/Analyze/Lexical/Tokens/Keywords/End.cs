@@ -4,8 +4,6 @@
     {
         new public static string Literal => "end";
 
-        public End(long startOffset) : base(startOffset, Literal) { }
-
-        static End() => ReservedTokens.RegisterToken(Literal, (pos) => new End(pos));
+        public End() : base(Literal) { }
     }
 }

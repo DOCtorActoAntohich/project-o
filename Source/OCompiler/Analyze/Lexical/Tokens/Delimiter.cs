@@ -2,6 +2,6 @@
 {
     internal class Delimiter : Token
     {
-        protected Delimiter(long startOffset, string literal) : base(startOffset, literal) { }
+        protected Delimiter(string literal) : base(literal) { }
     }
 }

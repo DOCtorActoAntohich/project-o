@@ -8,56 +8,48 @@ namespace OCompiler.Analyze.Lexical.Tokens
 {
     static class ReservedTokens
     {
-        private static Dictionary<string, Func<long, Token>> TokenConstructors { get; } = new();
+        private static Dictionary<string, Func<Token>> TokenConstructors { get; } = new();
 
-        public static void RegisterToken(string literal, Func<long, Token> constructor)
+        public static void RegisterToken<T>() where T : Token, new()
         {
-            TokenConstructors.TryAdd(literal, constructor);
+            TokenConstructors.Add(new T().Literal, () => new T());
         }
 
         static ReservedTokens()
         {
-            // This will call all the static constructors of the reserved tokens,
-            // which will add them to the TokenConstructors list.
-            var literals = new string[] {
-                BooleanLiterals.True.Literal,
-                BooleanLiterals.False.Literal,
-                CommentDelimiters.BlockEnd.Literal,
-                CommentDelimiters.BlockStart.Literal,
-                CommentDelimiters.LineStart.Literal,
-                Delimiters.Dot.Literal,
-                Delimiters.Colon.Literal,
-                Delimiters.Comma.Literal,
-                Delimiters.Assign.Literal,
-                Delimiters.StringQuote.Literal,
-                Delimiters.StringQuoteEscape.Literal,
-                Delimiters.LeftParenthesis.Literal,
-                Delimiters.LeftSquareBracket.Literal,
-                Delimiters.RightParenthesis.Literal,
-                Delimiters.RightSquareBracket.Literal,
-                Keywords.Var.Literal,
-                Keywords.If.Literal,
-                Keywords.Then.Literal,
-                Keywords.Else.Literal,
-                Keywords.Class.Literal,
-                Keywords.Extends.Literal,
-                Keywords.This.Literal,
-                Keywords.Method.Literal,
-                Keywords.Is.Literal,
-                Keywords.End.Literal,
-                Keywords.Return.Literal,
-                Keywords.While.Literal,
-                Keywords.Loop.Literal,
-            };
-            if (literals.Length != TokenConstructors.Count)
-            {
-                throw new Exception("Some of reserved tokens have not been registered.");
-            }
+            RegisterToken<BooleanLiterals.True>();
+            RegisterToken<BooleanLiterals.False>();
+            RegisterToken<CommentDelimiters.BlockEnd>();
+            RegisterToken<CommentDelimiters.BlockStart>();
+            RegisterToken<CommentDelimiters.LineStart>();
+            RegisterToken<Delimiters.Dot>();
+            RegisterToken<Delimiters.Colon>();
+            RegisterToken<Delimiters.Comma>();
+            RegisterToken<Delimiters.Assign>();
+            RegisterToken<Delimiters.StringQuote>();
+            RegisterToken<Delimiters.StringQuoteEscape>();
+            RegisterToken<Delimiters.LeftParenthesis>();
+            RegisterToken<Delimiters.LeftSquareBracket>();
+            RegisterToken<Delimiters.RightParenthesis>();
+            RegisterToken<Delimiters.RightSquareBracket>();
+            RegisterToken<Keywords.Var>();
+            RegisterToken<Keywords.If>();
+            RegisterToken<Keywords.Then>();
+            RegisterToken<Keywords.Else>();
+            RegisterToken<Keywords.Class>();
+            RegisterToken<Keywords.Extends>();
+            RegisterToken<Keywords.This>();
+            RegisterToken<Keywords.Method>();
+            RegisterToken<Keywords.Is>();
+            RegisterToken<Keywords.End>();
+            RegisterToken<Keywords.Return>();
+            RegisterToken<Keywords.While>();
+            RegisterToken<Keywords.Loop>();
         }
 
-        public static Func<long, Token> GetByLiteral(string literal)
+        public static Func<Token> GetByLiteral(string literal)
         {
-            return TokenConstructors.GetValueOrDefault(literal, pos => new UnexistingToken(pos));
+            return TokenConstructors.GetValueOrDefault(literal, () => new UnexistingToken());
         }
 
         public static bool IsReserved(string literal)

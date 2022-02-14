@@ -5,7 +5,7 @@ namespace OCompiler.Analyze.Lexical.Tokens
     internal class IntegerLiteral : Token
     {
         public int Value { get; }
-        public IntegerLiteral(long startOffset, string literal) : base(startOffset, literal)
+        public IntegerLiteral(string literal) : base(literal)
         {
             if (!literal.TryCastToInteger(out int result))
             {

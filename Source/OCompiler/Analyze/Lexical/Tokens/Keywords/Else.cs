@@ -4,8 +4,6 @@
     {
         new public static string Literal => "else";
 
-        public Else(long startOffset) : base(startOffset, Literal) { }
-
-        static Else() => ReservedTokens.RegisterToken(Literal, (pos) => new Else(pos));
+        public Else() : base(Literal) { }
     }
 }
