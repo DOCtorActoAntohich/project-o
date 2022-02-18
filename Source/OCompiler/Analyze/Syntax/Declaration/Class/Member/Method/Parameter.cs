@@ -1,7 +1,6 @@
 using System;
-using System.Collections.Generic;
 using OCompiler.Analyze.Lexical.Tokens;
-using OCompiler.Extensions;
+using OCompiler.Utils;
 
 namespace OCompiler.Analyze.Syntax.Declaration.Class.Member.Method;
 
@@ -10,7 +9,7 @@ internal class Parameter
     public Identifier Name { get; }
     public Identifier Type { get; }
 
-    public static Boolean TryParse(IEnumerator<Token> tokens, out Parameter? parameter)
+    public static Boolean TryParse(TokenEnumerator tokens, out Parameter? parameter)
     {
         // Name.
         if (tokens.Current() is not Identifier name)
@@ -42,5 +41,10 @@ internal class Parameter
     {
         Name = name;
         Type = type;
+    }
+
+    public override string ToString()
+    {
+        return $"{Name.Literal}: {Type.Literal}";
     }
 }

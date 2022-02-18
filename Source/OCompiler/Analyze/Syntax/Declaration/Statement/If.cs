@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
-using OCompiler.Analyze.Lexical.Tokens;
-using OCompiler.Extensions;
+using System.Text;
+using OCompiler.Utils;
 
 namespace OCompiler.Analyze.Syntax.Declaration.Statement;
 
@@ -10,7 +10,7 @@ internal class If: Statement
     public List<INestable> Body { get; }
     public List<INestable>? ElseBody { get; }
 
-    public static Boolean TryParse(IEnumerator<Token> tokens, out If? @if)
+    public static Boolean TryParse(TokenEnumerator tokens, out If? @if)
     {
         // Keyword.
         if (tokens.Current() is not Lexical.Tokens.Keywords.If)
@@ -70,5 +70,28 @@ internal class If: Statement
     {
         Body = body;
         ElseBody = elseBody;
+    }
+    
+    public override String ToString(String prefix)
+    {
+        StringBuilder @string = new StringBuilder();
+        
+        @string.AppendLine($"if {Expression}");
+
+
+        if (ElseBody is null)
+        {
+            @string.Append(Declaration.Body.ToString(Body, prefix));
+            return @string.ToString();
+        }
+        
+        @string.AppendLine(Declaration.Body.ToString(Body, prefix));
+        
+        // Else.
+        @string.Append(prefix);
+        @string.AppendLine("else");
+        @string.Append(Declaration.Body.ToString(ElseBody, prefix));
+        
+        return @string.ToString();
     }
 }

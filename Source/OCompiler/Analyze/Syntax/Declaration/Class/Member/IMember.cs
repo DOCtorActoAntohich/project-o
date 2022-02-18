@@ -1,6 +1,5 @@
 using System;
-using System.Collections.Generic;
-using OCompiler.Analyze.Lexical.Tokens;
+using OCompiler.Utils;
 
 namespace OCompiler.Analyze.Syntax.Declaration.Class.Member;
 
@@ -8,7 +7,7 @@ namespace OCompiler.Analyze.Syntax.Declaration.Class.Member;
 
 internal interface IMember
 {
-    public static Boolean TryParse(IEnumerator<Token> tokens, out IMember? member)
+    public static Boolean TryParse(TokenEnumerator tokens, out IMember? member)
     {
         if (Field.TryParse(tokens, out Field? field))
         {
@@ -31,4 +30,6 @@ internal interface IMember
         member = null;
         return false;
     }
+
+    public String ToString(String prefix);
 }

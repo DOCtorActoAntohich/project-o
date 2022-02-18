@@ -1,13 +1,13 @@
-using System.Collections.Generic;
-using OCompiler.Analyze.Lexical.Tokens;
+using System;
+using OCompiler.Utils;
 
 namespace OCompiler.Analyze.Syntax.Declaration.Statement;
 
-internal class Statement: INestable
+internal abstract class Statement: INestable
 {
     public Expression.Expression? Expression { get; }
 
-    public static bool TryParse(IEnumerator<Token> tokens, out Statement? statement)
+    public static bool TryParse(TokenEnumerator tokens, out Statement? statement)
     {
         if (Assignment.TryParse(tokens, out Assignment? field))
         {
@@ -26,7 +26,13 @@ internal class Statement: INestable
             statement = @while;
             return true;
         }
-
+        
+        if (Return.TryParse(tokens, out Return? @return))
+        {
+            statement = @return;
+            return true;
+        }
+        
         statement = null;
         return false;
     }
@@ -35,4 +41,6 @@ internal class Statement: INestable
     {
         Expression = expression;
     }
+
+    public abstract string ToString(String prefix);
 }

@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
-using OCompiler.Analyze.Lexical.Tokens;
+using System.Text;
 using OCompiler.Analyze.Syntax.Declaration.Class.Member.Method;
-using OCompiler.Extensions;
+using OCompiler.Utils;
 
 namespace OCompiler.Analyze.Syntax.Declaration.Class.Member;
 
@@ -12,7 +12,7 @@ internal class Constructor: IMember
     
     public List<INestable> Body { get; }
     
-    public static Boolean TryParse(IEnumerator<Token> tokens, out Constructor? constructor)
+    public static Boolean TryParse(TokenEnumerator tokens, out Constructor? constructor)
     {
         // Keyword.
         if (tokens.Current() is not Lexical.Tokens.Keywords.This)
@@ -57,5 +57,15 @@ internal class Constructor: IMember
     {
         Parameters = parameters;
         Body = body;
+    }
+    
+    public String ToString(String prefix)
+    {
+        StringBuilder @string = new StringBuilder();
+        
+        @string.AppendLine($"Constructor({Member.Method.Parameters.ToString(Parameters)})");
+        @string.Append(Declaration.Body.ToString(Body, prefix));
+
+        return @string.ToString();
     }
 }

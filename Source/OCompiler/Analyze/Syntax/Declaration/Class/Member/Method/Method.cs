@@ -1,7 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Text;
 using OCompiler.Analyze.Lexical.Tokens;
-using OCompiler.Extensions;
+using OCompiler.Utils;
 
 namespace OCompiler.Analyze.Syntax.Declaration.Class.Member.Method;
 
@@ -12,7 +13,7 @@ internal class Method: IMember
     public Identifier? ReturnType { get; }
     public List<INestable> Body { get; }
     
-    public static Boolean TryParse(IEnumerator<Token> tokens, out Method? method)
+    public static Boolean TryParse(TokenEnumerator tokens, out Method? method)
     {
         // Keyword.
         if (tokens.Current() is not Lexical.Tokens.Keywords.Method)
@@ -81,5 +82,16 @@ internal class Method: IMember
         Parameters = parameters;
         ReturnType = returnType;
         Body = body;
+    }
+    
+    public String ToString(String prefix)
+    {
+        StringBuilder @string = new StringBuilder();
+
+        String returnType = ReturnType is null ? "None" : ReturnType.Literal;
+        @string.AppendLine($"{Name.Literal}({Member.Method.Parameters.ToString(Parameters)}) -> {returnType}");
+        @string.Append(Declaration.Body.ToString(Body, prefix));
+        
+        return @string.ToString();
     }
 }

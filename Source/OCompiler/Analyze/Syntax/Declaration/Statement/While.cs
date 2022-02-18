@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
-using OCompiler.Analyze.Lexical.Tokens;
-using OCompiler.Extensions;
+using System.Text;
+using OCompiler.Utils;
 
 namespace OCompiler.Analyze.Syntax.Declaration.Statement;
 
@@ -9,7 +9,7 @@ internal class While: Statement
 {
     public List<INestable> Body { get; }
     
-    public static Boolean TryParse(IEnumerator<Token> tokens, out While? @while)
+    public static Boolean TryParse(TokenEnumerator tokens, out While? @while)
     {
         // Keyword.
         if (tokens.Current() is not Lexical.Tokens.Keywords.While)
@@ -45,7 +45,10 @@ internal class While: Statement
         {
             throw new Exception($"Keyword 'end' expected at position {tokens.Current().StartOffset}.");
         }
-
+        
+        // Get next token.
+        tokens.Next();
+        
         @while = new While(expression!, body!);
         return true;
     }
@@ -53,5 +56,15 @@ internal class While: Statement
     private While(Expression.Expression expression, List<INestable> body) : base(expression)
     {
         Body = body;
+    }
+
+    public override String ToString(String prefix)
+    {
+        StringBuilder @string = new StringBuilder();
+
+        @string.AppendLine($"while {Expression}");
+        @string.Append(Declaration.Body.ToString(Body, prefix));
+        
+        return @string.ToString();
     }
 }

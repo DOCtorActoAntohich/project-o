@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Text;
 using OCompiler.Analyze.Lexical.Tokens;
 
 namespace OCompiler.Analyze.Syntax.Declaration.Expression;
@@ -11,5 +12,10 @@ internal class Call : Expression
         base(token, child, parent)
     {
         Arguments = arguments;
+    }
+    
+    public override string ToString()
+    {
+        return $"{Token.Literal}{Declaration.Expression.Arguments.ToString(Arguments)}";
     }
 }

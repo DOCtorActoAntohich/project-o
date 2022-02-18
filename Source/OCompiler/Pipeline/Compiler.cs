@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using OCompiler.Analyze.Lexical;
-using System.Linq;
 using OCompiler.Analyze.Lexical.Tokens;
 using OCompiler.Analyze.Syntax;
 using OCompiler.Analyze.Syntax.Declaration.Class;
+using OCompiler.Utils;
 
 namespace OCompiler.Pipeline
 {
@@ -22,16 +22,14 @@ namespace OCompiler.Pipeline
             //var tokens = tokenizer.GetTokens().ToList();
             //Formatter.ShowHighlightedCode(tokens);
             //Formatter.ShowTokens(tokens);
-            IEnumerator<Token> tokens = tokenizer.GetTokens().GetEnumerator();
-
-            Boolean next = tokens.MoveNext();
+            IEnumerable<Token> tokens = tokenizer.GetTokens();
             
-            if (!Tree.TryParse(tokens, out List<Class>? tree))
+            if (!Tree.TryParse(new TokenEnumerator(tokens), out List<Class>? tree))
             {
                 throw new Exception("No classes.");
             }
             
-            Console.Write(tree);
+            Console.Write(Tree.ToString(tree));
         }
     }
 }

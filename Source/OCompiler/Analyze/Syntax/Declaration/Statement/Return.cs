@@ -1,13 +1,11 @@
 using System;
-using System.Collections.Generic;
-using OCompiler.Analyze.Lexical.Tokens;
-using OCompiler.Extensions;
+using OCompiler.Utils;
 
 namespace OCompiler.Analyze.Syntax.Declaration.Statement;
 
 internal class Return: Statement
 {
-    public static Boolean TryParse(IEnumerator<Token> tokens, out Return? @return)
+    public static Boolean TryParse(TokenEnumerator tokens, out Return? @return)
     {
         // Keyword.
         if (tokens.Current() is not Lexical.Tokens.Keywords.Return)
@@ -25,4 +23,14 @@ internal class Return: Statement
     }
 
     private Return(Expression.Expression? expression): base(expression) { }
+    
+    public override String ToString(String _)
+    {
+        return ToString();
+    }
+
+    public override string ToString()
+    {
+        return $"return {Expression}";
+    }
 }

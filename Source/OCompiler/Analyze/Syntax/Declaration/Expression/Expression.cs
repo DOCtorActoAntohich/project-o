@@ -1,7 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Text;
 using OCompiler.Analyze.Lexical.Tokens;
-using OCompiler.Extensions;
+using OCompiler.Utils;
 
 namespace OCompiler.Analyze.Syntax.Declaration.Expression;
 
@@ -11,7 +12,7 @@ internal class Expression: INestable
     public Expression? Child { get; private set; }
     public Token Token { get; }
     
-    public static Boolean TryParse(IEnumerator<Token> tokens, out Expression? expression)
+    public static Boolean TryParse(TokenEnumerator tokens, out Expression? expression)
     {
         if (tokens.Current() is not (Identifier or StringLiteral or RealLiteral or IntegerLiteral or BooleanLiteral))
         {
@@ -60,5 +61,23 @@ internal class Expression: INestable
         Parent = parent;
         Child = child;
         Token = name;
+    }
+    
+    public String ToString(String _)
+    {
+        return ToString();
+    }
+
+    public override string ToString()
+    {
+        StringBuilder @string = new StringBuilder();
+
+        if (Child is not null)
+        {
+            @string.Append('.');
+            @string.Append(Child);
+        }
+        
+        return $"{Token.Literal}{@string}";
     }
 }

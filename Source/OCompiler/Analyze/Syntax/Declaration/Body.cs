@@ -1,12 +1,13 @@
 using System;
 using System.Collections.Generic;
-using OCompiler.Analyze.Lexical.Tokens;
+using System.Text;
+using OCompiler.Utils;
 
 namespace OCompiler.Analyze.Syntax.Declaration;
 
 internal static class Body
 {
-    public static Boolean TryParse(IEnumerator<Token> tokens, out List<INestable>? body)
+    public static Boolean TryParse(TokenEnumerator tokens, out List<INestable>? body)
     {
         body = new List<INestable>();
 
@@ -32,5 +33,31 @@ internal static class Body
 
             return true;
         }
+    }
+
+    public static String ToString(List<INestable>? body, String prefix)
+    {
+        if (body is null)
+        {
+            return "";
+        }
+
+        StringBuilder @string = new StringBuilder();
+        for (Int32 i = 0; i < body.Count; ++i)
+        {
+            @string.Append(prefix);
+            
+            if (i + 1 == body.Count)
+            {
+                @string.Append("└── ");
+                @string.Append(body[i].ToString(prefix + "    "));
+                break;
+            }
+            
+            @string.Append("├── ");
+            @string.AppendLine(body[i].ToString(prefix + "│   "));
+        }
+
+        return @string.ToString();
     }
 }

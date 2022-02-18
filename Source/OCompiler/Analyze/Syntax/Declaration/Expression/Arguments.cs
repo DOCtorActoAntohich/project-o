@@ -1,13 +1,13 @@
 using System;
 using System.Collections.Generic;
-using OCompiler.Analyze.Lexical.Tokens;
-using OCompiler.Extensions;
+using System.Text;
+using OCompiler.Utils;
 
 namespace OCompiler.Analyze.Syntax.Declaration.Expression;
 
 internal static class Arguments
 {
-    public static Boolean TryParse(IEnumerator<Token> tokens, out List<Expression>? arguments)
+    public static Boolean TryParse(TokenEnumerator tokens, out List<Expression>? arguments)
     {
         if (tokens.Current() is not Lexical.Tokens.Delimiters.LeftParenthesis)
         {
@@ -30,6 +30,7 @@ internal static class Arguments
             {
                 // Get next token.
                 tokens.Next();
+                continue;
             }
             
             // Stop if no comma.
@@ -45,5 +46,21 @@ internal static class Arguments
         tokens.Next();
         
         return true;
+    }
+
+    public static String ToString(List<Expression>? arguments)
+    {
+        if (arguments is null)
+        {
+            return "";
+        }
+        
+        StringBuilder @string = new StringBuilder();
+        foreach (Expression argument in arguments)
+        {
+            @string.Append(argument.ToString(""));
+        }
+
+        return $"({@string})";
     }
 }

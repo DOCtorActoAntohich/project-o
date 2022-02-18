@@ -1,7 +1,6 @@
 using System;
-using System.Collections.Generic;
 using OCompiler.Analyze.Lexical.Tokens;
-using OCompiler.Extensions;
+using OCompiler.Utils;
 
 namespace OCompiler.Analyze.Syntax.Declaration.Statement;
 
@@ -11,18 +10,21 @@ internal class Assignment: Statement
     
     public new Expression.Expression Expression { get; }
     
-    public static Boolean TryParse(IEnumerator<Token> tokens, out Assignment? assignment)
+    public static Boolean TryParse(TokenEnumerator tokens, out Assignment? assignment)
     {
         // Parse name.
         if (tokens.Current() is not Identifier name)
         {
-            throw new Exception($"Expected variable name at position {tokens.Current().StartOffset}.");
+            assignment = null;
+            return false;
         }
         
         // Assign delimiter.
         if (tokens.Next() is not Lexical.Tokens.Delimiters.Assign)
         {
-            throw new Exception($"Expected ':=' at position {tokens.Current().StartOffset}.");
+            tokens.Back();
+            assignment = null;
+            return false;
         }
 
         // Get next token.
@@ -42,5 +44,15 @@ internal class Assignment: Statement
     {
         Identifier = identifier;
         Expression = expression;
+    }
+    
+    public override String ToString(String _)
+    {
+        return ToString();
+    }
+
+    public override string ToString()
+    {
+        return $"{Identifier.Literal} := {Expression}";
     }
 }

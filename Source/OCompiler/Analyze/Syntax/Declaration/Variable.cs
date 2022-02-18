@@ -1,14 +1,13 @@
 using System;
-using System.Collections.Generic;
 using OCompiler.Analyze.Lexical.Tokens;
 using OCompiler.Analyze.Syntax.Declaration.Statement;
-using OCompiler.Extensions;
+using OCompiler.Utils;
 
 namespace OCompiler.Analyze.Syntax.Declaration;
 
 internal class Variable: Assignment
 {
-    public static Boolean TryParse(IEnumerator<Token> tokens, out Variable? variable)
+    public static Boolean TryParse(TokenEnumerator tokens, out Variable? variable)
     {
         // Keyword.
         if (tokens.Current() is not Lexical.Tokens.Keywords.Var)
@@ -31,4 +30,9 @@ internal class Variable: Assignment
     }
 
     protected Variable(Identifier name, Expression.Expression expression): base(name, expression){ } 
+    
+    public override String ToString()
+    {
+        return $"var {base.ToString()}";
+    }
 }

@@ -1,13 +1,13 @@
 using System;
 using System.Collections.Generic;
-using OCompiler.Analyze.Lexical.Tokens;
-using OCompiler.Extensions;
+using System.Text;
+using OCompiler.Utils;
 
 namespace OCompiler.Analyze.Syntax.Declaration.Class.Member.Method;
 
 internal static class Parameters
 {
-    public static Boolean TryParse(IEnumerator<Token> tokens, out List<Parameter>? parameters)
+    public static Boolean TryParse(TokenEnumerator tokens, out List<Parameter>? parameters)
     {
         if (tokens.Current() is not Lexical.Tokens.Delimiters.LeftParenthesis)
         {
@@ -41,5 +41,21 @@ internal static class Parameters
         tokens.Next();
         
         return true;
+    }
+
+    public static String ToString(List<Parameter>? parameters)
+    {
+        if (parameters is null)
+        {
+            return "";
+        }
+        
+        StringBuilder @string = new StringBuilder();
+        foreach (Parameter parameter in parameters)
+        {
+            @string.Append(parameter);
+        }
+
+        return @string.ToString();
     }
 }
