@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Text;
 using OCompiler.Utils;
 
@@ -7,10 +6,10 @@ namespace OCompiler.Analyze.Syntax.Declaration.Statement;
 
 internal class If: Statement
 {
-    public List<INestable> Body { get; }
-    public List<INestable>? ElseBody { get; }
+    public Body Body { get; }
+    public Body? ElseBody { get; }
 
-    public static Boolean TryParse(TokenEnumerator tokens, out If? @if)
+    public static bool TryParse(TokenEnumerator tokens, out If? @if)
     {
         // Keyword.
         if (tokens.Current() is not Lexical.Tokens.Keywords.If)
@@ -36,23 +35,17 @@ internal class If: Statement
         // Get next token.
         tokens.Next();
         // Try parse body.
-        if (!Declaration.Body.TryParse(tokens, out List<INestable>? body))
-        {
-            throw new Exception($"Body expected at position {tokens.Current().StartOffset}.");
-        }
-        
+        var body = new Body(tokens);
+
         // Else.
-        List<INestable>? elseBody = null;
+        Body? elseBody = null;
         // Keyword.
         if (tokens.Current() is Lexical.Tokens.Keywords.Else)
         {
             // Get next token.
             tokens.Next();
             // Try parse body.
-            if (!Declaration.Body.TryParse(tokens, out elseBody))
-            {
-                throw new Exception($"Body expected at position {tokens.Current().StartOffset}.");
-            }
+            elseBody = new Body(tokens);
         }
         
         // Keyword.
@@ -65,32 +58,32 @@ internal class If: Statement
         return true;
     }
 
-    private If(Expression.Expression expression, List<INestable> body, List<INestable>? elseBody = null) : 
+    private If(Expression.Expression expression, Body body, Body? elseBody = null) : 
         base(expression)
     {
         Body = body;
         ElseBody = elseBody;
     }
     
-    public override String ToString(String prefix)
+    public override string ToString(string prefix)
     {
-        StringBuilder @string = new StringBuilder();
+        var @string = new StringBuilder();
         
         @string.AppendLine($"if {Expression}");
 
 
         if (ElseBody is null)
         {
-            @string.Append(Declaration.Body.ToString(Body, prefix));
+            @string.Append(Body.ToString(prefix));
             return @string.ToString();
         }
         
-        @string.AppendLine(Declaration.Body.ToString(Body, prefix));
+        @string.AppendLine(Body.ToString(prefix));
         
         // Else.
         @string.Append(prefix);
         @string.AppendLine("else");
-        @string.Append(Declaration.Body.ToString(ElseBody, prefix));
+        @string.Append(ElseBody.ToString(prefix));
         
         return @string.ToString();
     }

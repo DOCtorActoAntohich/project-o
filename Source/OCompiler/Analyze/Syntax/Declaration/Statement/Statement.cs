@@ -1,9 +1,8 @@
-using System;
 using OCompiler.Utils;
 
 namespace OCompiler.Analyze.Syntax.Declaration.Statement;
 
-internal abstract class Statement: INestable
+internal abstract class Statement: BodyStatement
 {
     public Expression.Expression? Expression { get; }
 
@@ -42,5 +41,5 @@ internal abstract class Statement: INestable
         Expression = expression;
     }
 
-    public abstract string ToString(String prefix);
+    public override abstract string ToString(string prefix);
 }

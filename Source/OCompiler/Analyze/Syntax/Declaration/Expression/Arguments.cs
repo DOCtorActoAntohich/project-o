@@ -48,17 +48,17 @@ internal static class Arguments
         return true;
     }
 
-    public static String ToString(List<Expression>? arguments)
+    public static string ToString(List<Expression>? arguments)
     {
         if (arguments is null)
         {
             return "";
         }
         
-        StringBuilder @string = new StringBuilder();
-        for (Int32 i = 0; i < arguments.Count; ++i)
+        var @string = new StringBuilder();
+        for (var i = 0; i < arguments.Count; ++i)
         {
-            @string.Append(arguments[i].ToString(""));
+            @string.Append(arguments[i].ToString());
             if (i + 1 != arguments.Count)
             {
                 @string.Append(", ");

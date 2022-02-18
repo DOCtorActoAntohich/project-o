@@ -10,7 +10,7 @@ internal class Assignment: Statement
     
     public new Expression.Expression Expression { get; }
     
-    public static Boolean TryParse(TokenEnumerator tokens, out Assignment? assignment)
+    public static bool TryParse(TokenEnumerator tokens, out Assignment? assignment)
     {
         // Parse name.
         if (tokens.Current() is not Identifier name)
@@ -31,7 +31,7 @@ internal class Assignment: Statement
         tokens.Next();
         
         // Expression.
-        if (!Declaration.Expression.Expression.TryParse(tokens, out Declaration.Expression.Expression? expression))
+        if (!Declaration.Expression.Expression.TryParse(tokens, out Expression.Expression? expression))
         {
             throw new Exception($"Expected expression at position {tokens.Current().StartOffset}.");
         }
@@ -46,7 +46,7 @@ internal class Assignment: Statement
         Expression = expression;
     }
     
-    public override String ToString(String _)
+    public override string ToString(string _)
     {
         return ToString();
     }

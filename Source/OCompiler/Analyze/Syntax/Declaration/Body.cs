@@ -1,61 +1,38 @@
-using System;
 using System.Collections.Generic;
 using System.Text;
 using OCompiler.Utils;
 
 namespace OCompiler.Analyze.Syntax.Declaration;
 
-internal static class Body
+internal class Body
 {
-    public static Boolean TryParse(TokenEnumerator tokens, out List<INestable>? body)
+    private readonly List<BodyStatement> _members = new();
+    public bool IsEmpty => _members.Count == 0;
+
+    public Body(TokenEnumerator tokens)
     {
-        body = new List<INestable>();
-
-        while (true)
+        while (BodyStatement.TryParse(tokens, out BodyStatement? bodyStatement))
         {
-            if (Variable.TryParse(tokens, out Variable? variable))
-            {
-                body.Add(variable!);
-                continue;
-            }
-            
-            if (Statement.Statement.TryParse(tokens, out Statement.Statement? statement))
-            {
-                body.Add(statement!);
-                continue;
-            }
-
-            if (Expression.Expression.TryParse(tokens, out Expression.Expression? expression))
-            {
-                body.Add(expression!);
-                continue;
-            }
-
-            return true;
+            _members.Add(bodyStatement!);
         }
     }
 
-    public static String ToString(List<INestable>? body, String prefix)
+    public string ToString(string prefix)
     {
-        if (body is null)
-        {
-            return "";
-        }
-
-        StringBuilder @string = new StringBuilder();
-        for (Int32 i = 0; i < body.Count; ++i)
+        var @string = new StringBuilder();
+        for (var i = 0; i < _members.Count; ++i)
         {
             @string.Append(prefix);
             
-            if (i + 1 == body.Count)
+            if (i + 1 == _members.Count)
             {
                 @string.Append("└── ");
-                @string.Append(body[i].ToString(prefix + "    "));
+                @string.Append(_members[i].ToString(prefix + "    "));
                 break;
             }
             
             @string.Append("├── ");
-            @string.AppendLine(body[i].ToString(prefix + "│   "));
+            @string.AppendLine(_members[i].ToString(prefix + "│   "));
         }
 
         return @string.ToString();

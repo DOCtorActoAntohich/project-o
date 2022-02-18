@@ -15,13 +15,12 @@ internal class Class
     public List<Method> Methods { get; }
     public List<Constructor> Constructors { get; }
 
-    public static Boolean TryParse(TokenEnumerator tokens, out Class? @class)
+    public static Class Parse(TokenEnumerator tokens)
     {
         // Class.
         if (tokens.Current() is not Lexical.Tokens.Keywords.Class)
         {
-            @class = null;
-            return false;
+            throw new Exception($"Keyword 'class' expected at position {tokens.Current().StartOffset}.");
         }
     
         // Class name.
@@ -39,9 +38,9 @@ internal class Class
         // Get next token.
         tokens.Next();
 
-        List<Field> fields = new List<Field>();
-        List<Method> methods = new List<Method>();
-        List<Constructor> constructors = new List<Constructor>();
+        var fields = new List<Field>();
+        var methods = new List<Method>();
+        var constructors = new List<Constructor>();
 
         // Parse members.
         while (IMember.TryParse(tokens, out IMember? member))
@@ -70,9 +69,8 @@ internal class Class
         
         // Get next token.
         tokens.Next();
-        
-        @class = new Class(name, fields, methods, constructors);
-        return true;
+
+        return new Class(name, fields, methods, constructors);
     }
 
     private Class(Identifier name, List<Field> fields, List<Method> methods, List<Constructor> constructors)
@@ -83,10 +81,10 @@ internal class Class
         Constructors = constructors;
     }
 
-    public String ToString(String prefix = "")
+    public string ToString(string prefix = "")
     {
-        StringBuilder @string = new StringBuilder();
-        List<IMember> members = new List<IMember>();
+        var @string = new StringBuilder();
+        var members = new List<IMember>();
 
         members.AddRange(Fields);
         members.AddRange(Constructors);
@@ -95,7 +93,7 @@ internal class Class
         // Name.
         @string.AppendLine(Name.Literal);
         
-        for (Int32 i = 0; i < members.Count; ++i)
+        for (var i = 0; i < members.Count; ++i)
         {
             @string.Append(prefix);
             

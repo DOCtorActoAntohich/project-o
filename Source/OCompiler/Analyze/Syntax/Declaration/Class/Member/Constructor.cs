@@ -8,11 +8,11 @@ namespace OCompiler.Analyze.Syntax.Declaration.Class.Member;
 
 internal class Constructor: IMember
 {
-    public List<Parameter>? Parameters { get; }
+    public List<Parameter> Parameters { get; }
     
-    public List<INestable> Body { get; }
+    public Body Body { get; }
     
-    public static Boolean TryParse(TokenEnumerator tokens, out Constructor? constructor)
+    public static bool TryParse(TokenEnumerator tokens, out Constructor? constructor)
     {
         // Keyword.
         if (tokens.Current() is not Lexical.Tokens.Keywords.This)
@@ -23,8 +23,8 @@ internal class Constructor: IMember
         
         // Get next token.
         tokens.Next();
-        // Try Parse parameters.
-        Member.Method.Parameters.TryParse(tokens, out List<Parameter>? parameters);
+        // Parse parameters.
+        var parameters = Method.Parameters.Parse(tokens);
 
         // Is.
         if (tokens.Current() is not Lexical.Tokens.Keywords.Is)
@@ -35,10 +35,7 @@ internal class Constructor: IMember
         // Get next token.
         tokens.Next();
         // Try parse body.
-        if (!Declaration.Body.TryParse(tokens, out List<INestable>? body))
-        {
-            throw new Exception($"Expected body at position {tokens.Current().StartOffset}.");
-        }
+        var body = new Body(tokens);
         
         // End.
         if (tokens.Current() is not Lexical.Tokens.Keywords.End)
@@ -53,18 +50,18 @@ internal class Constructor: IMember
         return true;
     }
 
-    private Constructor(List<Parameter>? parameters, List<INestable> body)
+    private Constructor(List<Parameter> parameters, Body body)
     {
         Parameters = parameters;
         Body = body;
     }
     
-    public String ToString(String prefix)
+    public string ToString(string prefix)
     {
-        StringBuilder @string = new StringBuilder();
+        var @string = new StringBuilder();
         
-        @string.AppendLine($"Constructor({Member.Method.Parameters.ToString(Parameters)})");
-        @string.Append(Declaration.Body.ToString(Body, prefix));
+        @string.AppendLine($"Constructor({Method.Parameters.ToString(Parameters)})");
+        @string.Append(Body.ToString(prefix));
 
         return @string.ToString();
     }

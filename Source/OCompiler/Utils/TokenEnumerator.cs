@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using OCompiler.Analyze.Lexical.Tokens;
@@ -8,7 +7,7 @@ namespace OCompiler.Utils;
 internal class TokenEnumerator
 {
     private readonly List<Token> _tokens;
-    private Int32 _index;
+    private int _index;
     
     public TokenEnumerator(IEnumerable<Token> tokens)
     {
@@ -16,7 +15,7 @@ internal class TokenEnumerator
         _index = 0;
     }
     
-    public Token Next(Boolean skipWhitespaces = true)
+    public Token Next(bool skipWhitespaces = true)
     {
         // Skip whitespaces.
         while (MoveNext() && skipWhitespaces && _tokens[_index] is Whitespace) { }
@@ -24,7 +23,7 @@ internal class TokenEnumerator
         return _tokens[_index];
     }
     
-    public Token Current(Boolean skipWhitespaces = true)
+    public Token Current(bool skipWhitespaces = true)
     {
         // Skip whitespaces.
         while (skipWhitespaces && _tokens[_index] is Whitespace && MoveNext()) { }
@@ -32,7 +31,7 @@ internal class TokenEnumerator
         return _tokens[_index];
     }
 
-    public Token Back(Boolean skipWhitespaces = true)
+    public Token Back(bool skipWhitespaces = true)
     {
         // Skip whitespaces.
         while (MoveBack() && skipWhitespaces && _tokens[_index] is Whitespace) { }
@@ -40,7 +39,7 @@ internal class TokenEnumerator
         return _tokens[_index];
     }
     
-    private Boolean MoveNext()
+    private bool MoveNext()
     {
         if (_tokens.Count - 1 == _index)
         {
@@ -51,7 +50,7 @@ internal class TokenEnumerator
         return true;
     }
     
-    private Boolean MoveBack()
+    private bool MoveBack()
     {
         if (_index == 0)
         {

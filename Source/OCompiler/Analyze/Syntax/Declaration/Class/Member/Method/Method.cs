@@ -9,11 +9,11 @@ namespace OCompiler.Analyze.Syntax.Declaration.Class.Member.Method;
 internal class Method: IMember
 {
     public Identifier Name { get; }
-    public List<Parameter>? Parameters { get; }
+    public List<Parameter> Parameters { get; }
     public Identifier? ReturnType { get; }
-    public List<INestable> Body { get; }
+    public Body Body { get; }
     
-    public static Boolean TryParse(TokenEnumerator tokens, out Method? method)
+    public static bool TryParse(TokenEnumerator tokens, out Method? method)
     {
         // Keyword.
         if (tokens.Current() is not Lexical.Tokens.Keywords.Method)
@@ -30,8 +30,8 @@ internal class Method: IMember
         
         // Get next token.
         tokens.Next();
-        // Try Parse parameters.
-        Member.Method.Parameters.TryParse(tokens, out List<Parameter>? parameters);
+        // Parse parameters.
+        var parameters = Member.Method.Parameters.Parse(tokens);
 
         // Try to parse return type.
         Identifier? returnType = null;
@@ -58,10 +58,7 @@ internal class Method: IMember
         // Get next token.
         tokens.Next();
         // Try parse body.
-        if (!Declaration.Body.TryParse(tokens, out List<INestable>? body))
-        {
-            throw new Exception($"Expected body at position {tokens.Current().StartOffset}.");
-        }
+        var body = new Body(tokens);
         
         // End.
         if (tokens.Current() is not Lexical.Tokens.Keywords.End)
@@ -76,7 +73,7 @@ internal class Method: IMember
         return true;
     }
 
-    private Method(Identifier name, List<Parameter>? parameters, Identifier? returnType, List<INestable> body)
+    private Method(Identifier name, List<Parameter> parameters, Identifier? returnType, Body body)
     {
         Name = name;
         Parameters = parameters;
@@ -84,13 +81,13 @@ internal class Method: IMember
         Body = body;
     }
     
-    public String ToString(String prefix)
+    public string ToString(string prefix)
     {
-        StringBuilder @string = new StringBuilder();
+        var @string = new StringBuilder();
 
-        String returnType = ReturnType is null ? "None" : ReturnType.Literal;
+        string returnType = ReturnType is null ? "None" : ReturnType.Literal;
         @string.AppendLine($"{Name.Literal}({Member.Method.Parameters.ToString(Parameters)}) -> {returnType}");
-        @string.Append(Declaration.Body.ToString(Body, prefix));
+        @string.Append(Body.ToString(prefix));
         
         return @string.ToString();
     }

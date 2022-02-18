@@ -7,39 +7,33 @@ using OCompiler.Utils;
 
 namespace OCompiler.Analyze.Syntax;
 
-internal static class Tree
+internal class Tree
 {
-    public static Boolean TryParse(TokenEnumerator tokens, out List<Class>? tree)
+    private readonly List<Class> _tree = new();
+    public bool IsEmpty => _tree.Count == 0;
+
+    public Tree(TokenEnumerator tokens)
     {
-        tree = new List<Class>();
-
-        while (Class.TryParse(tokens, out Class? @class))
+        while (tokens.Current() is not Lexical.Tokens.EndOfFile)
         {
-            tree.Add(@class!);
+            _tree.Add(Class.Parse(tokens));
         }
-
-        return true;
     }
 
-    public static String ToString(List<Class>? tree)
-    {
-        if (tree is null)
+    public override string ToString()
+    {        
+        var @string = new StringBuilder();
+        for (var i = 0; i < _tree.Count; ++i)
         {
-            return "";
-        }
-        
-        StringBuilder @string = new StringBuilder();
-        for (Int32 i = 0; i < tree.Count; ++i)
-        {
-            if (i + 1 == tree.Count)
+            if (i + 1 == _tree.Count)
             {
                 @string.Append("└── ");
-                @string.Append(tree[i].ToString("    "));
+                @string.Append(_tree[i].ToString("    "));
                 break;
             }
             
             @string.Append("├── ");
-            @string.AppendLine(tree[i].ToString("│   "));
+            @string.AppendLine(_tree[i].ToString("│   "));
         }
 
         return @string.ToString();

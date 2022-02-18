@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Text;
 using OCompiler.Utils;
 
@@ -7,9 +6,9 @@ namespace OCompiler.Analyze.Syntax.Declaration.Statement;
 
 internal class While: Statement
 {
-    public List<INestable> Body { get; }
+    public Body Body { get; }
     
-    public static Boolean TryParse(TokenEnumerator tokens, out While? @while)
+    public static bool TryParse(TokenEnumerator tokens, out While? @while)
     {
         // Keyword.
         if (tokens.Current() is not Lexical.Tokens.Keywords.While)
@@ -21,7 +20,7 @@ internal class While: Statement
         // Get next token.
         tokens.Next();
         // Try parse expression.
-        if (!Declaration.Expression.Expression.TryParse(tokens, out Declaration.Expression.Expression? expression))
+        if (!Declaration.Expression.Expression.TryParse(tokens, out Expression.Expression? expression))
         {
             throw new Exception($"Expression expected at position {tokens.Current().StartOffset}.");
         }
@@ -35,10 +34,7 @@ internal class While: Statement
         // Get next token.
         tokens.Next();
         // Try parse body.
-        if (!Declaration.Body.TryParse(tokens, out List<INestable>? body))
-        {
-            throw new Exception($"Body expected at position {tokens.Current().StartOffset}.");
-        }
+        var body = new Body(tokens);
         
         // Keyword.
         if (tokens.Current() is not Lexical.Tokens.Keywords.End)
@@ -53,17 +49,17 @@ internal class While: Statement
         return true;
     }
     
-    private While(Expression.Expression expression, List<INestable> body) : base(expression)
+    private While(Expression.Expression expression, Body body) : base(expression)
     {
         Body = body;
     }
 
-    public override String ToString(String prefix)
+    public override string ToString(string prefix)
     {
-        StringBuilder @string = new StringBuilder();
+        var @string = new StringBuilder();
 
         @string.AppendLine($"while {Expression}");
-        @string.Append(Declaration.Body.ToString(Body, prefix));
+        @string.Append(Body.ToString(prefix));
         
         return @string.ToString();
     }

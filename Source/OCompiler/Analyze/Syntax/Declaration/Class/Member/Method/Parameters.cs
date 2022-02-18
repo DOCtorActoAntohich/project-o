@@ -7,19 +7,18 @@ namespace OCompiler.Analyze.Syntax.Declaration.Class.Member.Method;
 
 internal static class Parameters
 {
-    public static Boolean TryParse(TokenEnumerator tokens, out List<Parameter>? parameters)
+    public static List<Parameter> Parse(TokenEnumerator tokens)
     {
+        var parameters = new List<Parameter>();
         if (tokens.Current() is not Lexical.Tokens.Delimiters.LeftParenthesis)
         {
-            parameters = null;
-            return false;
+            return parameters;
         }
         
         // Get next token.
         tokens.Next();
         
         // Parse parameters.
-        parameters = new List<Parameter>();
         while (Parameter.TryParse(tokens, out Parameter? parameter))
         {
             // Success.
@@ -30,6 +29,7 @@ internal static class Parameters
             {
                 break;
             }
+            tokens.Next();
         }
 
         if (tokens.Current() is not Lexical.Tokens.Delimiters.RightParenthesis)
@@ -40,20 +40,24 @@ internal static class Parameters
         // Get next token.
         tokens.Next();
         
-        return true;
+        return parameters;
     }
 
-    public static String ToString(List<Parameter>? parameters)
+    public static string ToString(List<Parameter>? parameters)
     {
         if (parameters is null)
         {
             return "";
         }
         
-        StringBuilder @string = new StringBuilder();
-        foreach (Parameter parameter in parameters)
+        var @string = new StringBuilder();
+        for (var i = 0; i < parameters.Count; ++i)
         {
-            @string.Append(parameter);
+            @string.Append(parameters[i].ToString());
+            if (i + 1 != parameters.Count)
+            {
+                @string.Append(", ");
+            }
         }
 
         return @string.ToString();

@@ -1,13 +1,10 @@
-using System;
 using OCompiler.Utils;
 
 namespace OCompiler.Analyze.Syntax.Declaration.Class.Member;
 
-
-
 internal interface IMember
 {
-    public static Boolean TryParse(TokenEnumerator tokens, out IMember? member)
+    public static bool TryParse(TokenEnumerator tokens, out IMember? member)
     {
         if (Field.TryParse(tokens, out Field? field))
         {
@@ -31,5 +28,5 @@ internal interface IMember
         return false;
     }
 
-    public String ToString(String prefix);
+    public string ToString(string prefix);
 }
