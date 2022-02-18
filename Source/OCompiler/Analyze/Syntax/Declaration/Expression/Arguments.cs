@@ -56,9 +56,13 @@ internal static class Arguments
         }
         
         StringBuilder @string = new StringBuilder();
-        foreach (Expression argument in arguments)
+        for (Int32 i = 0; i < arguments.Count; ++i)
         {
-            @string.Append(argument.ToString(""));
+            @string.Append(arguments[i].ToString(""));
+            if (i + 1 != arguments.Count)
+            {
+                @string.Append(", ");
+            }
         }
 
         return $"({@string})";

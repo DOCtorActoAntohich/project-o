@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Text;
 using OCompiler.Analyze.Lexical.Tokens;
 
 namespace OCompiler.Analyze.Syntax.Declaration.Expression;
