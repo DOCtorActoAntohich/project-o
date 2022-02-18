@@ -5,8 +5,11 @@ using OCompiler.Utils;
 
 namespace OCompiler.Analyze.Syntax.Declaration;
 
-internal class Variable: Assignment
+internal class Variable : BodyStatement
 {
+    public Identifier Identifier { get; }
+    public Expression.Expression Expression { get; }
+
     public static bool TryParse(TokenEnumerator tokens, out Variable? variable)
     {
         // Keyword.
@@ -15,24 +18,45 @@ internal class Variable: Assignment
             variable = null;
             return false;
         }
-        
-        // Get next token.
-        tokens.Next();
-        
-        // Parse statement.
-        if (!Assignment.TryParse(tokens, out Assignment? assignment))
+
+        // Parse name.
+        if (tokens.Next() is not Identifier name)
         {
-            throw new Exception($"Expected assignment name at position {tokens.Current().StartOffset}.");
+            throw new Exception($"Expected variable name at position {tokens.Current().StartOffset}.");
+        }
+        
+        // Assign delimiter.
+        if (tokens.Next() is not Lexical.Tokens.Delimiters.Colon)
+        {
+            throw new Exception($"Expected expression at position {tokens.Current().StartOffset}.");
         }
 
-        variable = new Variable(assignment!.Identifier, assignment.Expression);
+        // Get next token.
+        tokens.Next();
+
+        // Expression.
+        if (!Declaration.Expression.Expression.TryParse(tokens, out Expression.Expression? expression))
+        {
+            throw new Exception($"Expected expression at position {tokens.Current().StartOffset}.");
+        }
+
+        variable = new Variable(name, expression!);
         return true;
     }
 
-    protected Variable(Identifier name, Expression.Expression expression): base(name, expression){ } 
-    
+    protected Variable(Identifier name, Expression.Expression expression)
+    {
+        Identifier = name;
+        Expression = expression;
+    }
+
+    public override string ToString(string _)
+    {
+        return ToString();
+    }
+
     public override string ToString()
     {
-        return $"var {base.ToString()}";
+        return $"var {Identifier.Literal} : {Expression}";
     }
 }
