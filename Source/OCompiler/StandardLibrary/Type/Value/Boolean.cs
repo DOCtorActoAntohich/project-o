@@ -1,3 +1,5 @@
+using OCompiler.StandardLibrary.Type.Reference;
+
 namespace OCompiler.StandardLibrary.Type.Value;
 
 public readonly struct Boolean
@@ -21,6 +23,11 @@ public readonly struct Boolean
         return Value ?
             new Integer(1) :
             new Integer(0);
+    }
+
+    public new String ToString()
+    {
+        return new String(Value.ToString());
     }
 
 

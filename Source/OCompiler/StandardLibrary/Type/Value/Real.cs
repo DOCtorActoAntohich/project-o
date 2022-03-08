@@ -1,4 +1,5 @@
-using System;
+using System.Globalization;
+using String = OCompiler.StandardLibrary.Type.Reference.String;
 
 namespace OCompiler.StandardLibrary.Type.Value;
 
@@ -25,7 +26,7 @@ public readonly struct Real
 
     public Real(Integer p)
     {
-        Value = (double) p.Value;
+        Value = p.Value;
     }
     
     
@@ -45,6 +46,11 @@ public readonly struct Real
         return Value is < -double.Epsilon or > double.Epsilon ?
             new Boolean(true) :
             new Boolean(false);
+    }
+
+    public new String ToString()
+    {
+        return new String(Value.ToString(CultureInfo.CurrentCulture));
     }
     
     

@@ -1,7 +1,9 @@
+using OCompiler.StandardLibrary.Type.Reference;
+
 namespace OCompiler.StandardLibrary.Type.Value;
 
 // Implicitly inherits System.ValueType because `struct`.
-public struct Integer
+public readonly struct Integer
 {
     // System.Int32 (hopefully).
     internal int Value { get; }
@@ -47,6 +49,11 @@ public struct Integer
         return Value != 0 ?
             new Boolean(true) :
             new Boolean(false);
+    }
+
+    public new String ToString()
+    {
+        return new String(Value.ToString());
     }
 
 
