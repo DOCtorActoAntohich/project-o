@@ -13,7 +13,7 @@ internal class Expression: IBodyStatement
     
     public static bool TryParse(TokenEnumerator tokens, out Expression? expression)
     {
-        if (tokens.Current() is not (Identifier or StringLiteral or RealLiteral or IntegerLiteral or BooleanLiteral))
+        if (tokens.Current() is not (Identifier or StringLiteral or RealLiteral or IntegerLiteral or BooleanLiteral or Lexical.Tokens.Keywords.This))
         {
             expression = null;
             return false;
