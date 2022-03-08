@@ -15,5 +15,9 @@
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
         <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
     </PropertyGroup>
+
+    <ItemGroup>
+      <Folder Include="StandardLibrary\Type\Reference" />
+    </ItemGroup>
     
 </Project>
