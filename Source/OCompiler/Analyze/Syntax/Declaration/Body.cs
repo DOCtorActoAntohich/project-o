@@ -6,12 +6,12 @@ namespace OCompiler.Analyze.Syntax.Declaration;
 
 internal class Body
 {
-    private readonly List<BodyStatement> _members = new();
+    private readonly List<IBodyStatement> _members = new();
     public bool IsEmpty => _members.Count == 0;
 
     public Body(TokenEnumerator tokens)
     {
-        while (BodyStatement.TryParse(tokens, out BodyStatement? bodyStatement))
+        while (IBodyStatement.TryParse(tokens, out IBodyStatement? bodyStatement))
         {
             _members.Add(bodyStatement!);
         }
@@ -38,7 +38,7 @@ internal class Body
         return @string.ToString();
     }
 
-    public IEnumerator<BodyStatement> GetEnumerator()
+    public IEnumerator<IBodyStatement> GetEnumerator()
     {
         return _members.GetEnumerator();
     }

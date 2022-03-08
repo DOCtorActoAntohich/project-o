@@ -2,11 +2,9 @@ using OCompiler.Utils;
 
 namespace OCompiler.Analyze.Syntax.Declaration.Statement;
 
-internal abstract class Statement: BodyStatement
+internal interface IStatement : IBodyStatement
 {
-    public Expression.Expression? Expression { get; }
-
-    public static bool TryParse(TokenEnumerator tokens, out Statement? statement)
+    public static bool TryParse(TokenEnumerator tokens, out IStatement? statement)
     {
         if (Assignment.TryParse(tokens, out Assignment? field))
         {
@@ -35,11 +33,6 @@ internal abstract class Statement: BodyStatement
         statement = null;
         return false;
     }
-    
-    protected Statement(Expression.Expression? expression)
-    {
-        Expression = expression;
-    }
 
-    public override abstract string ToString(string prefix);
+    public new abstract string ToString(string prefix);
 }

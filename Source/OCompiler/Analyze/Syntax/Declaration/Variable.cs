@@ -5,7 +5,7 @@ using OCompiler.Utils;
 
 namespace OCompiler.Analyze.Syntax.Declaration;
 
-internal class Variable : BodyStatement
+internal class Variable : IBodyStatement
 {
     public Identifier Identifier { get; }
     public Expression.Expression Expression { get; }
@@ -50,7 +50,7 @@ internal class Variable : BodyStatement
         Expression = expression;
     }
 
-    public override string ToString(string _)
+    public string ToString(string _)
     {
         return ToString();
     }

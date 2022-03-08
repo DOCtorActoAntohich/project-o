@@ -5,7 +5,7 @@ using OCompiler.Utils;
 
 namespace OCompiler.Analyze.Syntax.Declaration.Expression;
 
-internal class Expression: BodyStatement
+internal class Expression: IBodyStatement
 {
     public Expression? Parent { get; private set; }
     public Expression? Child { get; private set; }
@@ -62,7 +62,7 @@ internal class Expression: BodyStatement
         Token = name;
     }
     
-    public override string ToString(string _)
+    public string ToString(string _)
     {
         return ToString();
     }

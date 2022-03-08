@@ -4,11 +4,11 @@ using OCompiler.Utils;
 
 namespace OCompiler.Analyze.Syntax.Declaration.Statement;
 
-internal class Assignment: Statement
+internal class Assignment : IStatement
 {
     public Identifier Identifier { get; }
     
-    public new Expression.Expression Expression { get; }
+    public Expression.Expression Value { get; }
     
     public static bool TryParse(TokenEnumerator tokens, out Assignment? assignment)
     {
@@ -40,19 +40,19 @@ internal class Assignment: Statement
         return true;
     }
     
-    protected Assignment(Identifier identifier, Expression.Expression expression) : base(expression)
+    protected Assignment(Identifier identifier, Expression.Expression value)
     {
         Identifier = identifier;
-        Expression = expression;
+        Value = value;
     }
     
-    public override string ToString(string _)
+    public string ToString(string _)
     {
         return ToString();
     }
 
     public override string ToString()
     {
-        return $"{Identifier.Literal} := {Expression}";
+        return $"{Identifier.Literal} := {Value}";
     }
 }

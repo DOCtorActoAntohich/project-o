@@ -2,8 +2,10 @@ using OCompiler.Utils;
 
 namespace OCompiler.Analyze.Syntax.Declaration.Statement;
 
-internal class Return: Statement
+internal class Return : IStatement
 {
+    public Expression.Expression? ReturnValue { get; }
+
     public static bool TryParse(TokenEnumerator tokens, out Return? @return)
     {
         // Keyword.
@@ -15,21 +17,23 @@ internal class Return: Statement
         
         // Get next token.
         tokens.Next();
-        _ = Declaration.Expression.Expression.TryParse(tokens, out Expression.Expression? expression);
+        _ = Expression.Expression.TryParse(tokens, out Expression.Expression? expression);
 
         @return = new Return(expression);
         return true;
     }
 
-    private Return(Expression.Expression? expression): base(expression) { }
+    private Return(Expression.Expression? returnValue) {
+        ReturnValue = returnValue;
+    }
     
-    public override string ToString(string _)
+    public string ToString(string _)
     {
         return ToString();
     }
 
     public override string ToString()
     {
-        return $"return {Expression}";
+        return $"return {ReturnValue}";
     }
 }

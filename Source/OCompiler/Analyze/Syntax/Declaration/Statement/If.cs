@@ -4,10 +4,11 @@ using OCompiler.Utils;
 
 namespace OCompiler.Analyze.Syntax.Declaration.Statement;
 
-internal class If: Statement
+internal class If : IStatement
 {
     public Body Body { get; }
     public Body? ElseBody { get; }
+    public Expression.Expression Condition { get; }
 
     public static bool TryParse(TokenEnumerator tokens, out If? @if)
     {
@@ -58,18 +59,18 @@ internal class If: Statement
         return true;
     }
 
-    private If(Expression.Expression expression, Body body, Body? elseBody = null) : 
-        base(expression)
+    private If(Expression.Expression condition, Body body, Body? elseBody = null)
     {
         Body = body;
         ElseBody = elseBody;
+        Condition = condition;
     }
     
-    public override string ToString(string prefix)
+    public string ToString(string prefix)
     {
         var @string = new StringBuilder();
         
-        @string.AppendLine($"if {Expression}");
+        @string.AppendLine($"if {Condition}");
 
 
         if (ElseBody is null)

@@ -4,9 +4,10 @@ using OCompiler.Utils;
 
 namespace OCompiler.Analyze.Syntax.Declaration.Statement;
 
-internal class While: Statement
+internal class While : IStatement
 {
     public Body Body { get; }
+    public Expression.Expression Condition { get; }
     
     public static bool TryParse(TokenEnumerator tokens, out While? @while)
     {
@@ -49,16 +50,17 @@ internal class While: Statement
         return true;
     }
     
-    private While(Expression.Expression expression, Body body) : base(expression)
+    private While(Expression.Expression condition, Body body)
     {
+        Condition = condition;
         Body = body;
     }
 
-    public override string ToString(string prefix)
+    public string ToString(string prefix)
     {
         var @string = new StringBuilder();
 
-        @string.AppendLine($"while {Expression}");
+        @string.AppendLine($"while {Condition}");
         @string.Append(Body.ToString(prefix));
         
         return @string.ToString();
