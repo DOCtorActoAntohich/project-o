@@ -7,7 +7,7 @@ namespace OCompiler.Analyze.Syntax.Declaration.Statement;
 internal class If : IStatement
 {
     public Body Body { get; }
-    public Body? ElseBody { get; }
+    public Body ElseBody { get; }
     public Expression.Expression Condition { get; }
 
     public static bool TryParse(TokenEnumerator tokens, out If? @if)
@@ -39,7 +39,7 @@ internal class If : IStatement
         var body = new Body(tokens);
 
         // Else.
-        Body? elseBody = null;
+        Body? elseBody = new();
         // Keyword.
         if (tokens.Current() is Lexical.Tokens.Keywords.Else)
         {
@@ -62,7 +62,7 @@ internal class If : IStatement
     private If(Expression.Expression condition, Body body, Body? elseBody = null)
     {
         Body = body;
-        ElseBody = elseBody;
+        ElseBody = elseBody ?? new Body();
         Condition = condition;
     }
     

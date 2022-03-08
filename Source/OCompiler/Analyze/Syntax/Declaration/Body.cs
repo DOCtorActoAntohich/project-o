@@ -17,6 +17,11 @@ internal class Body
         }
     }
 
+    public Body()
+    {
+
+    }
+
     public string ToString(string prefix)
     {
         var @string = new StringBuilder();
