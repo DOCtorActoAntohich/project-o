@@ -1,63 +1,38 @@
 using System.Collections.Generic;
-using System.Linq;
 using OCompiler.Analyze.Lexical.Tokens;
 
 namespace OCompiler.Utils;
 
 internal class TokenEnumerator
 {
-    private readonly List<Token> _tokens;
-    private int _index;
+    private readonly BufferedEnumerator<Token> _tokens;
     
     public TokenEnumerator(IEnumerable<Token> tokens)
     {
-        _tokens = tokens.ToList();
-        _index = 0;
+        _tokens = new BufferedEnumerator<Token>(tokens);
     }
     
     public Token Next(bool skipWhitespaces = true)
     {
         // Skip whitespaces.
-        while (MoveNext() && skipWhitespaces && _tokens[_index] is Whitespace) { }
+        while (_tokens.MoveNext() && skipWhitespaces && _tokens.Current is Whitespace) { }
         
-        return _tokens[_index];
+        return _tokens.Current;
     }
     
     public Token Current(bool skipWhitespaces = true)
     {
         // Skip whitespaces.
-        while (skipWhitespaces && _tokens[_index] is Whitespace && MoveNext()) { }
+        while (skipWhitespaces && _tokens.Current is Whitespace && _tokens.MoveNext()) { }
 
-        return _tokens[_index];
+        return _tokens.Current;
     }
 
     public Token Back(bool skipWhitespaces = true)
     {
         // Skip whitespaces.
-        while (MoveBack() && skipWhitespaces && _tokens[_index] is Whitespace) { }
+        while (_tokens.MoveBack() && skipWhitespaces && _tokens.Current is Whitespace) { }
         
-        return _tokens[_index];
-    }
-    
-    private bool MoveNext()
-    {
-        if (_tokens.Count - 1 == _index)
-        {
-            return false;
-        }
-        
-        ++_index;
-        return true;
-    }
-    
-    private bool MoveBack()
-    {
-        if (_index == 0)
-        {
-            return false;
-        }
-        
-        --_index;
-        return true;
+        return _tokens.Current;
     }
 }
