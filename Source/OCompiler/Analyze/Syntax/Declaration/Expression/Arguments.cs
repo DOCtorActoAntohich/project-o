@@ -7,7 +7,7 @@ namespace OCompiler.Analyze.Syntax.Declaration.Expression;
 
 internal static class Arguments
 {
-    public static Boolean TryParse(TokenEnumerator tokens, out List<Expression>? arguments)
+    public static bool TryParse(TokenEnumerator tokens, out List<Expression>? arguments)
     {
         if (tokens.Current() is not Lexical.Tokens.Delimiters.LeftParenthesis)
         {

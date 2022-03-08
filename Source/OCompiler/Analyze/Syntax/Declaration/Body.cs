@@ -37,4 +37,9 @@ internal class Body
 
         return @string.ToString();
     }
+
+    public IEnumerator<BodyStatement> GetEnumerator()
+    {
+        return _members.GetEnumerator();
+    }
 }

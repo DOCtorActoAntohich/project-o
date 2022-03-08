@@ -9,7 +9,7 @@ internal class Parameter
     public Identifier Name { get; }
     public Identifier Type { get; }
 
-    public static Boolean TryParse(TokenEnumerator tokens, out Parameter? parameter)
+    public static bool TryParse(TokenEnumerator tokens, out Parameter? parameter)
     {
         // Name.
         if (tokens.Current() is not Identifier name)
