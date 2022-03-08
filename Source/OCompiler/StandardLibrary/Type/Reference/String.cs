@@ -39,7 +39,7 @@ public class String : AnyRef
     }
 
 
-    public Integer ToInt()
+    public Integer ToInteger()
     {
         return new Integer(int.Parse(Value));
     }
