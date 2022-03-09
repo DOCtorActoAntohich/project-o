@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Linq;
 using OCompiler.Analyze.Lexical;
-using OCompiler.Analyze.Lexical.Tokens;
+using OCompiler.Analyze.Semantics;
 using OCompiler.Analyze.Syntax;
 using OCompiler.Utils;
 
@@ -18,10 +18,8 @@ namespace OCompiler.Pipeline
         public void Run()
         {
             var tokenizer = new Tokenizer(SourceFilePath);
-            //var tokens = tokenizer.GetTokens().ToList();
-            //Formatter.ShowHighlightedCode(tokens);
-            //Formatter.ShowTokens(tokens);
-            IEnumerable<Token> tokens = tokenizer.GetTokens();
+            var tokens = tokenizer.GetTokens().ToList();
+            Formatter.ShowHighlightedCode(tokens);
 
             var tokenTree = new Tree(new TokenEnumerator(tokens));
             if (tokenTree.IsEmpty)
@@ -30,6 +28,8 @@ namespace OCompiler.Pipeline
             }
             
             Console.Write(tokenTree.ToString());
+
+            var _ = new TreeValidator(tokenTree);
         }
     }
 }

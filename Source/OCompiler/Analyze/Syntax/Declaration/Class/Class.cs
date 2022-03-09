@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Linq;
 using OCompiler.Analyze.Lexical.Tokens;
 using OCompiler.Analyze.Syntax.Declaration.Class.Member;
 using OCompiler.Analyze.Syntax.Declaration.Class.Member.Method;
@@ -103,6 +104,44 @@ internal class Class
         Methods = methods;
         Constructors = constructors;
         Extends = extends;
+    }
+
+    public string? GetMethodReturnType(string name, List<string> argumentTypes)
+    {
+        var candidates = Methods.Where(
+            m => m.Name.Literal == name &&
+            m.Parameters.Select(p => p.Type.Literal).SequenceEqual(argumentTypes)
+        ).ToList();
+        if (candidates.Count > 1)
+        {
+            throw new Exception($"More than one method matches signature {name}({string.Join(",", argumentTypes)})");
+        }
+        if (candidates.Count == 0)
+        {
+            return null;
+        }
+
+        var method = candidates[0];
+        return method.ReturnType == null ? "Void" : method.ReturnType.Literal;
+    }
+
+    public bool HasField(string name)
+    {
+        var field = Fields.Where(f => f.Identifier.Literal == name).FirstOrDefault();
+        return field != null;
+    }
+
+    public bool HasConstructor(List<string> argumentTypes)
+    {
+        var candidates = Constructors.Where(
+            c => c.Parameters.Select(p => p.Type.Literal).SequenceEqual(argumentTypes)
+        ).ToList();
+        if (candidates.Count > 1)
+        {
+            throw new Exception($"More than one constructor matches signature {Name}({string.Join(",", argumentTypes)})");
+        }
+
+        return candidates.Count == 1;
     }
 
     public string ToString(string prefix = "")
