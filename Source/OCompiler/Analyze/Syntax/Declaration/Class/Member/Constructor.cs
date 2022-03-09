@@ -6,7 +6,7 @@ using OCompiler.Utils;
 
 namespace OCompiler.Analyze.Syntax.Declaration.Class.Member;
 
-internal class Constructor: IMember
+internal class Constructor: IClassMember
 {
     public List<Parameter> Parameters { get; }
     

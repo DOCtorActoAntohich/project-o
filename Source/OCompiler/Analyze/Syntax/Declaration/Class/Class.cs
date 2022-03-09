@@ -43,7 +43,7 @@ internal class Class
         var constructors = new List<Constructor>();
 
         // Parse members.
-        while (IMember.TryParse(tokens, out IMember? member))
+        while (IClassMember.TryParse(tokens, out IClassMember? member))
         {
             switch (member)
             {
@@ -84,7 +84,7 @@ internal class Class
     public string ToString(string prefix = "")
     {
         var @string = new StringBuilder();
-        var members = new List<IMember>();
+        var members = new List<IClassMember>();
 
         members.AddRange(Fields);
         members.AddRange(Constructors);

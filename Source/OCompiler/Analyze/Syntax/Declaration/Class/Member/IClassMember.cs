@@ -2,9 +2,9 @@ using OCompiler.Utils;
 
 namespace OCompiler.Analyze.Syntax.Declaration.Class.Member;
 
-internal interface IMember
+internal interface IClassMember
 {
-    public static bool TryParse(TokenEnumerator tokens, out IMember? member)
+    public static bool TryParse(TokenEnumerator tokens, out IClassMember? member)
     {
         if (Field.TryParse(tokens, out Field? field))
         {

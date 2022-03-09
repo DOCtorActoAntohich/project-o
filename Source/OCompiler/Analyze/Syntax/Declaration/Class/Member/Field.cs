@@ -3,7 +3,7 @@ using OCompiler.Utils;
 
 namespace OCompiler.Analyze.Syntax.Declaration.Class.Member;
 
-internal class Field: Variable, IMember
+internal class Field: Variable, IClassMember
 {
     public static bool TryParse(TokenEnumerator tokens, out Field? field)
     {

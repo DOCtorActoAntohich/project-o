@@ -6,7 +6,7 @@ using OCompiler.Utils;
 
 namespace OCompiler.Analyze.Syntax.Declaration.Class.Member.Method;
 
-internal class Method: IMember
+internal class Method: IClassMember
 {
     public Identifier Name { get; }
     public List<Parameter> Parameters { get; }
