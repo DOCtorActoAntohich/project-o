@@ -1,17 +1,20 @@
 using System;
+using Void = OCompiler.StandardLibrary.Type.Value.Void;
 
 namespace OCompiler.StandardLibrary.Type.Reference;
 
 public static class IO
 {
-    static void Write(String str)
+    static Void Write(String str)
     {
         Console.Write(str.Value);
+        return new Void();
     }
     
-    static void WriteLine(String str)
+    static Void WriteLine(String str)
     {
         Console.WriteLine(str.Value);
+        return new Void();
     }
 
     static String ReadLine()
