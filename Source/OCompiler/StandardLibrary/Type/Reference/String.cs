@@ -55,9 +55,9 @@ public class String : AnyRef
     }
 
 
-    public Integer At(Integer index)
+    public String At(Integer index)
     {
-        return new Integer(Value[index.Value]);
+        return new String(Value[index.Value..index.Value]);
     }
 
     public String Concatenate(String other)
