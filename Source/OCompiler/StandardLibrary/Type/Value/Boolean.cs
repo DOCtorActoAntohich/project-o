@@ -2,7 +2,7 @@ using OCompiler.StandardLibrary.Type.Reference;
 
 namespace OCompiler.StandardLibrary.Type.Value;
 
-public readonly struct Boolean
+public readonly struct Boolean : AnyValue
 {
     internal bool Value { get; }
 

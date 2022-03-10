@@ -4,7 +4,7 @@ using String = OCompiler.StandardLibrary.Type.Reference.String;
 namespace OCompiler.StandardLibrary.Type.Value;
 
 // Get real lol.
-public readonly struct Real
+public readonly struct Real : AnyValue
 {
     internal double Value { get; }
     
