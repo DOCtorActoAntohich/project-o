@@ -4,8 +4,6 @@
     {
         new public static string Literal => "]";
 
-        public RightSquareBracket(long startOffset) : base(startOffset, Literal) { }
-
-        static RightSquareBracket() => ReservedTokens.RegisterToken(Literal, (pos) => new RightSquareBracket(pos));
+        public RightSquareBracket() : base(Literal) { }
     }
 }

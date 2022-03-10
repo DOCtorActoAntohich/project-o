@@ -2,6 +2,6 @@
 {
     internal class BooleanLiteral : Token
     {
-        protected BooleanLiteral(long startOffset, string literal) : base(startOffset, literal) { }
+        protected BooleanLiteral(string literal) : base(literal) { }
     }
 }

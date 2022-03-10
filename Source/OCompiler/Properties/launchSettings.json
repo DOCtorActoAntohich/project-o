@@ -5,7 +5,11 @@
       "commandName": "Project",
       "commandLineArgs": "$(SolutionDir)/Examples/main.ol"
     },
-	"String and comments": {
+    "Without generics and inheritance": {
+      "commandName": "Project",
+      "commandLineArgs": "$(SolutionDir)/Examples/simple.ol"
+    },
+	  "String and comments": {
       "commandName": "Project",
       "commandLineArgs": "$(SolutionDir)/Examples/strings.ol"
     },

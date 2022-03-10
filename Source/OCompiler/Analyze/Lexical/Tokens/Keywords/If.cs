@@ -4,8 +4,6 @@
     {
         new public static string Literal => "if";
 
-        public If(long startOffset) : base(startOffset, Literal) { }
-
-        static If() => ReservedTokens.RegisterToken(Literal, (pos) => new If(pos));
+        public If() : base(Literal) { }
     }
 }

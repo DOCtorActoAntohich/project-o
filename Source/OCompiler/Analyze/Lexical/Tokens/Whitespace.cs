@@ -2,7 +2,7 @@
 {
     internal class Whitespace : Token
     {
-        public Whitespace(long startOffset, string literal) : base(startOffset, literal)
+        public Whitespace(string literal) : base(literal)
         {
             if (!string.IsNullOrWhiteSpace(literal))
             {

@@ -4,8 +4,6 @@
     {
         new public static string Literal => "(";
 
-        public LeftParenthesis(long startOffset) : base(startOffset, Literal) { }
-
-        static LeftParenthesis() => ReservedTokens.RegisterToken(Literal, (pos) => new LeftParenthesis(pos));
+        public LeftParenthesis() : base(Literal) { }
     }
 }

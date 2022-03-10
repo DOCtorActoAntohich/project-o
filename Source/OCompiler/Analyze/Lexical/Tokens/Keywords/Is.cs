@@ -4,8 +4,6 @@
     {
         new public static string Literal => "is";
 
-        public Is(long startOffset) : base(startOffset, Literal) { }
-
-        static Is() => ReservedTokens.RegisterToken(Literal, (pos) => new Is(pos));
+        public Is() : base(Literal) { }
     }
 }

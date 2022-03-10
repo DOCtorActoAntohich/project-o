@@ -4,8 +4,6 @@
     {
         new public static string Literal => "while";
 
-        public While(long startOffset) : base(startOffset, Literal) { }
-
-        static While() => ReservedTokens.RegisterToken(Literal, (pos) => new While(pos));
+        public While() : base(Literal) { }
     }
 }
