@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using OCompiler.Analyze.Lexical.Tokens;
 using OCompiler.Analyze.Syntax;
 using OCompiler.Analyze.Syntax.Declaration;
-using OCompiler.Analyze.Syntax.Declaration.Class;
 using OCompiler.Analyze.Syntax.Declaration.Class.Member;
 using OCompiler.Analyze.Syntax.Declaration.Class.Member.Method;
 using OCompiler.Analyze.Syntax.Declaration.Expression;
@@ -16,6 +15,8 @@ namespace OCompiler.Analyze.Semantics;
 
 internal class TreeValidator
 {
+    public List<ClassInfo.ClassInfo> ValidatedClasses => new(_knownClasses.Values);
+
     private readonly Dictionary<string, ClassInfo.ClassInfo> _knownClasses = StandardClassInfo.LoadStandardClasses();
     private readonly List<Identifier> _classReferences = new();
     private readonly List<ExpressionInfo> _expressions = new();
