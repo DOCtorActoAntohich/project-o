@@ -3,7 +3,7 @@ using Void = OCompiler.StandardLibrary.Type.Value.Void;
 
 namespace OCompiler.StandardLibrary.Type.Reference;
 
-public static class IO
+public class IO
 {
     static Void Write(String str)
     {
