@@ -2,7 +2,7 @@
 
 using OCompiler.Analyze.Syntax.Declaration.Class.Member;
 using OCompiler.Analyze.Syntax.Declaration.Expression;
-using OCompiler.Analyze.Semantics.ClassInfo;
+using OCompiler.Analyze.Semantics.Class;
 
 namespace OCompiler.Analyze.Semantics;
 

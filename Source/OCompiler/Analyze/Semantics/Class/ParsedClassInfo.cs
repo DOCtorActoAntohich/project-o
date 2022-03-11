@@ -11,19 +11,52 @@ using OCompiler.Analyze.Syntax.Declaration.Class.Member.Method;
 using OCompiler.Analyze.Syntax.Declaration.Expression;
 using OCompiler.Analyze.Syntax.Declaration.Statement;
 
-namespace OCompiler.Analyze.Semantics.ClassInfo;
+namespace OCompiler.Analyze.Semantics.Class;
 
 internal class ParsedClassInfo : ClassInfo
 {
-    public override Class Class { get; }
-    public List<Method> Methods => Class.Methods;
-    public List<Field> Fields => Class.Fields;
-    public List<Constructor> Constructors => Class.Constructors;
+    public override Syntax.Declaration.Class.Class? Class { get; }
+    public override ClassInfo? BaseClass { get; }
+    public List<Method> Methods => Class!.Methods;
+    public List<Field> Fields => Class!.Fields;
+    public List<Constructor> Constructors => Class!.Constructors;
 
-    public ParsedClassInfo(Class parsedClass)
+    private Dictionary<string, ParsedClassInfo> parsedClasses = new();
+
+    public ParsedClassInfo(Syntax.Declaration.Class.Class parsedClass)
     {
-        Class = parsedClass;
+        if (parsedClasses.TryGetValue(Name, out var classInfo) && classInfo is not EmptyParsedClassInfo)
+        {
+            return;
+        }
+
         Name = parsedClass.Name.Literal;
+        Class = parsedClass;
+        if (parsedClass.Extends != null)
+        {
+            BaseClass = GetByName(parsedClass.Extends.Literal);
+        }
+        parsedClasses[Name] = this;
+    }
+
+    public ParsedClassInfo()
+    {
+    }
+
+    public ClassInfo GetByName(string name)
+    {
+        if (parsedClasses.ContainsKey(name))
+        {
+            return parsedClasses[name];
+        }
+        if (StandardClassInfo.StandardClasses.ContainsKey(name))
+        {
+            return StandardClassInfo.StandardClasses[name];
+        }
+
+        var newClassInfo = new EmptyParsedClassInfo(name);
+        parsedClasses.Add(name, newClassInfo);
+        return newClassInfo;
     }
 
     public override string? GetMethodReturnType(string name, List<string> argumentTypes)

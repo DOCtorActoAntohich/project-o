@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
 
-namespace OCompiler.Analyze.Semantics.ClassInfo;
+namespace OCompiler.Analyze.Semantics.Class;
 
 internal abstract class ClassInfo
 {
-    public abstract object Class { get; }
+    public abstract object? Class { get; }
+    public abstract object? BaseClass { get; }
     public string Name { get; protected set; } = "";
 
     public abstract string? GetMethodReturnType(string name, List<string> argumentTypes);

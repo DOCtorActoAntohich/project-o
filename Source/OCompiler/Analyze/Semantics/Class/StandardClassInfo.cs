@@ -3,22 +3,42 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace OCompiler.Analyze.Semantics.ClassInfo;
+namespace OCompiler.Analyze.Semantics.Class;
 
 internal class StandardClassInfo : ClassInfo
 {
     public override Type Class { get; }
+    public override Type? BaseClass { get; }
     public List<MethodInfo> Methods { get; }
     public List<FieldInfo> Fields { get; }
     public List<ConstructorInfo> Constructors { get; }
+    public static Dictionary<string, ClassInfo> StandardClasses { get; private set; }
 
     public StandardClassInfo(Type standardClassType)
     {
         Class = standardClassType;
+        BaseClass = standardClassType.BaseType;
         Name = standardClassType.Name;
         Methods = standardClassType.GetRuntimeMethods().ToList();
         Fields = standardClassType.GetRuntimeFields().ToList();
         Constructors = standardClassType.GetConstructors().ToList();
+    }
+
+    static StandardClassInfo()
+    {
+        StandardClasses = GetStandardClasses();
+    }
+
+    private static Dictionary<string, ClassInfo> GetStandardClasses()
+    {
+        var asm = Assembly.GetExecutingAssembly();
+        return new Dictionary<string, ClassInfo>(
+            asm.GetTypes().Where(
+                type => (type.IsClass || type.IsValueType) &&
+                type.Namespace != null &&
+                type.Namespace.StartsWith("OCompiler.StandardLibrary")
+            ).Select(t => new KeyValuePair<string, ClassInfo>(t.Name, new StandardClassInfo(t)))
+        );
     }
 
     public override string? GetMethodReturnType(string name, List<string> argumentTypes)
@@ -57,17 +77,5 @@ internal class StandardClassInfo : ClassInfo
         }
 
         return candidates.Count == 1;
-    }
-
-    public static Dictionary<string, ClassInfo> LoadStandardClasses()
-    {
-        var asm = Assembly.GetExecutingAssembly();
-        return new Dictionary<string, ClassInfo>(
-            asm.GetTypes().Where(
-                type => (type.IsClass || type.IsValueType) &&
-                type.Namespace != null &&
-                type.Namespace.StartsWith("OCompiler.StandardLibrary")
-            ).Select(t => new KeyValuePair<string, ClassInfo>(t.Name, new StandardClassInfo(t)))
-        );
     }
 }

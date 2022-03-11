@@ -9,15 +9,15 @@ using OCompiler.Analyze.Syntax.Declaration.Class.Member;
 using OCompiler.Analyze.Syntax.Declaration.Class.Member.Method;
 using OCompiler.Analyze.Syntax.Declaration.Expression;
 using OCompiler.Analyze.Syntax.Declaration.Statement;
-using OCompiler.Analyze.Semantics.ClassInfo;
+using OCompiler.Analyze.Semantics.Class;
 
 namespace OCompiler.Analyze.Semantics;
 
 internal class TreeValidator
 {
-    public List<ClassInfo.ClassInfo> ValidatedClasses => new(_knownClasses.Values);
+    public List<ClassInfo> ValidatedClasses => new(_knownClasses.Values);
 
-    private readonly Dictionary<string, ClassInfo.ClassInfo> _knownClasses = StandardClassInfo.LoadStandardClasses();
+    private readonly Dictionary<string, ClassInfo> _knownClasses = new(StandardClassInfo.StandardClasses);
     private readonly List<Identifier> _classReferences = new();
     private readonly List<ExpressionInfo> _expressions = new();
 
@@ -236,7 +236,7 @@ internal class TreeValidator
         return type;
     }
 
-    private ClassInfo.ClassInfo GetKnownType(string name)
+    private Class.ClassInfo GetKnownType(string name)
     {
         if (!_knownClasses.TryGetValue(name, out var classInfo))
         {
