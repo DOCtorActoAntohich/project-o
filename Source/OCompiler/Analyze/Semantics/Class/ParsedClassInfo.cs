@@ -96,6 +96,15 @@ internal class ParsedClassInfo : ClassInfo
         return field != null;
     }
 
+    public void AddFieldType(string name, string type)
+    {
+        var field = Fields.Where(f => f.Name == name).FirstOrDefault();
+        if (field != null && field.Type == null)
+        {
+            field.SetType(type);
+        }
+    }
+
     public override bool HasConstructor(List<string> argumentTypes)
     {
         var candidates = Constructors.Where(

@@ -246,6 +246,10 @@ internal class TreeValidator
                         throw new Exception($"Field {fieldName} is not found in class {primaryClass}");
                     }
                     var fieldType = ValidateExpression(candidates[0]);
+                    if (_knownClasses[primaryClass.Name] is ParsedClassInfo parsedClass)
+                    {
+                        parsedClass.AddFieldType(fieldName, fieldType);
+                    }
                     primaryClass = GetKnownType(fieldType);
                     break;
                 default:
