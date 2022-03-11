@@ -11,6 +11,7 @@ namespace OCompiler.Analyze.Syntax.Declaration.Class;
 internal class Class
 {
     public Identifier Name { get; }
+    public Identifier? Extends { get; }
     public List<Field> Fields { get; }
     public List<Method> Methods { get; }
     public List<Constructor> Constructors { get; }
@@ -29,8 +30,24 @@ internal class Class
             throw new Exception($"Class identifier expected at position {tokens.Current().StartOffset}.");
         }
         
+        // Extends.
+        Identifier? extends = null;
+        if (tokens.Next() is Lexical.Tokens.Keywords.Extends)
+        {
+            if (tokens.Next() is not Identifier)
+            {
+                throw new Exception($"Class identifier expected at position {tokens.Current().StartOffset}.");
+            }
+            
+            // Save.
+            extends = (Identifier)tokens.Current();
+            
+            // Move forward.
+            tokens.Next();
+        }
+        
         // Is.
-        if (tokens.Next() is not Lexical.Tokens.Keywords.Is)
+        if (tokens.Current() is not Lexical.Tokens.Keywords.Is)
         {
             throw new Exception($"Keyword 'is' expected at position {tokens.Current().StartOffset}.");
         }
@@ -70,15 +87,22 @@ internal class Class
         // Get next token.
         tokens.Next();
 
-        return new Class(name, fields, methods, constructors);
+        return new Class(name, fields, methods, constructors, extends);
     }
 
-    private Class(Identifier name, List<Field> fields, List<Method> methods, List<Constructor> constructors)
+    private Class(
+        Identifier name, 
+        List<Field> fields, 
+        List<Method> methods, 
+        List<Constructor> constructors, 
+        Identifier? extends = null
+        )
     {
         Name = name;
         Fields = fields;
         Methods = methods;
         Constructors = constructors;
+        Extends = extends;
     }
 
     public string ToString(string prefix = "")
@@ -91,8 +115,8 @@ internal class Class
         members.AddRange(Methods);
         
         // Name.
-        @string.AppendLine(Name.Literal);
-        
+        @string.AppendLine(Extends is null ? Name.Literal : $"{Name.Literal} extends {Extends.Literal}");
+
         for (var i = 0; i < members.Count; ++i)
         {
             @string.Append(prefix);

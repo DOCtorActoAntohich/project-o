@@ -8,7 +8,7 @@ class Main is
   end
 end
 
-class Calculator is
+class Calculator extends Object is
   method sum(numbers: Array) is
     var result : T(0)
     i := 0
