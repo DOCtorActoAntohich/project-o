@@ -8,7 +8,7 @@ internal class ParsedFieldInfo
     public Field Field { get; }
     public string Name => Field.Identifier.Literal;
     public Expression Expression => Field.Expression;
-    public string? Type { get; private set; };
+    public string? Type { get; private set; }
 
     public ParsedFieldInfo(Field parsedField)
     {
