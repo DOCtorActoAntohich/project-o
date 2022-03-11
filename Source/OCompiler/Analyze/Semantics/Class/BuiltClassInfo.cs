@@ -6,7 +6,7 @@ using System.Text;
 
 namespace OCompiler.Analyze.Semantics.Class;
 
-internal class StandardClassInfo : ClassInfo
+internal class BuiltClassInfo : ClassInfo
 {
     public override Type Class { get; }
     public override Type? BaseClass { get; }
@@ -15,30 +15,30 @@ internal class StandardClassInfo : ClassInfo
     public List<ConstructorInfo> Constructors { get; }
     public static Dictionary<string, ClassInfo> StandardClasses { get; private set; }
 
-    public StandardClassInfo(Type standardClassType)
+    public BuiltClassInfo(Type builtClassType)
     {
-        Class = standardClassType;
-        BaseClass = standardClassType.BaseType;
-        Name = standardClassType.Name;
-        Methods = standardClassType.GetRuntimeMethods().ToList();
-        Fields = standardClassType.GetRuntimeFields().ToList();
-        Constructors = standardClassType.GetConstructors().ToList();
+        Class = builtClassType;
+        BaseClass = builtClassType.BaseType;
+        Name = builtClassType.Name;
+        Methods = builtClassType.GetRuntimeMethods().ToList();
+        Fields = builtClassType.GetRuntimeFields().ToList();
+        Constructors = builtClassType.GetConstructors().ToList();
     }
 
-    static StandardClassInfo()
+    static BuiltClassInfo()
     {
         StandardClasses = GetStandardClasses();
     }
 
-    private static Dictionary<string, ClassInfo> GetStandardClasses()
+    private static Dictionary<string, ClassInfo> GetStandardClasses(string @namespace = "OCompiler.StandardLibrary")
     {
         var asm = Assembly.GetExecutingAssembly();
         return new Dictionary<string, ClassInfo>(
             asm.GetTypes().Where(
                 type => (type.IsClass || type.IsValueType) &&
                 type.Namespace != null &&
-                type.Namespace.StartsWith("OCompiler.StandardLibrary")
-            ).Select(t => new KeyValuePair<string, ClassInfo>(t.Name, new StandardClassInfo(t)))
+                type.Namespace.StartsWith(@namespace)
+            ).Select(type => new KeyValuePair<string, ClassInfo>(type.Name, new BuiltClassInfo(type)))
         );
     }
 

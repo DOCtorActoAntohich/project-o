@@ -18,18 +18,17 @@ internal class ParsedClassInfo : ClassInfo
 {
     public override Syntax.Declaration.Class.Class? Class { get; }
     public override ClassInfo? BaseClass { get; }
-    public List<Method> Methods => Class!.Methods;
-    public List<Field> Fields => Class!.Fields;
-    public List<Constructor> Constructors => Class!.Constructors;
+    public List<ParsedMethodInfo> Methods { get; } = new();
+    public List<ParsedFieldInfo> Fields { get; } = new();
+    public List<ParsedConstructorInfo> Constructors { get; } = new();
 
-    private static Dictionary<string, ParsedClassInfo> parsedClasses = new();
+    private readonly static Dictionary<string, ParsedClassInfo> parsedClasses = new();
 
-    public ParsedClassInfo(Syntax.Declaration.Class.Class parsedClass)
+    private ParsedClassInfo(Syntax.Declaration.Class.Class parsedClass)
     {
-        if (parsedClasses.TryGetValue(Name, out var classInfo) && classInfo is not EmptyParsedClassInfo)
-        {
-            return;
-        }
+        Methods = parsedClass.Methods.Select(method => new ParsedMethodInfo(method)).ToList();
+        Fields = parsedClass.Fields.Select(field => new ParsedFieldInfo(field)).ToList();
+        Constructors = parsedClass.Constructors.Select(constructor => new ParsedConstructorInfo(constructor)).ToList();
 
         Name = parsedClass.Name.Literal;
         Class = parsedClass;
@@ -37,11 +36,23 @@ internal class ParsedClassInfo : ClassInfo
         {
             BaseClass = GetByName(parsedClass.Extends.Literal);
         }
-        parsedClasses[Name] = this;
     }
 
-    public ParsedClassInfo()
+    protected ParsedClassInfo()
     {
+    }
+
+    public static ParsedClassInfo GetByClass(Syntax.Declaration.Class.Class parsedClass)
+    {
+        var name = parsedClass.Name.Literal;
+        if (parsedClasses.TryGetValue(name, out var classInfo) && classInfo is not EmptyParsedClassInfo)
+        {
+            return classInfo;
+        }
+
+        var newInfo = new ParsedClassInfo(parsedClass);
+        parsedClasses[name] = newInfo;
+        return newInfo;
     }
 
     public static ClassInfo GetByName(string name)
@@ -50,9 +61,9 @@ internal class ParsedClassInfo : ClassInfo
         {
             return parsedClasses[name];
         }
-        if (StandardClassInfo.StandardClasses.ContainsKey(name))
+        if (BuiltClassInfo.StandardClasses.ContainsKey(name))
         {
-            return StandardClassInfo.StandardClasses[name];
+            return BuiltClassInfo.StandardClasses[name];
         }
 
         var newClassInfo = new EmptyParsedClassInfo(name);
@@ -63,8 +74,8 @@ internal class ParsedClassInfo : ClassInfo
     public override string? GetMethodReturnType(string name, List<string> argumentTypes)
     {
         var candidates = Methods.Where(
-            m => m.Name.Literal == name &&
-            m.Parameters.Select(p => p.Type.Literal).SequenceEqual(argumentTypes)
+            m => m.Name == name &&
+            m.Parameters.Select(p => p.Type).SequenceEqual(argumentTypes)
         ).ToList();
         if (candidates.Count > 1)
         {
@@ -76,19 +87,19 @@ internal class ParsedClassInfo : ClassInfo
         }
 
         var method = candidates[0];
-        return method.ReturnType == null ? "Void" : method.ReturnType.Literal;
+        return method.ReturnType;
     }
 
     public override bool HasField(string name)
     {
-        var field = Fields.Where(f => f.Identifier.Literal == name).FirstOrDefault();
+        var field = Fields.Where(f => f.Name == name).FirstOrDefault();
         return field != null;
     }
 
     public override bool HasConstructor(List<string> argumentTypes)
     {
         var candidates = Constructors.Where(
-            c => c.Parameters.Select(p => p.Type.Literal).SequenceEqual(argumentTypes)
+            c => c.Parameters.Select(p => p.Type).SequenceEqual(argumentTypes)
         ).ToList();
         if (candidates.Count > 1)
         {

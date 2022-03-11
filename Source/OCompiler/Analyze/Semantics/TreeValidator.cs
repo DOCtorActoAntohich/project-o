@@ -18,15 +18,15 @@ internal class TreeValidator
 {
     public List<ClassInfo> ValidatedClasses => new(_knownClasses.Values);
 
-    private readonly Dictionary<string, ClassInfo> _knownClasses = new(StandardClassInfo.StandardClasses);
-    private readonly List<Identifier> _classReferences = new();
+    private readonly Dictionary<string, ClassInfo> _knownClasses = new(BuiltClassInfo.StandardClasses);
+    private readonly List<string> _classReferences = new();
     private readonly List<ExpressionInfo> _expressions = new();
 
     public TreeValidator(Tree syntaxTree)
     {
         foreach (var @class in syntaxTree)
         {
-            Validate(new ParsedClassInfo(@class));
+            Validate(ParsedClassInfo.GetByClass(@class));
         }
 
         foreach (var expression in _expressions)
@@ -34,12 +34,11 @@ internal class TreeValidator
             ValidateExpression(expression);
         }
 
-        foreach (var identifier in _classReferences)
+        foreach (var className in _classReferences)
         {
-            var className = identifier.Literal;
             if (!_knownClasses.ContainsKey(className))
             {
-                throw new Exception($"Unknown type {className} was referenced at position {identifier.StartOffset}");
+                throw new Exception($"Unknown type {className} was referenced");
             }
         }
     }
@@ -56,9 +55,9 @@ internal class TreeValidator
             @string.AppendLine(")");
         }
         @string.AppendLine("\nExplicitly referenced classes:");
-        foreach (var identifier in _classReferences)
+        foreach (var className in _classReferences)
         {
-            @string.AppendLine(identifier.Literal);
+            @string.AppendLine(className);
         }
         return @string.ToString();
     }
@@ -80,12 +79,12 @@ internal class TreeValidator
         _knownClasses.Add(classInfo.Name, classInfo);
     }
 
-    public void Validate(Field field, ParsedClassInfo classInfo)
+    public void Validate(ParsedFieldInfo field, ParsedClassInfo classInfo)
     {
-        LateValidate(new ExpressionInfo(field.Expression, classInfo, field.Identifier.Literal));
+        LateValidate(new ExpressionInfo(field.Expression, classInfo, field.Name));
     }
 
-    public void Validate(Method method, ParsedClassInfo classInfo)
+    public void Validate(ParsedMethodInfo method, ParsedClassInfo classInfo)
     {
         var locals = new Dictionary<string, string?>();
         foreach (var parameter in method.Parameters)
@@ -95,11 +94,11 @@ internal class TreeValidator
         _classReferences.Add(method.ReturnType!); // TODO: make ReturnType not-null
         foreach (var statement in method.Body)
         {
-            Validate(statement, classInfo, method, ref locals);
+            Validate(statement, classInfo, method.Method, ref locals);
         }
     }
 
-    public void Validate(Constructor constructor, ParsedClassInfo classInfo)
+    public void Validate(ParsedConstructorInfo constructor, ParsedClassInfo classInfo)
     {
         var locals = new Dictionary<string, string?>();
         foreach (var parameter in constructor.Parameters)
@@ -108,7 +107,7 @@ internal class TreeValidator
         }
         foreach (var statement in constructor.Body)
         {
-            Validate(statement, classInfo, constructor, ref locals);
+            Validate(statement, classInfo, constructor.Constructor, ref locals);
         }
     }
 
