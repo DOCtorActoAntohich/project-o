@@ -2,9 +2,9 @@
 
 namespace OCompiler.StandardLibrary.Type.Value;
 
-public interface AnyValue
+public abstract class AnyValue
 {
-    public String ToString()
+    public new String ToString()
     {
         return new String();
     }

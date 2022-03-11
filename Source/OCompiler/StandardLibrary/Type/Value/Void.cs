@@ -1,6 +1,6 @@
 ﻿namespace OCompiler.StandardLibrary.Type.Value;
 
-public readonly struct Void : AnyValue
+public class Void : AnyValue
 {
     /*        ඞ        */
 }

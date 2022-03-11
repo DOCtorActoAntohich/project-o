@@ -2,8 +2,7 @@ using OCompiler.StandardLibrary.Type.Reference;
 
 namespace OCompiler.StandardLibrary.Type.Value;
 
-// Implicitly inherits System.ValueType because `struct`.
-public readonly struct Integer : AnyValue
+public class Integer : AnyValue
 {
     // System.Int32 (hopefully).
     internal int Value { get; }
