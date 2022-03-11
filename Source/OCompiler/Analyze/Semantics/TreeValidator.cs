@@ -10,6 +10,7 @@ using OCompiler.Analyze.Syntax.Declaration.Class.Member.Method;
 using OCompiler.Analyze.Syntax.Declaration.Expression;
 using OCompiler.Analyze.Syntax.Declaration.Statement;
 using OCompiler.Analyze.Semantics.Class;
+using System.Text;
 
 namespace OCompiler.Analyze.Semantics;
 
@@ -41,6 +42,25 @@ internal class TreeValidator
                 throw new Exception($"Unknown type {className} was referenced at position {identifier.StartOffset}");
             }
         }
+    }
+
+    public string GetValidationInfo()
+    {
+        StringBuilder @string = new();
+        @string.AppendLine("Known classes:");
+        foreach (var (name, classInfo) in _knownClasses)
+        {
+            @string.Append(name);
+            @string.Append(" (");
+            @string.Append(classInfo.ToString());
+            @string.AppendLine(")");
+        }
+        @string.AppendLine("\nExplicitly referenced classes:");
+        foreach (var identifier in _classReferences)
+        {
+            @string.AppendLine(identifier.Literal);
+        }
+        return @string.ToString();
     }
 
     public void Validate(ParsedClassInfo classInfo)
@@ -177,7 +197,7 @@ internal class TreeValidator
         };
 
         var primaryClass = GetKnownType(type);
-
+        
         if (info.Expression is Call constructorCall)
         {
             var argTypes = new List<string>();
@@ -206,7 +226,8 @@ internal class TreeValidator
                     type = primaryClass.GetMethodReturnType(call.Token.Literal, argTypes);
                     if (type == null)
                     {
-                        throw new Exception($"Couldn't find a method for call {call} on type {primaryClass.Name}");
+                        var argsStr = string.Join(", ", argTypes);
+                        throw new Exception($"Couldn't find a method for call {call.Token.Literal}({argsStr}) on type {primaryClass.Name}");
                     }
                     primaryClass = GetKnownType(type);
                     break;

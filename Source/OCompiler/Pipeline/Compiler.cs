@@ -27,9 +27,10 @@ namespace OCompiler.Pipeline
                 throw new Exception("No classes.");
             }
             
-            Console.Write(tokenTree.ToString());
+            Console.WriteLine(tokenTree.ToString());
 
-            var _ = new TreeValidator(tokenTree);
+            var validator = new TreeValidator(tokenTree);
+            Console.WriteLine(validator.GetValidationInfo());
         }
     }
 }

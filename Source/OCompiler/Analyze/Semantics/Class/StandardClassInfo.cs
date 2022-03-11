@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Text;
 
 namespace OCompiler.Analyze.Semantics.Class;
 
@@ -77,5 +78,18 @@ internal class StandardClassInfo : ClassInfo
         }
 
         return candidates.Count == 1;
+    }
+
+    public override string ToString()
+    {
+        StringBuilder @string = new();
+        @string.Append("Standard library class ");
+        @string.Append(Name);
+        if (BaseClass != null && BaseClass != typeof(object))
+        {
+            @string.Append(" extends ");
+            @string.Append(BaseClass.Name);
+        }
+        return @string.ToString();
     }
 }

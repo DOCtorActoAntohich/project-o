@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 using OCompiler.Analyze.Lexical.Tokens;
 using OCompiler.Analyze.Syntax;
@@ -95,5 +96,18 @@ internal class ParsedClassInfo : ClassInfo
         }
 
         return candidates.Count == 1;
+    }
+
+    public override string ToString()
+    {
+        StringBuilder @string = new();
+        @string.Append("Parsed class ");
+        @string.Append(Name);
+        if (BaseClass != null)
+        {
+            @string.Append(" extends ");
+            @string.Append(BaseClass);
+        }
+        return @string.ToString();
     }
 }
