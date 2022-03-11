@@ -22,7 +22,7 @@ internal class ParsedClassInfo : ClassInfo
     public List<Field> Fields => Class!.Fields;
     public List<Constructor> Constructors => Class!.Constructors;
 
-    private Dictionary<string, ParsedClassInfo> parsedClasses = new();
+    private static Dictionary<string, ParsedClassInfo> parsedClasses = new();
 
     public ParsedClassInfo(Syntax.Declaration.Class.Class parsedClass)
     {
@@ -44,7 +44,7 @@ internal class ParsedClassInfo : ClassInfo
     {
     }
 
-    public ClassInfo GetByName(string name)
+    public static ClassInfo GetByName(string name)
     {
         if (parsedClasses.ContainsKey(name))
         {
