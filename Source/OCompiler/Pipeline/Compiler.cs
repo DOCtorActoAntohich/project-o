@@ -3,6 +3,7 @@ using System.Linq;
 using OCompiler.Analyze.Lexical;
 using OCompiler.Analyze.Semantics;
 using OCompiler.Analyze.Syntax;
+using OCompiler.Generate;
 using OCompiler.Utils;
 
 namespace OCompiler.Pipeline
@@ -31,6 +32,8 @@ namespace OCompiler.Pipeline
 
             var validator = new TreeValidator(tokenTree);
             Console.WriteLine(validator.GetValidationInfo());
+
+            var generator = new CodeGenerator(validator.ValidatedClasses);
         }
     }
 }
