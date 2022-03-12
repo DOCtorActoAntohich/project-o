@@ -6,12 +6,6 @@ internal interface IStatement : IBodyStatement
 {
     public static bool TryParse(TokenEnumerator tokens, out IStatement? statement)
     {
-        if (Assignment.TryParse(tokens, out Assignment? field))
-        {
-            statement = field;
-            return true;
-        }
-        
         if (If.TryParse(tokens, out If? @if))
         {
             statement = @if;
@@ -30,6 +24,12 @@ internal interface IStatement : IBodyStatement
             return true;
         }
         
+        if (Assignment.TryParse(tokens, out Assignment? field))
+        {
+            statement = field;
+            return true;
+        }
+
         statement = null;
         return false;
     }
