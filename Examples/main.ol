@@ -1,6 +1,8 @@
 class Main is
+  var sus : true
   this is
     IO.Write("this".Concatenate(" is ").Concatenate(Strings().somestring))
+    this.sus := false
   end
 end
 

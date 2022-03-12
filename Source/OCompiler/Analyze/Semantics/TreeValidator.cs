@@ -142,28 +142,61 @@ internal class TreeValidator
 
     public void ValidateAssignment(Assignment assignment, ParsedClassInfo classInfo, CallableInfo callable)
     {
-        var variable = assignment.Variable;
-        if (variable.Child != null)
+        var variableOrField = assignment.Variable;
+        if (variableOrField.Child == null)
         {
-            if (variable.Token is not Lexical.Tokens.Keywords.This)
-            {
-                throw new Exception($"Fields of other classes cannot be changed directly");
-            }
-            variable = variable.Child;
-        }
-
-        if (callable.LocalVariables.TryGetValue(variable.Token.Literal, out var varInfo))
-        {
-            var valueInfo = new ExpressionInfo(assignment.Value, new Context(classInfo, _knownClasses, callable));
-            valueInfo.ValidateExpression();
-            if (valueInfo.Type != varInfo.Type)
-            {
-                throw new Exception($"Cannot assign value of type {valueInfo.Type} to a variable of type {varInfo.Type}");
-            }
+            ValidateLocalAssignment(variableOrField.Token.Literal, assignment.Value, classInfo, callable);
             return;
         }
 
-        throw new Exception($"{assignment.Variable} must be declared before assignment");
+        if (variableOrField.Token is not Lexical.Tokens.Keywords.This || variableOrField.Child.Child != null)
+        {
+            throw new Exception($"Fields of other classes cannot be changed directly");
+        }
+
+        ValidateFieldAssignment(variableOrField.Child.Token.Literal, assignment.Value, classInfo, callable);
+    }
+
+    public void ValidateLocalAssignment(
+        string variableName,
+        Syntax.Declaration.Expression.Expression value,
+        ParsedClassInfo classInfo,
+        CallableInfo callable
+    )
+    {
+        if (!callable.LocalVariables.TryGetValue(variableName, out var varInfo))
+        {
+            throw new Exception($"Variable {variableName} must be declared before assignment");
+        }
+
+        var valueInfo = new ExpressionInfo(value, new Context(classInfo, _knownClasses, callable));
+        valueInfo.ValidateExpression();
+        if (valueInfo.Type != varInfo.Type)
+        {
+            throw new Exception($"Cannot assign value of type {valueInfo.Type} to a variable of type {varInfo.Type}");
+        }
+    }
+
+    public void ValidateFieldAssignment(
+        string fieldName,
+        Syntax.Declaration.Expression.Expression value,
+        ParsedClassInfo classInfo,
+        CallableInfo callable
+    )
+    {
+        var field = classInfo.GetFieldInfo(fieldName);
+        if (field == null)
+        {
+            throw new Exception($"Field {fieldName} must be declared before assignment");
+        }
+
+        field.Expression.ValidateExpression();
+        var valueInfo = new ExpressionInfo(value, new Context(classInfo, _knownClasses, callable));
+        valueInfo.ValidateExpression();
+        if (valueInfo.Type != field.Expression.Type)
+        {
+            throw new Exception($"Cannot assign value of type {valueInfo.Type} to a field of type {field.Expression.Type}");
+        }
     }
 
     public void ValidateIf(If conditional, ParsedClassInfo classInfo, CallableInfo callable)
