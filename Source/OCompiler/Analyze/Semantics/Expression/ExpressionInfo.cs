@@ -94,22 +94,21 @@ internal class ExpressionInfo
                         throw new Exception($"Couldn't find a field {fieldName} in type {type}");
                     }
 
-                    string fieldType;
                     switch (primaryClass)
                     {
                         case ParsedClassInfo parsedClass:
                             var fieldExpression = parsedClass.GetFieldInfo(fieldName)!.Expression;
                             fieldExpression.ValidateExpression();
-                            fieldType = fieldExpression.Type!;
-                            parsedClass.AddFieldType(fieldName, fieldType);
+                            type = fieldExpression.Type!;
+                            parsedClass.AddFieldType(fieldName, type);
                             break;
                         case BuiltClassInfo builtClass:
-                            fieldType = builtClass.GetFieldType(fieldName)!;
+                            type = builtClass.GetFieldType(fieldName)!;
                             break;
                         default:
                             throw new Exception($"Unknown ClassInfo object: {primaryClass}");
                     }
-                    primaryClass = Context.GetClassByName(fieldType);
+                    primaryClass = Context.GetClassByName(type);
                     break;
                 default:
                     throw new Exception($"Unknown Expression type: {childInfo.Expression}");
