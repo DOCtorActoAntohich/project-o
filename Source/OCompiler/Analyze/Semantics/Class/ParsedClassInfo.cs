@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 
 using OCompiler.Analyze.Semantics.Callable;
-using OCompiler.Analyze.Semantics.Expression;
 using OCompiler.Analyze.Syntax.Declaration.Class.Member;
 using OCompiler.Analyze.Syntax.Declaration.Class.Member.Method;
 

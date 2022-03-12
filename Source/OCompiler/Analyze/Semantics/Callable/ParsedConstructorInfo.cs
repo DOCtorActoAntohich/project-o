@@ -1,7 +1,4 @@
-﻿using OCompiler.Analyze.Semantics.Class;
-using OCompiler.Analyze.Syntax.Declaration.Class.Member;
-
-using System.Collections.Generic;
+﻿using OCompiler.Analyze.Syntax.Declaration.Class.Member;
 
 namespace OCompiler.Analyze.Semantics.Callable;
 

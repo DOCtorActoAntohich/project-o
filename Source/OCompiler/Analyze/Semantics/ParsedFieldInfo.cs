@@ -1,8 +1,5 @@
-﻿using OCompiler.Analyze.Semantics.Class;
-using OCompiler.Analyze.Semantics.Expression;
+﻿using OCompiler.Analyze.Semantics.Expression;
 using OCompiler.Analyze.Syntax.Declaration.Class.Member;
-
-using System.Collections.Generic;
 
 namespace OCompiler.Analyze.Semantics;
 

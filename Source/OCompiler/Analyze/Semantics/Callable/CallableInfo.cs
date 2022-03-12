@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 
-using OCompiler.Analyze.Semantics.Class;
 using OCompiler.Analyze.Semantics.Expression;
 using OCompiler.Analyze.Syntax.Declaration;
 using OCompiler.Analyze.Syntax.Declaration.Class.Member;
