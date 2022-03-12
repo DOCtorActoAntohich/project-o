@@ -1,28 +1,30 @@
 using System;
-using OCompiler.Analyze.Lexical.Tokens;
+using OCompiler.Analyze.Lexical.Tokens.Delimiters;
 using OCompiler.Utils;
 
 namespace OCompiler.Analyze.Syntax.Declaration.Statement;
 
 internal class Assignment : IStatement
 {
-    public Identifier Identifier { get; }
+    public Expression.Expression Variable { get; }
     
     public Expression.Expression Value { get; }
     
     public static bool TryParse(TokenEnumerator tokens, out Assignment? assignment)
     {
-        // Parse name.
-        if (tokens.Current() is not Identifier name)
+        int index = tokens.Index;
+        
+        // Variable.
+        if (!Expression.Expression.TryParse(tokens, out Expression.Expression? variable))
         {
             assignment = null;
             return false;
         }
         
         // Assign delimiter.
-        if (tokens.Next() is not Lexical.Tokens.Delimiters.Assign)
+        if (tokens.Current() is not Assign)
         {
-            tokens.Back();
+            tokens.RestoreIndex(index);
             assignment = null;
             return false;
         }
@@ -31,18 +33,18 @@ internal class Assignment : IStatement
         tokens.Next();
         
         // Expression.
-        if (!Declaration.Expression.Expression.TryParse(tokens, out Expression.Expression? expression))
+        if (!Expression.Expression.TryParse(tokens, out Expression.Expression? value))
         {
             throw new Exception($"Expected expression at position {tokens.Current().StartOffset}.");
         }
         
-        assignment = new Assignment(name, expression!);
+        assignment = new Assignment(variable!, value!);
         return true;
     }
     
-    protected Assignment(Identifier identifier, Expression.Expression value)
+    protected Assignment(Expression.Expression variable, Expression.Expression value)
     {
-        Identifier = identifier;
+        Variable = variable;
         Value = value;
     }
     
@@ -53,6 +55,6 @@ internal class Assignment : IStatement
 
     public override string ToString()
     {
-        return $"{Identifier.Literal} := {Value}";
+        return $"{Variable} := {Value}";
     }
 }

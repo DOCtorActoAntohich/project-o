@@ -7,10 +7,17 @@ internal class Field: Variable, IClassMember
 {
     public static bool TryParse(TokenEnumerator tokens, out Field? field)
     {
-        bool result = Variable.TryParse(tokens, out var variable);
-        field = (Field)variable!;
-        return result;
+        if (!Variable.TryParse(tokens, out var variable))
+        {
+            field = null;
+            return false;
+        }
+
+        field = new Field(variable!);
+        return true;
     }
-    
-    protected Field(Identifier name, Expression.Expression expression): base(name, expression) { }
+
+    protected Field(Identifier name, Expression.Expression expression) : base(name, expression) { }
+
+    protected Field(Variable variable) : base(variable.Identifier, variable.Expression) { }
 }
