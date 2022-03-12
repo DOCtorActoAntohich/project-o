@@ -27,10 +27,10 @@ internal class BuiltClassInfo : ClassInfo
 
     static BuiltClassInfo()
     {
-        StandardClasses = GetStandardClasses();
+        StandardClasses = LoadStandardClasses();
     }
 
-    private static Dictionary<string, ClassInfo> GetStandardClasses(string @namespace = "OCompiler.StandardLibrary")
+    private static Dictionary<string, ClassInfo> LoadStandardClasses(string @namespace = "OCompiler.StandardLibrary")
     {
         var asm = Assembly.GetExecutingAssembly();
         return new Dictionary<string, ClassInfo>(
@@ -44,27 +44,23 @@ internal class BuiltClassInfo : ClassInfo
 
     public override string? GetMethodReturnType(string name, List<string> argumentTypes)
     {
-        var candidates = Methods.Where(
+        var method = Methods.Where(
             m => m.Name == name &&
             m.GetParameters().Select(p => p.ParameterType.Name).SequenceEqual(argumentTypes)
-        ).ToList();
-        if (candidates.Count > 1)
-        {
-            throw new Exception($"More than one method matches signature {name}({string.Join(",", argumentTypes)})");
-        }
-        if (candidates.Count == 0)
-        {
-            return null;
-        }
+        ).FirstOrDefault();
 
-        var method = candidates[0];
-        return method.ReturnType.Name;
+        return method?.ReturnType.Name;
+    }
+
+    public override string? GetFieldType(string name)
+    {
+        var field = Fields.Where(f => f.Name == name).FirstOrDefault();
+        return field?.FieldType.Name;
     }
 
     public override bool HasField(string name)
     {
-        var field = Fields.Where(f => f.Name == name).FirstOrDefault();
-        return field != null;
+        return GetFieldType(name) != null;
     }
 
     public override bool HasConstructor(List<string> argumentTypes)

@@ -1,16 +1,14 @@
 ﻿using System;
-using System.Linq;
+using System.Text;
 using System.Collections.Generic;
 
-using OCompiler.Analyze.Lexical.Tokens;
 using OCompiler.Analyze.Syntax;
 using OCompiler.Analyze.Syntax.Declaration;
 using OCompiler.Analyze.Syntax.Declaration.Class.Member;
-using OCompiler.Analyze.Syntax.Declaration.Class.Member.Method;
-using OCompiler.Analyze.Syntax.Declaration.Expression;
 using OCompiler.Analyze.Syntax.Declaration.Statement;
 using OCompiler.Analyze.Semantics.Class;
-using System.Text;
+using OCompiler.Analyze.Semantics.Expression;
+using OCompiler.Analyze.Semantics.Callable;
 
 namespace OCompiler.Analyze.Semantics;
 
@@ -20,18 +18,20 @@ internal class TreeValidator
 
     private readonly Dictionary<string, ClassInfo> _knownClasses = new(BuiltClassInfo.StandardClasses);
     private readonly List<string> _classReferences = new();
-    private readonly List<ExpressionInfo> _expressions = new();
 
     public TreeValidator(Tree syntaxTree)
     {
         foreach (var @class in syntaxTree)
         {
-            Validate(ParsedClassInfo.GetByClass(@class));
+            var parsedClass = ParsedClassInfo.GetByClass(@class);
+            _knownClasses.Add(parsedClass.Name, parsedClass);
         }
-
-        foreach (var expression in _expressions)
+        foreach (var @class in syntaxTree)
         {
-            ValidateExpression(expression);
+            var parsedClass = ParsedClassInfo.GetByClass(@class);
+            ValidateConstructors(parsedClass);
+            ValidateMethods(parsedClass);
+            ValidateFields(parsedClass);
         }
 
         foreach (var className in _classReferences)
@@ -62,31 +62,50 @@ internal class TreeValidator
         return @string.ToString();
     }
 
-    public void Validate(ParsedClassInfo classInfo)
+    public void ValidateConstructors(ParsedClassInfo classInfo)
+    {
+        foreach (var constructor in classInfo.Constructors)
+        {
+            ValidateConstructor(constructor, classInfo);
+        }
+    }
+
+    public void ValidateMethods(ParsedClassInfo classInfo)
+    {
+        foreach (var method in classInfo.Methods)
+        {
+            ValidateMethod(method, classInfo);
+        }
+    }
+
+    public void ValidateFields(ParsedClassInfo classInfo)
     {
         foreach (var field in classInfo.Fields)
         {
-            Validate(field, classInfo);
+            if (field.Type != null)
+            {
+                continue;
+            }
+            field.Expression.ValidateExpression(classInfo, _knownClasses);
+            field.Type = field.Expression.Type;
+            Console.WriteLine($"Warning: unused field {field.Name} of type {field.Type}");
         }
-        foreach (var constructor in classInfo.Constructors)
-        {
-            Validate(constructor, classInfo);
-        }
-        foreach (var method in classInfo.Methods)
-        {
-            Validate(method, classInfo);
-        }
-        _knownClasses.Add(classInfo.Name, classInfo);
     }
 
-    public void Validate(ParsedFieldInfo field, ParsedClassInfo classInfo)
+    public void ValidateConstructor(ParsedConstructorInfo constructor, ParsedClassInfo classInfo)
     {
-        LateValidate(new ExpressionInfo(field.Expression, classInfo, field.Name));
+        foreach (var parameter in constructor.Parameters)
+        {
+            _classReferences.Add(parameter.Type);
+        }
+        foreach (var statement in constructor.Body)
+        {
+            ValidateStatement(statement, classInfo, constructor);
+        }
     }
 
-    public void Validate(ParsedMethodInfo method, ParsedClassInfo classInfo)
+    public void ValidateMethod(ParsedMethodInfo method, ParsedClassInfo classInfo)
     {
-        var locals = new Dictionary<string, string?>();
         foreach (var parameter in method.Parameters)
         {
             _classReferences.Add(parameter.Type);
@@ -94,210 +113,123 @@ internal class TreeValidator
         _classReferences.Add(method.ReturnType!); // TODO: make ReturnType not-null
         foreach (var statement in method.Body)
         {
-            Validate(statement, classInfo, method.Method, ref locals);
+            ValidateStatement(statement, classInfo, method);
         }
     }
 
-    public void Validate(ParsedConstructorInfo constructor, ParsedClassInfo classInfo)
-    {
-        var locals = new Dictionary<string, string?>();
-        foreach (var parameter in constructor.Parameters)
-        {
-            _classReferences.Add(parameter.Type);
-        }
-        foreach (var statement in constructor.Body)
-        {
-            Validate(statement, classInfo, constructor.Constructor, ref locals);
-        }
-    }
-
-    public void Validate(IBodyStatement statement, ParsedClassInfo classInfo, IClassMember method, ref Dictionary<string, string?> locals)
+    public void ValidateStatement(IBodyStatement statement, ParsedClassInfo classInfo, CallableInfo callable)
     {
         switch (statement)
         {
             case Variable variable:
-                Validate(variable, classInfo, method, ref locals);
+                ValidateVariable(variable, classInfo, callable);
                 break;
             case Assignment assignment:
-                Validate(assignment, classInfo, method, ref locals);
+                ValidateAssignment(assignment, classInfo, callable);
                 break;
             case If conditional:
-                Validate(conditional, classInfo, method, ref locals);
-                break;
-            case Return @return:
-                Validate(@return, classInfo, method, ref locals);
+                ValidateIf(conditional, classInfo, callable);
                 break;
             case While loop:
-                Validate(loop, classInfo, method, ref locals);
+                ValidateLoop(loop, classInfo, callable);
                 break;
-            case Expression expression:
-                LateValidate(new ExpressionInfo(expression, classInfo, method, null, locals));
+            case Return @return:
+                ValidateReturn(@return, classInfo, callable);
+                break;
+            case Syntax.Declaration.Expression.Expression expression:
+                new ExpressionInfo(expression).ValidateExpression(classInfo, _knownClasses, callable);
                 break;
             default:
                 throw new Exception($"Unknown IBodyStatement: {statement}");
         }
     }
 
-    public void Validate(Variable variable, ParsedClassInfo classInfo, IClassMember method, ref Dictionary<string, string?> locals)
+    public void ValidateVariable(Variable variable, ParsedClassInfo classInfo, CallableInfo callable)
     {
-        var variableName = variable.Identifier.Literal;
-        locals.Add(variableName, null);
-        LateValidate(new ExpressionInfo(variable.Expression, classInfo, method, variableName, locals));
+        if (!callable.LocalVariables.TryGetValue(variable.Identifier.Literal, out var varInfo))
+        {
+            varInfo = new ExpressionInfo(variable.Expression);
+            callable.LocalVariables.Add(variable.Identifier.Literal, varInfo);
+        }
+        if (varInfo.Type == null)
+        {
+            varInfo.ValidateExpression(classInfo, _knownClasses, callable);
+        }
     }
 
-    public void Validate(Assignment assignment, ParsedClassInfo classInfo, IClassMember method, ref Dictionary<string, string?> locals)
+    public void ValidateAssignment(Assignment assignment, ParsedClassInfo classInfo, CallableInfo callable)
     {
-        LateValidate(new ExpressionInfo(assignment.Value, classInfo, method, null, locals));
+        if (callable.LocalVariables.TryGetValue(assignment.Identifier.Literal, out var varInfo))
+        {
+            var valueInfo = new ExpressionInfo(assignment.Value);
+            valueInfo.ValidateExpression(classInfo, _knownClasses, callable);
+            if (valueInfo.Type != varInfo.Type)
+            {
+                throw new Exception($"Cannot assign value of type {valueInfo.Type} to a variable of type {varInfo.Type}");
+            }
+            return;
+        }
+        if (/* LHS is field and class has this field */false)
+        {
+        }
+        throw new Exception($"{assignment.Identifier.Literal} must be declared before assignment");
     }
 
-    public void Validate(If conditional, ParsedClassInfo classInfo, IClassMember method, ref Dictionary<string, string?> locals)
+    public void ValidateIf(If conditional, ParsedClassInfo classInfo, CallableInfo callable)
     {
-        LateValidate(new ExpressionInfo(conditional.Condition, classInfo, method, null, locals));
+        ValidateCondition(conditional.Condition, classInfo, callable);
         foreach (var statement in conditional.Body)
         {
-            Validate(statement, classInfo, method, ref locals);
+            ValidateStatement(statement, classInfo, callable);
         }
         foreach (var statement in conditional.ElseBody)
         {
-            Validate(statement, classInfo, method, ref locals);
+            ValidateStatement(statement, classInfo, callable);
         }
     }
 
-    public void Validate(Return @return, ParsedClassInfo classInfo, IClassMember method, ref Dictionary<string, string?> locals)
+    public void ValidateLoop(While loop, ParsedClassInfo classInfo, CallableInfo callable)
     {
-        LateValidate(new ExpressionInfo(@return.ReturnValue!, classInfo, method, null, locals));
-    }
-
-    public void Validate(While loop, ParsedClassInfo classInfo, IClassMember method, ref Dictionary<string, string?> locals)
-    {
-        LateValidate(new ExpressionInfo(loop.Condition, classInfo, method, null, locals));
+        ValidateCondition(loop.Condition, classInfo, callable);
         foreach (var statement in loop.Body)
         {
-            Validate(statement, classInfo, method, ref locals);
+            ValidateStatement(statement, classInfo, callable);
         }
     }
 
-    private void LateValidate(ExpressionInfo info)
+    public void ValidateReturn(Return @return, ParsedClassInfo classInfo, CallableInfo callable)
     {
-        _expressions.Add(info);
-    }
-
-    private string ValidateExpression(ExpressionInfo info)
-    {
-        var type = info.Expression.Token switch
+        string methodReturnType = callable switch
         {
-            Identifier identifier => ResolveType(identifier.Literal, info),
-            Lexical.Tokens.Keywords.This => info.Class.Name,
-            IntegerLiteral => "Integer",
-            BooleanLiteral => "Boolean",
-            StringLiteral => "String",
-            RealLiteral => "Real",
-            _ => throw new Exception($"Unexpected Primary expression: {info.Expression}")
+            ParsedConstructorInfo => "Void",
+            ParsedMethodInfo method => method.ReturnType,
+            _ => throw new Exception($"Unknown CallableInfo type: {callable}"),
         };
 
-        var primaryClass = GetKnownType(type);
-        
-        if (info.Expression is Call constructorCall)
+        string returnType = "Void";
+        if (@return.ReturnValue != null)
         {
-            var argTypes = new List<string>();
-            foreach (var arg in constructorCall.Arguments)
-            {
-                argTypes.Add(ValidateExpression(info.FromSameContext(arg)));
-            }
-            if (!primaryClass.HasConstructor(argTypes))
-            {
-                throw new Exception($"Couldn't find a constructor to call: {constructorCall}");
-            }
+            var returnInfo = new ExpressionInfo(@return.ReturnValue);
+            returnInfo.ValidateExpression(classInfo, _knownClasses, callable);
+            returnType = returnInfo.Type!;
         }
-
-        var childInfo = info.GetChildInfo();
-
-        while (childInfo != null)
+        if (returnType != methodReturnType)
         {
-            switch (childInfo.Expression)
-            {
-                case Call call:
-                    var argTypes = new List<string>();
-                    foreach (var arg in call.Arguments)
-                    {
-                        argTypes.Add(ValidateExpression(info.FromSameContext(arg)));
-                    }
-                    type = primaryClass.GetMethodReturnType(call.Token.Literal, argTypes);
-                    if (type == null)
-                    {
-                        var argsStr = string.Join(", ", argTypes);
-                        throw new Exception($"Couldn't find a method for call {call.Token.Literal}({argsStr}) on type {primaryClass.Name}");
-                    }
-                    primaryClass = GetKnownType(type);
-                    break;
-                case Expression expression:
-                    var fieldName = expression.Token.Literal;
-                    if (!primaryClass.HasField(fieldName))
-                    {
-                        throw new Exception($"Couldn't find a field {fieldName} in type {type}");
-                    }
-                    var candidates = _expressions.Where(exprInfo => exprInfo.TargetVariable == fieldName && exprInfo.Class == primaryClass).ToList();
-                    if (candidates.Count > 1)
-                    {
-                        throw new Exception($"Field {fieldName} defined more than once in class {primaryClass}");
-                    }
-                    if (candidates.Count == 0)
-                    {
-                        throw new Exception($"Field {fieldName} is not found in class {primaryClass}");
-                    }
-                    var fieldType = ValidateExpression(candidates[0]);
-                    if (_knownClasses[primaryClass.Name] is ParsedClassInfo parsedClass)
-                    {
-                        parsedClass.AddFieldType(fieldName, fieldType);
-                    }
-                    primaryClass = GetKnownType(fieldType);
-                    break;
-                default:
-                    throw new Exception($"Unknown Expression type: {childInfo.Expression}");
-            }
-            childInfo = childInfo.GetChildInfo();
+            throw new Exception(
+                methodReturnType == "Void" ?
+                $"Cannot use value of type {returnType} as a return value, expected return without an object" :
+                $"Cannot use value of type {returnType} as a return value, expected {methodReturnType}"
+            );
         }
-        return type;
     }
 
-    private Class.ClassInfo GetKnownType(string name)
+    public void ValidateCondition(Syntax.Declaration.Expression.Expression condition, ParsedClassInfo classInfo, CallableInfo callable)
     {
-        if (!_knownClasses.TryGetValue(name, out var classInfo))
+        var conditionInfo = new ExpressionInfo(condition);
+        conditionInfo.ValidateExpression(classInfo, _knownClasses, callable);
+        if (conditionInfo.Type != "Boolean")
         {
-            throw new Exception($"Unknown type: {name}");
+            throw new Exception($"Cannot use value of type {conditionInfo.Type} as a condition, it must be a Boolean");
         }
-        return classInfo;
-    }
-
-    private string ResolveType(string classOrVariable, ExpressionInfo info)
-    {
-        if (_knownClasses.ContainsKey(classOrVariable))
-        {
-            return classOrVariable;
-        }
-        if (!info.LocalVariables.ContainsKey(classOrVariable))
-        {
-            throw new Exception($"Use of unassigned variable {classOrVariable}");
-        }
-
-        var type = info.LocalVariables[classOrVariable];
-        if (type == null)
-        {
-            foreach (var otherInfo in _expressions)
-            {
-                if (otherInfo.Method == info.Method && otherInfo.TargetVariable == classOrVariable)
-                {
-                    type = ValidateExpression(otherInfo);
-                    info.LocalVariables[classOrVariable] = type;
-                    break;
-                }
-            }
-
-            if (type == null)
-            {
-                throw new Exception($"Unknown symbol {classOrVariable}");
-            }
-        }
-        return type;
     }
 }
