@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
+using OCompiler.Analyze.Semantics.Class;
 using OCompiler.Analyze.Semantics.Expression;
 using OCompiler.Analyze.Syntax.Declaration;
 using OCompiler.Analyze.Syntax.Declaration.Class.Member;
@@ -15,9 +16,11 @@ internal abstract class CallableInfo
     public Body Body { get; }
     public List<ParsedParameterInfo> Parameters { get; } = new();
     public Dictionary<string, ExpressionInfo> LocalVariables { get; } = new();
+    public Context Context { get; }
 
-    public CallableInfo(IClassMember parsedMember)
+    public CallableInfo(IClassMember parsedMember, Context context)
     {
+        Context = context;
         switch (parsedMember)
         {
             case Constructor constructor:
@@ -56,7 +59,7 @@ internal abstract class CallableInfo
         {
             if (statement is Variable variable)
             {
-                LocalVariables.Add(variable.Identifier.Literal, new ExpressionInfo(variable.Expression));
+                LocalVariables.Add(variable.Identifier.Literal, new ExpressionInfo(variable.Expression, Context));
             }
         }
     }

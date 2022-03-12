@@ -1,5 +1,4 @@
 ﻿using OCompiler.Analyze.Lexical.Tokens;
-using OCompiler.Analyze.Semantics.Callable;
 using OCompiler.Analyze.Semantics.Class;
 using OCompiler.Analyze.Syntax.Declaration.Expression;
 
@@ -11,11 +10,13 @@ namespace OCompiler.Analyze.Semantics.Expression;
 internal class ExpressionInfo
 {
     public Syntax.Declaration.Expression.Expression Expression { get; }
+    public Context Context { get; }
     public string? Type { get; private set; }
 
-    public ExpressionInfo(Syntax.Declaration.Expression.Expression expression)
+    public ExpressionInfo(Syntax.Declaration.Expression.Expression expression, Context context)
     {
         Expression = expression;
+        Context = context;
     }
 
     public ExpressionInfo? GetChildInfo()
@@ -24,20 +25,20 @@ internal class ExpressionInfo
         {
             return null;
         }
-        return new(Expression.Child);
+        return new(Expression.Child, Context);
     }
 
     public ExpressionInfo FromSameContext(Syntax.Declaration.Expression.Expression expression)
     {
-        return new(expression);
+        return new(expression, Context);
     }
 
-    public void ValidateExpression(ParsedClassInfo currentClass, Dictionary<string, ClassInfo> allClasses, CallableInfo? currentMethod = null)
+    public void ValidateExpression()
     {
         var type = Expression.Token switch
         {
-            Identifier identifier => ResolveType(identifier.Literal, currentClass, allClasses, currentMethod),
-            Lexical.Tokens.Keywords.This => currentClass.Name,
+            Identifier identifier => ResolveType(identifier.Literal),
+            Lexical.Tokens.Keywords.This => Context.CurrentClass.Name,
             IntegerLiteral => "Integer",
             BooleanLiteral => "Boolean",
             StringLiteral => "String",
@@ -45,7 +46,7 @@ internal class ExpressionInfo
             _ => throw new Exception($"Unexpected Primary expression: {Expression}")
         };
 
-        var primaryClass = GetClassByName(type, allClasses);
+        var primaryClass = Context.GetClassByName(type);
 
         if (Expression is Call constructorCall)
         {
@@ -53,8 +54,8 @@ internal class ExpressionInfo
             var argTypes = new List<string>();
             foreach (var arg in constructorCall.Arguments)
             {
-                var argExpression = new ExpressionInfo(arg);
-                argExpression.ValidateExpression(currentClass, allClasses, currentMethod);
+                var argExpression = FromSameContext(arg);
+                argExpression.ValidateExpression();
                 argTypes.Add(argExpression.Type!);
             }
             if (!primaryClass.HasConstructor(argTypes))
@@ -74,8 +75,8 @@ internal class ExpressionInfo
                     var argTypes = new List<string>();
                     foreach (var arg in call.Arguments)
                     {
-                        var argExpression = new ExpressionInfo(arg);
-                        argExpression.ValidateExpression(currentClass, allClasses, currentMethod);
+                        var argExpression = FromSameContext(arg);
+                        argExpression.ValidateExpression();
                         argTypes.Add(argExpression.Type!);
                     }
                     type = primaryClass.GetMethodReturnType(call.Token.Literal, argTypes);
@@ -84,7 +85,7 @@ internal class ExpressionInfo
                         var argsStr = string.Join(", ", argTypes);
                         throw new Exception($"Couldn't find a method for call {call.Token.Literal}({argsStr}) on type {primaryClass.Name}");
                     }
-                    primaryClass = GetClassByName(type, allClasses);
+                    primaryClass = Context.GetClassByName(type);
                     break;
                 case Syntax.Declaration.Expression.Expression expression:
                     var fieldName = expression.Token.Literal;
@@ -98,7 +99,7 @@ internal class ExpressionInfo
                     {
                         case ParsedClassInfo parsedClass:
                             var fieldExpression = parsedClass.GetFieldInfo(fieldName)!.Expression;
-                            fieldExpression.ValidateExpression(currentClass, allClasses);
+                            fieldExpression.ValidateExpression();
                             fieldType = fieldExpression.Type!;
                             parsedClass.AddFieldType(fieldName, fieldType);
                             break;
@@ -108,7 +109,7 @@ internal class ExpressionInfo
                         default:
                             throw new Exception($"Unknown ClassInfo object: {primaryClass}");
                     }
-                    primaryClass = GetClassByName(fieldType, allClasses);
+                    primaryClass = Context.GetClassByName(fieldType);
                     break;
                 default:
                     throw new Exception($"Unknown Expression type: {childInfo.Expression}");
@@ -118,46 +119,32 @@ internal class ExpressionInfo
         Type = type;
     }
 
-    private static ClassInfo GetClassByName(string name, Dictionary<string, ClassInfo> classes)
+    private string ResolveType(string classOrVariable)
     {
-        if (!classes.TryGetValue(name, out var classInfo))
-        {
-            throw new Exception($"Unknown type: {name}");
-        }
-        return classInfo;
-    }
-
-    private static string ResolveType(
-        string classOrVariable,
-        ParsedClassInfo currentClass,
-        Dictionary<string, ClassInfo> classes,
-        CallableInfo? currentMethod = null
-    )
-    {
-        if (classes.ContainsKey(classOrVariable))
+        if (Context.Classes!.ContainsKey(classOrVariable))
         {
             return classOrVariable;
         }
-        if (currentMethod == null)
+        if (Context.CurrentMethod == null)
         {
             throw new Exception($"Unknown class {classOrVariable}");
         }
 
-        var methodParameterType = currentMethod.GetParameterType(classOrVariable);
+        var methodParameterType = Context.CurrentMethod.GetParameterType(classOrVariable);
         if (methodParameterType != null)
         {
             return methodParameterType;
         }
 
-        if (!currentMethod.LocalVariables.ContainsKey(classOrVariable))
+        if (!Context.CurrentMethod.LocalVariables.ContainsKey(classOrVariable))
         {
             throw new Exception($"Use of unassigned variable {classOrVariable}");
         }
 
-        var localVarInfo = currentMethod.LocalVariables[classOrVariable];
+        var localVarInfo = Context.CurrentMethod.LocalVariables[classOrVariable];
         if (localVarInfo.Type == null)
         {
-            localVarInfo.ValidateExpression(currentClass, classes, currentMethod);
+            localVarInfo.ValidateExpression();
         }
         return localVarInfo.Type!;
     }

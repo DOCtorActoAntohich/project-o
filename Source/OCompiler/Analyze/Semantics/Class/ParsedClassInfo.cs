@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 
 using OCompiler.Analyze.Semantics.Callable;
+using OCompiler.Analyze.Semantics.Expression;
 using OCompiler.Analyze.Syntax.Declaration.Class.Member;
 using OCompiler.Analyze.Syntax.Declaration.Class.Member.Method;
 
@@ -16,11 +17,13 @@ internal class ParsedClassInfo : ClassInfo
     public List<ParsedMethodInfo> Methods { get; } = new();
     public List<ParsedFieldInfo> Fields { get; } = new();
     public List<ParsedConstructorInfo> Constructors { get; } = new();
+    public Context Context { get; }
 
     private readonly static Dictionary<string, ParsedClassInfo> parsedClasses = new();
 
     private ParsedClassInfo(Syntax.Declaration.Class.Class parsedClass)
     {
+        Context = new Context(this);
         AddMethods(parsedClass.Methods);
         AddFields(parsedClass.Fields);
         AddConstructors(parsedClass.Constructors);
@@ -35,13 +38,14 @@ internal class ParsedClassInfo : ClassInfo
 
     protected ParsedClassInfo()
     {
+        Context = new Context(this);
     }
 
     private void AddMethods(List<Method> methods)
     {
         foreach (var method in methods)
         {
-            var methodInfo = new ParsedMethodInfo(method);
+            var methodInfo = new ParsedMethodInfo(method, Context);
             var methodName = methodInfo.Name;
             var parameterTypes = methodInfo.GetParameterTypes();
             if (HasMethod(methodName, parameterTypes))
@@ -58,7 +62,7 @@ internal class ParsedClassInfo : ClassInfo
     {
         foreach (var field in fields)
         {
-            var fieldInfo = new ParsedFieldInfo(field);
+            var fieldInfo = new ParsedFieldInfo(field, Context);
             if (Fields.Where(f => f.Name == fieldInfo.Name).Any())
             {
                 throw new Exception($"Field {fieldInfo.Name} defined more than once in class {Name}");
@@ -71,7 +75,7 @@ internal class ParsedClassInfo : ClassInfo
     {
         foreach (var constructor in constructors)
         {
-            var constructorInfo = new ParsedConstructorInfo(constructor);
+            var constructorInfo = new ParsedConstructorInfo(constructor, Context);
             var parameterTypes = constructorInfo.GetParameterTypes();
             if (HasConstructor(parameterTypes))
             {

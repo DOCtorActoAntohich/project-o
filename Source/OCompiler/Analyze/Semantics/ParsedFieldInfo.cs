@@ -1,5 +1,8 @@
-﻿using OCompiler.Analyze.Semantics.Expression;
+﻿using OCompiler.Analyze.Semantics.Class;
+using OCompiler.Analyze.Semantics.Expression;
 using OCompiler.Analyze.Syntax.Declaration.Class.Member;
+
+using System.Collections.Generic;
 
 namespace OCompiler.Analyze.Semantics;
 
@@ -9,10 +12,12 @@ internal class ParsedFieldInfo
     public string Name => Field.Identifier.Literal;
     public ExpressionInfo Expression { get; }
     public string? Type { get; set; }
+    public Context Context { get; }
 
-    public ParsedFieldInfo(Field parsedField)
+    public ParsedFieldInfo(Field parsedField, Context context)
     {
+        Context = context;
         Field = parsedField;
-        Expression = new ExpressionInfo(parsedField.Expression);
+        Expression = new ExpressionInfo(parsedField.Expression, Context);
     }
 }
