@@ -55,6 +55,9 @@ internal class If : IStatement
             throw new Exception($"Keyword 'end' expected at position {tokens.Current().StartOffset}.");
         }
 
+        // Get next token.
+        tokens.Next();
+
         @if = new If(expression!, body!, elseBody);
         return true;
     }
