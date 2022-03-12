@@ -142,7 +142,17 @@ internal class TreeValidator
 
     public void ValidateAssignment(Assignment assignment, ParsedClassInfo classInfo, CallableInfo callable)
     {
-        if (callable.LocalVariables.TryGetValue(assignment.Identifier.Literal, out var varInfo))
+        var variable = assignment.Variable;
+        if (variable.Child != null)
+        {
+            if (variable.Token is not Lexical.Tokens.Keywords.This)
+            {
+                throw new Exception($"Fields of other classes cannot be changed directly");
+            }
+            variable = variable.Child;
+        }
+
+        if (callable.LocalVariables.TryGetValue(variable.Token.Literal, out var varInfo))
         {
             var valueInfo = new ExpressionInfo(assignment.Value, new Context(classInfo, _knownClasses, callable));
             valueInfo.ValidateExpression();
@@ -152,10 +162,8 @@ internal class TreeValidator
             }
             return;
         }
-        if (/* LHS is field and class has this field */false)
-        {
-        }
-        throw new Exception($"{assignment.Identifier.Literal} must be declared before assignment");
+
+        throw new Exception($"{assignment.Variable} must be declared before assignment");
     }
 
     public void ValidateIf(If conditional, ParsedClassInfo classInfo, CallableInfo callable)
