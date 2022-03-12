@@ -1,20 +1,17 @@
 class Main is
   this is
-    var numbers : Array(3)
-    numbers.set(0, 5.15)
-    numbers.set(1, 22.05)
-    numbers.set(2, 15.22)
-    Calculator.sum(numbers)
+    var a : 7
+    IO.WriteLine(Calculator().magic(a).ToString())
   end
 end
 
-class Calculator extends Object is
-  method sum(numbers: Array) is
-    var result : T(0)
-    i := 0
-    while i.Less(numbers.Length) loop
-      result := result.Plus(numbers.get(i))
+class Calculator is
+  this is end
+  method magic(num: Integer) : Integer is
+    if num.Less(5) then
+      var result : num.Mult(12).Minus(num.Mult(2))
+      return result.Minus(1)
     end
-    return result
+    return num.Plus(num)
   end
 end
