@@ -127,6 +127,10 @@ internal class TreeValidator
 
     public void ValidateVariable(Variable variable, ParsedClassInfo classInfo, CallableInfo callable)
     {
+        if (_knownClasses.ContainsKey(variable.Identifier.Literal))
+        {
+            throw new Exception($"Cannot create variable, name {variable.Identifier.Literal} is already used by a class");
+        }
         if (!callable.LocalVariables.TryGetValue(variable.Identifier.Literal, out var varInfo))
         {
             varInfo = new ExpressionInfo(variable.Expression, new Context(classInfo, _knownClasses, callable));
