@@ -9,9 +9,11 @@ namespace OCompiler.Analyze.Semantics.Expression;
 
 internal class ExpressionInfo
 {
+    private string? _type;
+
     public Syntax.Declaration.Expression.Expression Expression { get; }
     public Context Context { get; }
-    public string? Type { get; private set; }
+    public string Type { get => ValidateAndGetType(); private set => _type = value; }
 
     public ExpressionInfo(Syntax.Declaration.Expression.Expression expression, Context context)
     {
@@ -146,5 +148,14 @@ internal class ExpressionInfo
             localVarInfo.ValidateExpression();
         }
         return localVarInfo.Type!;
+    }
+
+    private string ValidateAndGetType()
+    {
+        if (_type == null)
+        {
+            ValidateExpression();
+        }
+        return _type!;
     }
 }
