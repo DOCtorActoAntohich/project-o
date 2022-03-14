@@ -57,8 +57,7 @@ internal class ExpressionInfo
             foreach (var arg in constructorCall.Arguments)
             {
                 var argExpression = FromSameContext(arg);
-                argExpression.ValidateExpression();
-                argTypes.Add(argExpression.Type!);
+                argTypes.Add(argExpression.Type);
             }
             if (!primaryClass.HasConstructor(argTypes))
             {
@@ -78,8 +77,7 @@ internal class ExpressionInfo
                     foreach (var arg in call.Arguments)
                     {
                         var argExpression = FromSameContext(arg);
-                        argExpression.ValidateExpression();
-                        argTypes.Add(argExpression.Type!);
+                        argTypes.Add(argExpression.Type);
                     }
                     type = primaryClass.GetMethodReturnType(call.Token.Literal, argTypes);
                     if (type == null)
@@ -100,8 +98,7 @@ internal class ExpressionInfo
                     {
                         case ParsedClassInfo parsedClass:
                             var fieldExpression = parsedClass.GetFieldInfo(fieldName)!.Expression;
-                            fieldExpression.ValidateExpression();
-                            type = fieldExpression.Type!;
+                            type = fieldExpression.Type;
                             parsedClass.AddFieldType(fieldName, type);
                             break;
                         case BuiltClassInfo builtClass:
