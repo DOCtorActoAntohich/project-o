@@ -33,7 +33,8 @@ namespace OCompiler.Pipeline
             var validator = new TreeValidator(tokenTree);
             Console.WriteLine(validator.GetValidationInfo());
 
-            var generator = new CodeGenerator(validator.ValidatedClasses);
+            var generator = new Emitter(validator.ValidatedClasses);
+            generator.Run();
         }
     }
 }
