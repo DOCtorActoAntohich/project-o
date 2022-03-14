@@ -226,7 +226,8 @@ internal class TreeValidator
         if (@return.ReturnValue != null)
         {
             var returnInfo = new ExpressionInfo(@return.ReturnValue, new Context(classInfo, _knownClasses, callable));
-            returnType = returnInfo.Type;
+            returnInfo.ValidateExpression();
+            returnType = returnInfo.Type!;
         }
         if (returnType != methodReturnType)
         {
@@ -241,6 +242,7 @@ internal class TreeValidator
     public void ValidateCondition(Syntax.Declaration.Expression.Expression condition, ParsedClassInfo classInfo, CallableInfo callable)
     {
         var conditionInfo = new ExpressionInfo(condition, new Context(classInfo, _knownClasses, callable));
+        conditionInfo.ValidateExpression();
         if (conditionInfo.Type != "Boolean")
         {
             throw new Exception($"Cannot use value of type {conditionInfo.Type} as a condition, it must be a Boolean");

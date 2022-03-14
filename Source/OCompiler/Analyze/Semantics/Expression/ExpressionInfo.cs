@@ -11,7 +11,7 @@ internal class ExpressionInfo
 {
     private string? _type;
 
-    public Syntax.Declaration.Expression.Expression Expression { get; }
+    public Syntax.Declaration.Expression.Expression Expression { get; private set; }
     public Context Context { get; }
     public string Type { get => ValidateAndGetType(); private set => _type = value; }
 
@@ -59,7 +59,7 @@ internal class ExpressionInfo
                 var argExpression = FromSameContext(arg);
                 argTypes.Add(argExpression.Type);
             }
-            if (!primaryClass.HasConstructor(argTypes))
+            if (argTypes.Count > 0 && !primaryClass.HasConstructor(argTypes))
             {
                 throw new Exception($"Couldn't find a constructor to call: {constructorCall}");
             }
@@ -72,23 +72,17 @@ internal class ExpressionInfo
             switch (childInfo.Expression)
             {
                 case Call call:
-                    // Get parameter types and find the matching method
-                    var argTypes = new List<string>();
-                    foreach (var arg in call.Arguments)
-                    {
-                        var argExpression = FromSameContext(arg);
-                        argTypes.Add(argExpression.Type);
-                    }
-                    type = primaryClass.GetMethodReturnType(call.Token.Literal, argTypes);
-                    if (type == null)
-                    {
-                        var argsStr = string.Join(", ", argTypes);
-                        throw new Exception($"Couldn't find a method for call {call.Token.Literal}({argsStr}) on type {primaryClass.Name}");
-                    }
+                    type = GetCallResultType(primaryClass, call);
                     primaryClass = Context.GetClassByName(type);
                     break;
-                case Syntax.Declaration.Expression.Expression expression:
-                    var fieldName = expression.Token.Literal;
+                case Syntax.Declaration.Expression.Expression childExpression:
+                    // Check if there is a method with this name and no parameters
+                    if (primaryClass.GetMethodReturnType(childExpression.Token.Literal, new()) != null)
+                    {
+                        childInfo.Expression = childExpression.ReplaceWithCall();
+                        continue;
+                    }
+                    var fieldName = childExpression.Token.Literal;
                     if (!primaryClass.HasField(fieldName))
                     {
                         throw new Exception($"Couldn't find a field {fieldName} in type {type}");
@@ -117,6 +111,23 @@ internal class ExpressionInfo
         Type = type;
     }
 
+    private string GetCallResultType(ClassInfo primaryClass, Call call)
+    {
+        // Get parameter types and find the matching method
+        var argTypes = new List<string>();
+        foreach (var arg in call.Arguments)
+        {
+            var argExpression = FromSameContext(arg);
+            argTypes.Add(argExpression.Type);
+        }
+        var type = primaryClass.GetMethodReturnType(call.Token.Literal, argTypes);
+        if (type == null)
+        {
+            var argsStr = string.Join(", ", argTypes);
+            throw new Exception($"Couldn't find a method for call {call.Token.Literal}({argsStr}) on type {primaryClass.Name}");
+        }
+        return type;
+    }
     private string ResolveType(string classOrVariable)
     {
         if (Context.Classes!.ContainsKey(classOrVariable))
