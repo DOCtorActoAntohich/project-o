@@ -11,9 +11,14 @@ namespace OCompiler.Pipeline
     internal class Compiler
     {
         public string SourceFilePath { get; }
-        public Compiler(string sourceFilePath)
+        public string EntryClass { get; }
+        public string[] EntrypointArgs { get; }
+
+        public Compiler(string sourceFilePath, string entryClass, string[] entrypointArgs)
         {
             SourceFilePath = sourceFilePath;
+            EntryClass = entryClass;
+            EntrypointArgs = entrypointArgs;
         }
 
         public void Run()
@@ -35,6 +40,9 @@ namespace OCompiler.Pipeline
 
             var generator = new Emitter(validator.ValidatedClasses);
             generator.Run();
+
+            var entrypoint = Invoker.GetEntryPoint(validator.ValidatedClasses, EntryClass, EntrypointArgs);
+            Console.WriteLine($"Entry point class: {entrypoint.Context.Class.Name}");
         }
     }
 }

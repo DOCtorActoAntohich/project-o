@@ -67,6 +67,15 @@ internal class BuiltClassInfo : ClassInfo
         return method?.ReturnType.Name;
     }
 
+    public override ConstructorInfo? GetConstructor(List<string> argumentTypes)
+    {
+        var constructor = Constructors.Where(
+            c => c.GetParameters().Select(p => p.ParameterType.Name).SequenceEqual(argumentTypes)
+        ).FirstOrDefault();
+
+        return constructor;
+    }
+
     public override string? GetFieldType(string name)
     {
         var field = Fields.Where(f => f.Name == name).FirstOrDefault();
@@ -80,15 +89,7 @@ internal class BuiltClassInfo : ClassInfo
 
     public override bool HasConstructor(List<string> argumentTypes)
     {
-        var candidates = Constructors.Where(
-            c => c.GetParameters().Select(p => p.ParameterType.Name).SequenceEqual(argumentTypes)
-        ).ToList();
-        if (candidates.Count > 1)
-        {
-            throw new Exception($"More than one constructor matches signature {Name}({string.Join(",", argumentTypes)})");
-        }
-
-        return candidates.Count == 1;
+        return GetConstructor(argumentTypes) != null;
     }
 
     public override string ToString(bool includeBase = true)

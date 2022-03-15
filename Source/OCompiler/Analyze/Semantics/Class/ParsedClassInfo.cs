@@ -141,6 +141,15 @@ internal class ParsedClassInfo : ClassInfo
         return type;
     }
 
+    public override ParsedConstructorInfo? GetConstructor(List<string> argumentTypes)
+    {
+        var constructor = Constructors.Where(
+            c => c.Parameters.Select(p => p.Type).SequenceEqual(argumentTypes)
+        ).FirstOrDefault();
+
+        return constructor;
+    }
+
     public bool HasMethod(string name, List<string> argumentTypes)
     {
         return GetMethodReturnType(name, argumentTypes) != null;
@@ -182,11 +191,7 @@ internal class ParsedClassInfo : ClassInfo
 
     public override bool HasConstructor(List<string> argumentTypes)
     {
-        var constructor = Constructors.Where(
-            c => c.Parameters.Select(p => p.Type).SequenceEqual(argumentTypes)
-        ).FirstOrDefault();
-
-        return constructor != null;
+        return GetConstructor(argumentTypes) != null;
     }
 
     public override string ToString(bool includeBase = true)
