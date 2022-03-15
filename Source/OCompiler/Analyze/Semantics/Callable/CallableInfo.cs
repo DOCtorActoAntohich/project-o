@@ -73,6 +73,11 @@ internal abstract class CallableInfo
         return Parameters.Where(p => p.Name == name).FirstOrDefault()?.Type;
     }
 
+    public bool HasParameter(string name)
+    {
+        return GetParameterType(name) != null;
+    }
+
     public List<string> GetParameterTypes()
     {
         return Parameters.Select(p => p.Type).ToList();
