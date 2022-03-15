@@ -127,14 +127,19 @@ internal class TreeValidator
 
     public void ValidateVariable(Variable variable, ParsedClassInfo classInfo, CallableInfo callable)
     {
-        if (_knownClasses.ContainsKey(variable.Identifier.Literal))
+        var variableName = variable.Identifier.Literal;
+        if (_knownClasses.ContainsKey(variableName))
         {
-            throw new Exception($"Cannot create variable, name {variable.Identifier.Literal} is already used by a class");
+            throw new Exception($"Cannot create variable, name {variableName} is already used by a class");
         }
-        if (!callable.LocalVariables.TryGetValue(variable.Identifier.Literal, out var varInfo))
+        if (callable.HasParameter(variableName))
+        {
+            throw new Exception($"Cannot create variable, name {variableName} is already used by a method parameter");
+        }
+        if (!callable.LocalVariables.TryGetValue(variableName, out var varInfo))
         {
             varInfo = new ExpressionInfo(variable.Expression, new Context(classInfo, _knownClasses, callable));
-            callable.LocalVariables.Add(variable.Identifier.Literal, varInfo);
+            callable.LocalVariables.Add(variableName, varInfo);
         }
         varInfo.ValidateExpression();
     }
@@ -163,6 +168,10 @@ internal class TreeValidator
         CallableInfo callable
     )
     {
+        if (callable.HasParameter(variableName))
+        {
+            throw new Exception($"Cannot assign a value to the method parameter {variableName}");
+        }
         if (!callable.LocalVariables.TryGetValue(variableName, out var varInfo))
         {
             throw new Exception($"Variable {variableName} must be declared before assignment");
@@ -171,7 +180,7 @@ internal class TreeValidator
         var valueInfo = new ExpressionInfo(value, new Context(classInfo, _knownClasses, callable));
         if (valueInfo.Type != varInfo.Type)
         {
-            throw new Exception($"Cannot assign value of type {valueInfo.Type} to a variable of type {varInfo.Type}");
+            throw new Exception($"Cannot assign value of type {valueInfo.Type} to a variable {variableName} of type {varInfo.Type}");
         }
     }
 
@@ -191,7 +200,7 @@ internal class TreeValidator
         var valueInfo = new ExpressionInfo(value, new Context(classInfo, _knownClasses, callable));
         if (valueInfo.Type != field.Expression.Type)
         {
-            throw new Exception($"Cannot assign value of type {valueInfo.Type} to a field of type {field.Expression.Type}");
+            throw new Exception($"Cannot assign value of type {valueInfo.Type} to a field {fieldName} of type {field.Expression.Type}");
         }
     }
 
