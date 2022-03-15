@@ -6,6 +6,8 @@ internal class Return : IStatement
 {
     public Expression.Expression? ReturnValue { get; }
 
+    public static Return EmptyReturn => new(null);
+
     public static bool TryParse(TokenEnumerator tokens, out Return? @return)
     {
         // Keyword.
