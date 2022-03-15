@@ -26,7 +26,7 @@ internal class Body : IEnumerable<IBodyStatement>
 
     public void AddTrailingReturn()
     {
-        if (_members[^1] is not Return)
+        if (_members.Count == 0 || _members[^1] is not Return)
         {
             _members.Add(Return.EmptyReturn);
         }

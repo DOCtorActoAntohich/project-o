@@ -26,6 +26,7 @@ internal class ParsedClassInfo : ClassInfo
         AddMethods(parsedClass.Methods);
         AddFields(parsedClass.Fields);
         AddConstructors(parsedClass.Constructors);
+        AddDefaultConstructor();
 
         Name = parsedClass.Name.Literal;
         Class = parsedClass;
@@ -83,6 +84,15 @@ internal class ParsedClassInfo : ClassInfo
             }
             Constructors.Add(constructorInfo);
         }
+    }
+
+    private void AddDefaultConstructor()
+    {
+        if (HasConstructor(new()))
+        {
+            return;
+        }
+        Constructors.Add(new ParsedConstructorInfo(Constructor.EmptyConstructor, Context));
     }
 
     public static ParsedClassInfo GetByClass(Syntax.Declaration.Class.Class parsedClass)
