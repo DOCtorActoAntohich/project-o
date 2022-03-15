@@ -27,15 +27,20 @@ internal abstract class CallableInfo
                 Body = constructor.Body;
                 AddParameters(constructor.Parameters);
                 AddLocalVariables();
+                Body.AddTrailingReturn();
                 break;
             case Method method:
                 Callable = method;
                 Body = method.Body;
                 AddParameters(method.Parameters);
                 AddLocalVariables();
+                if (method.ReturnType == null)
+                {
+                    Body.AddTrailingReturn();
+                }
                 break;
             default:
-                throw new Exception("Attempt to CallableInfo not with constructor or method.");
+                throw new Exception("Attempt to create CallableInfo not with constructor or method.");
         }
     }
 

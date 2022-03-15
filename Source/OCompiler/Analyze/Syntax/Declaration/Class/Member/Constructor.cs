@@ -11,6 +11,8 @@ internal class Constructor: IClassMember
     public List<Parameter> Parameters { get; }
     
     public Body Body { get; }
+
+    public static Constructor EmptyConstructor = new(new(), new());
     
     public static bool TryParse(TokenEnumerator tokens, out Constructor? constructor)
     {
