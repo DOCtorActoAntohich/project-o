@@ -23,13 +23,13 @@ internal class While : IStatement
         // Try parse expression.
         if (!Declaration.Expression.Expression.TryParse(tokens, out Expression.Expression? expression))
         {
-            throw new Exception($"Expression expected at position {tokens.Current().StartOffset}.");
+            throw new Exception($"Expression expected at line {tokens.Current().Position.Line}.");
         }
         
         // Keyword.
         if (tokens.Current() is not Lexical.Tokens.Keywords.Loop)
         {
-            throw new Exception($"Keyword 'loop' expected at position {tokens.Current().StartOffset}.");
+            throw new Exception($"Keyword 'loop' expected at line {tokens.Current().Position.Line}.");
         }
         
         // Get next token.
@@ -40,7 +40,7 @@ internal class While : IStatement
         // Keyword.
         if (tokens.Current() is not Lexical.Tokens.Keywords.End)
         {
-            throw new Exception($"Keyword 'end' expected at position {tokens.Current().StartOffset}.");
+            throw new Exception($"Keyword 'end' expected at line {tokens.Current().Position.Line}.");
         }
         
         // Get next token.

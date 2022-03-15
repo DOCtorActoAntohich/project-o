@@ -54,7 +54,7 @@ internal class Expression: IBodyStatement
         // Try parse child.
         if (!TryParse(tokens, out Expression? child))
         {
-            throw new Exception($"Expected expression at position {tokens.Current().StartOffset}.");
+            throw new Exception($"Expected expression at line {tokens.Current().Position.Line}.");
         }
 
         expression.Child = child;

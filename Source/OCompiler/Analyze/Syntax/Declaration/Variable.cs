@@ -22,13 +22,13 @@ internal class Variable : IBodyStatement
         // Parse name.
         if (tokens.Next() is not Identifier name)
         {
-            throw new Exception($"Expected variable name at position {tokens.Current().StartOffset}.");
+            throw new Exception($"Expected variable name at line {tokens.Current().Position.Line}.");
         }
         
         // Assign delimiter.
         if (tokens.Next() is not Lexical.Tokens.Delimiters.Colon)
         {
-            throw new Exception($"Expected expression at position {tokens.Current().StartOffset}.");
+            throw new Exception($"Expected expression at line {tokens.Current().Position.Line}.");
         }
 
         // Get next token.
@@ -37,7 +37,7 @@ internal class Variable : IBodyStatement
         // Expression.
         if (!Declaration.Expression.Expression.TryParse(tokens, out Expression.Expression? expression))
         {
-            throw new Exception($"Expected expression at position {tokens.Current().StartOffset}.");
+            throw new Exception($"Expected expression at line {tokens.Current().Position.Line}.");
         }
 
         variable = new Variable(name, expression!);

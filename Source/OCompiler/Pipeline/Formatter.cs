@@ -22,7 +22,7 @@ namespace OCompiler.Pipeline
         {
             foreach (var token in tokens)
             {
-                Console.Write($"{token.StartOffset}-{token.StartOffset + token.Length}:".PadLeft(10));
+                Console.Write($"{token.Position.Line}:{token.Position.Column}:".PadRight(8));
                 Console.ForegroundColor = GetConsoleColor(token);
                 var tokenOutput = token is Whitespace or EndOfFile ? "" : $" '{token.Literal}'";
                 Console.Write(tokenOutput.PadRight(15));

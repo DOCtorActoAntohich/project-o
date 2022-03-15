@@ -35,7 +35,7 @@ internal class Assignment : IStatement
         // Expression.
         if (!Expression.Expression.TryParse(tokens, out Expression.Expression? value))
         {
-            throw new Exception($"Expected expression at position {tokens.Current().StartOffset}.");
+            throw new Exception($"Expected expression at line {tokens.Current().Position.Line}.");
         }
         
         assignment = new Assignment(variable!, value!);

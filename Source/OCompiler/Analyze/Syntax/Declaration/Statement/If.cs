@@ -24,13 +24,13 @@ internal class If : IStatement
         // Try parse expression.
         if (!Declaration.Expression.Expression.TryParse(tokens, out Declaration.Expression.Expression? expression))
         {
-            throw new Exception($"Expression expected at position {tokens.Current().StartOffset}.");
+            throw new Exception($"Expression expected at line {tokens.Current().Position.Line}.");
         }
         
         // Keyword.
         if (tokens.Current() is not Lexical.Tokens.Keywords.Then)
         {
-            throw new Exception($"Keyword 'then' expected at position {tokens.Current().StartOffset}.");
+            throw new Exception($"Keyword 'then' expected at line {tokens.Current().Position.Line}.");
         }
         
         // Get next token.
@@ -52,7 +52,7 @@ internal class If : IStatement
         // Keyword.
         if (tokens.Current() is not Lexical.Tokens.Keywords.End)
         {
-            throw new Exception($"Keyword 'end' expected at position {tokens.Current().StartOffset}.");
+            throw new Exception($"Keyword 'end' expected at line {tokens.Current().Position.Line}.");
         }
 
         // Get next token.

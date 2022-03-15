@@ -25,7 +25,7 @@ internal class Method: IClassMember
         // Name.
         if (tokens.Next() is not Identifier name)
         {
-            throw new Exception($"Expected method name at position {tokens.Current().StartOffset}.");
+            throw new Exception($"Expected method name at line {tokens.Current().Position.Line}.");
         }
         
         // Get next token.
@@ -41,7 +41,7 @@ internal class Method: IClassMember
             // Return type.
             if (tokens.Next() is not Identifier)
             {
-                throw new Exception($"Expected class name at position {tokens.Current().StartOffset}.");
+                throw new Exception($"Expected class name at line {tokens.Current().Position.Line}.");
             }
             
             returnType = (Identifier)tokens.Current();
@@ -52,7 +52,7 @@ internal class Method: IClassMember
         // Is.
         if (tokens.Current() is not Lexical.Tokens.Keywords.Is)
         {
-            throw new Exception($"Expected keyword 'is' at position {tokens.Current().StartOffset}.");
+            throw new Exception($"Expected keyword 'is' at line {tokens.Current().Position.Line}.");
         }
         
         // Get next token.
@@ -63,7 +63,7 @@ internal class Method: IClassMember
         // End.
         if (tokens.Current() is not Lexical.Tokens.Keywords.End)
         {
-            throw new Exception($"Expected keyword 'end' at position {tokens.Current().StartOffset}.");
+            throw new Exception($"Expected keyword 'end' at line {tokens.Current().Position.Line}.");
         }
         
         // Get next token.

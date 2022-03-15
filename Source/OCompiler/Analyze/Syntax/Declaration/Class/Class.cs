@@ -22,13 +22,13 @@ internal class Class
         // Class.
         if (tokens.Current() is not Lexical.Tokens.Keywords.Class)
         {
-            throw new Exception($"Keyword 'class' expected at position {tokens.Current().StartOffset}.");
+            throw new Exception($"Keyword 'class' expected at line {tokens.Current().Position.Line}.");
         }
     
         // Class name.
         if (tokens.Next() is not Identifier name)
         {
-            throw new Exception($"Class identifier expected at position {tokens.Current().StartOffset}.");
+            throw new Exception($"Class identifier expected at line {tokens.Current().Position.Line}.");
         }
         
         // Extends.
@@ -37,7 +37,7 @@ internal class Class
         {
             if (tokens.Next() is not Identifier)
             {
-                throw new Exception($"Class identifier expected at position {tokens.Current().StartOffset}.");
+                throw new Exception($"Class identifier expected at line {tokens.Current().Position.Line}.");
             }
             
             // Save.
@@ -50,7 +50,7 @@ internal class Class
         // Is.
         if (tokens.Current() is not Lexical.Tokens.Keywords.Is)
         {
-            throw new Exception($"Keyword 'is' expected at position {tokens.Current().StartOffset}.");
+            throw new Exception($"Keyword 'is' expected at line {tokens.Current().Position.Line}.");
         }
 
         // Get next token.
@@ -82,7 +82,7 @@ internal class Class
         // End.
         if (tokens.Current() is not Lexical.Tokens.Keywords.End)
         {
-            throw new Exception($"Keyword 'end' expected at position {tokens.Current().StartOffset}.");
+            throw new Exception($"Keyword 'end' expected at line {tokens.Current().Position.Line}.");
         }
         
         // Get next token.

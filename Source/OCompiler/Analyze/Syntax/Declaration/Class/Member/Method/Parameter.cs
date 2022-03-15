@@ -21,13 +21,13 @@ internal class Parameter
         // Colon.
         if (tokens.Next() is not Lexical.Tokens.Delimiters.Colon)
         {
-            throw new Exception($"Expected ':' at position {tokens.Current().StartOffset}.");
+            throw new Exception($"Expected ':' at line {tokens.Current().Position.Line}.");
         }
         
         // Type.
         if (tokens.Next() is not Identifier type)
         {
-            throw new Exception($"Expected class name at position {tokens.Current().StartOffset}.");
+            throw new Exception($"Expected class name at line {tokens.Current().Position.Line}.");
         }
         
         // Get next token.

@@ -4,7 +4,7 @@ namespace OCompiler.Analyze.Lexical.Tokens
 {
     abstract class Token
     {
-        public long StartOffset { get; protected set; }
+        public TokenPosition Position { get; protected set; } = new();
         public int Length => Literal.Length;
 
         public string Literal { get; }
@@ -14,7 +14,7 @@ namespace OCompiler.Analyze.Lexical.Tokens
             Literal = literal;
         }
 
-        public static bool TryParse(long position, string literal, out Token token)
+        public static bool TryParse(TokenPosition position, string literal, out Token token)
         {
             if (ReservedTokens.IsReserved(literal))
             {
@@ -41,7 +41,7 @@ namespace OCompiler.Analyze.Lexical.Tokens
                 token = new UnexistingToken();
             }
 
-            token.StartOffset = position;
+            token.Position = position;
             return token is not UnexistingToken;
         }
     }

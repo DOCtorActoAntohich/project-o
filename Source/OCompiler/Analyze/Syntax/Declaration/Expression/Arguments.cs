@@ -39,7 +39,7 @@ internal static class Arguments
 
         if (tokens.Current() is not Lexical.Tokens.Delimiters.RightParenthesis)
         {
-            throw new Exception($"Expected ')' at position {tokens.Current().StartOffset}.");
+            throw new Exception($"Expected ')' at line {tokens.Current().Position.Line}.");
         }
         
         // Get next token.
