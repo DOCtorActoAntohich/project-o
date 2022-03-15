@@ -2,9 +2,9 @@
 
 namespace OCompiler
 {
-    class Program
+    internal static class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             new Compiler(sourceFilePath: args[0]).Run();
         }

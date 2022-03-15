@@ -61,7 +61,17 @@ internal class Expression: IBodyStatement
         Child = child;
         Token = name;
     }
-    
+
+    public Call ReplaceWithCall()
+    {
+        var call = new Call(this);
+        if (Parent != null)
+        {
+            Parent.Child = call;
+        }
+        return call;
+    }
+
     public string ToString(string _)
     {
         return ToString();

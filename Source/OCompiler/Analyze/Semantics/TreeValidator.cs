@@ -4,7 +4,6 @@ using System.Collections.Generic;
 
 using OCompiler.Analyze.Syntax;
 using OCompiler.Analyze.Syntax.Declaration;
-using OCompiler.Analyze.Syntax.Declaration.Class.Member;
 using OCompiler.Analyze.Syntax.Declaration.Statement;
 using OCompiler.Analyze.Semantics.Class;
 using OCompiler.Analyze.Semantics.Expression;
@@ -78,7 +77,6 @@ internal class TreeValidator
             {
                 continue;
             }
-            field.Expression.ValidateExpression();
             field.Type = field.Expression.Type;
             Console.WriteLine($"Warning: unused field {field.Name} of type {field.Type}");
         }
@@ -129,15 +127,16 @@ internal class TreeValidator
 
     public void ValidateVariable(Variable variable, ParsedClassInfo classInfo, CallableInfo callable)
     {
+        if (_knownClasses.ContainsKey(variable.Identifier.Literal))
+        {
+            throw new Exception($"Cannot create variable, name {variable.Identifier.Literal} is already used by a class");
+        }
         if (!callable.LocalVariables.TryGetValue(variable.Identifier.Literal, out var varInfo))
         {
             varInfo = new ExpressionInfo(variable.Expression, new Context(classInfo, _knownClasses, callable));
             callable.LocalVariables.Add(variable.Identifier.Literal, varInfo);
         }
-        if (varInfo.Type == null)
-        {
-            varInfo.ValidateExpression();
-        }
+        varInfo.ValidateExpression();
     }
 
     public void ValidateAssignment(Assignment assignment, ParsedClassInfo classInfo, CallableInfo callable)
@@ -170,7 +169,6 @@ internal class TreeValidator
         }
 
         var valueInfo = new ExpressionInfo(value, new Context(classInfo, _knownClasses, callable));
-        valueInfo.ValidateExpression();
         if (valueInfo.Type != varInfo.Type)
         {
             throw new Exception($"Cannot assign value of type {valueInfo.Type} to a variable of type {varInfo.Type}");
@@ -190,9 +188,7 @@ internal class TreeValidator
             throw new Exception($"Field {fieldName} must be declared before assignment");
         }
 
-        field.Expression.ValidateExpression();
         var valueInfo = new ExpressionInfo(value, new Context(classInfo, _knownClasses, callable));
-        valueInfo.ValidateExpression();
         if (valueInfo.Type != field.Expression.Type)
         {
             throw new Exception($"Cannot assign value of type {valueInfo.Type} to a field of type {field.Expression.Type}");
