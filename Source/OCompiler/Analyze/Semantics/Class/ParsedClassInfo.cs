@@ -6,6 +6,7 @@ using System.Text;
 using OCompiler.Analyze.Semantics.Callable;
 using OCompiler.Analyze.Syntax.Declaration.Class.Member;
 using OCompiler.Analyze.Syntax.Declaration.Class.Member.Method;
+using Boolean = OCompiler.StandardLibrary.Type.Value.Boolean;
 
 namespace OCompiler.Analyze.Semantics.Class;
 
@@ -18,7 +19,7 @@ internal class ParsedClassInfo : ClassInfo
     public List<ParsedConstructorInfo> Constructors { get; } = new();
     public Context Context { get; }
 
-    private readonly static Dictionary<string, ParsedClassInfo> parsedClasses = new();
+    private static readonly Dictionary<string, ParsedClassInfo> ParsedClasses = new();
 
     private ParsedClassInfo(Syntax.Declaration.Class.Class parsedClass)
     {
@@ -88,21 +89,21 @@ internal class ParsedClassInfo : ClassInfo
     public static ParsedClassInfo GetByClass(Syntax.Declaration.Class.Class parsedClass)
     {
         var name = parsedClass.Name.Literal;
-        if (parsedClasses.TryGetValue(name, out var classInfo) && classInfo is not EmptyParsedClassInfo)
+        if (ParsedClasses.TryGetValue(name, out var classInfo) && classInfo is not EmptyParsedClassInfo)
         {
             return classInfo;
         }
 
         var newInfo = new ParsedClassInfo(parsedClass);
-        parsedClasses[name] = newInfo;
+        ParsedClasses[name] = newInfo;
         return newInfo;
     }
 
     public static ClassInfo GetByName(string name)
     {
-        if (parsedClasses.ContainsKey(name))
+        if (ParsedClasses.ContainsKey(name))
         {
-            return parsedClasses[name];
+            return ParsedClasses[name];
         }
         if (BuiltClassInfo.StandardClasses.ContainsKey(name))
         {
@@ -110,7 +111,7 @@ internal class ParsedClassInfo : ClassInfo
         }
 
         var newClassInfo = new EmptyParsedClassInfo(name);
-        parsedClasses.Add(name, newClassInfo);
+        ParsedClasses.Add(name, newClassInfo);
         return newClassInfo;
     }
 

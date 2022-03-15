@@ -9,19 +9,13 @@ namespace OCompiler.CodeGeneration.Translation.CSharp;
 
 internal class Code
 {
-    public string Text { get; private set; }
+    public string Text { get; }
     
-    public Code(TreeValidator ast)
+    public Code(CodeCompileUnit compileUnit)
     {
-        var compileUnit = GenerateCompileUnit(ast);
         Text = GenerateCode(compileUnit);
     }
 
-    private static CodeCompileUnit GenerateCompileUnit(TreeValidator ast)
-    {
-        // TODO: convert tree to compile unit.
-        return new CodeCompileUnit();
-    }
     
     private static string GenerateCode(CodeCompileUnit compileUnit)
     {
