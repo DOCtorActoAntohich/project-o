@@ -7,7 +7,7 @@ public class String : AnyRef
 {
     internal string Value { get; }
 
-    internal String(string p)
+    public String(string p)
     {
         Value = p;
     }
@@ -35,7 +35,7 @@ public class String : AnyRef
 
     public String(Boolean p)
     {
-        Value = p.Value.ToString();
+        Value = p._value.ToString();
     }
 
 
@@ -63,5 +63,10 @@ public class String : AnyRef
     public String Concatenate(String other)
     {
         return new String(Value + other.Value);
+    }
+
+    public new string ToString()
+    {
+        return Value;
     }
 }

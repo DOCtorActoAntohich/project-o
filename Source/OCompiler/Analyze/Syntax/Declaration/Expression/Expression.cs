@@ -8,7 +8,7 @@ namespace OCompiler.Analyze.Syntax.Declaration.Expression;
 internal class Expression: IBodyStatement
 {
     public Expression? Parent { get; private set; }
-    public Expression? Child { get; private set; }
+    public Expression? Child { get; set; }
     public Token Token { get; }
     
     public static bool TryParse(TokenEnumerator tokens, out Expression? expression)
@@ -55,7 +55,7 @@ internal class Expression: IBodyStatement
         return true;
     }
 
-    protected Expression(Token name, Expression? child = null, Expression? parent = null)
+    public Expression(Token name, Expression? child = null, Expression? parent = null)
     {
         Parent = parent;
         Child = child;
