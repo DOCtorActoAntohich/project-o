@@ -1,11 +1,10 @@
-using System;
 using System.Collections.Generic;
 using System.Text;
-using System.Linq;
 using OCompiler.Analyze.Lexical.Tokens;
 using OCompiler.Analyze.Syntax.Declaration.Class.Member;
 using OCompiler.Analyze.Syntax.Declaration.Class.Member.Method;
 using OCompiler.Utils;
+using OCompiler.Exceptions;
 
 namespace OCompiler.Analyze.Syntax.Declaration.Class;
 
@@ -22,13 +21,13 @@ internal class Class
         // Class.
         if (tokens.Current() is not Lexical.Tokens.Keywords.Class)
         {
-            throw new Exception($"Keyword 'class' expected at line {tokens.Current().Position.Line}.");
+            throw new SyntaxError(tokens.Current().Position, $"Expected 'class' keyword");
         }
     
         // Class name.
         if (tokens.Next() is not Identifier name)
         {
-            throw new Exception($"Class identifier expected at line {tokens.Current().Position.Line}.");
+            throw new SyntaxError(tokens.Current().Position, $"Class identifier expected at line {tokens.Current().Position.Line}.");
         }
         
         // Extends.
@@ -37,7 +36,7 @@ internal class Class
         {
             if (tokens.Next() is not Identifier)
             {
-                throw new Exception($"Class identifier expected at line {tokens.Current().Position.Line}.");
+                throw new SyntaxError(tokens.Current().Position, $"Class identifier expected at line {tokens.Current().Position.Line}.");
             }
             
             // Save.
@@ -50,7 +49,7 @@ internal class Class
         // Is.
         if (tokens.Current() is not Lexical.Tokens.Keywords.Is)
         {
-            throw new Exception($"Keyword 'is' expected at line {tokens.Current().Position.Line}.");
+            throw new SyntaxError(tokens.Current().Position, $"Expected 'is' keyword");
         }
 
         // Get next token.
@@ -82,7 +81,7 @@ internal class Class
         // End.
         if (tokens.Current() is not Lexical.Tokens.Keywords.End)
         {
-            throw new Exception($"Keyword 'end' expected at line {tokens.Current().Position.Line}.");
+            throw new SyntaxError(tokens.Current().Position, $"Expected 'end' keyword");
         }
         
         // Get next token.

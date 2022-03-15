@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using OCompiler.Analyze.Lexical.Tokens;
+using OCompiler.Exceptions;
 using OCompiler.Utils;
 
 namespace OCompiler.Analyze.Syntax.Declaration.Expression;
@@ -54,7 +55,7 @@ internal class Expression: IBodyStatement
         // Try parse child.
         if (!TryParse(tokens, out Expression? child))
         {
-            throw new Exception($"Expected expression at line {tokens.Current().Position.Line}.");
+            throw new SyntaxError(tokens.Current().Position, "Expected expression");
         }
 
         expression.Child = child;

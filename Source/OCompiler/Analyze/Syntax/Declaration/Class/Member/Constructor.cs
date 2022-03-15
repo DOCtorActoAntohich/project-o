@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using OCompiler.Analyze.Syntax.Declaration.Class.Member.Method;
+using OCompiler.Exceptions;
 using OCompiler.Utils;
 
 namespace OCompiler.Analyze.Syntax.Declaration.Class.Member;
@@ -31,7 +32,7 @@ internal class Constructor: IClassMember
         // Is.
         if (tokens.Current() is not Lexical.Tokens.Keywords.Is)
         {
-            throw new Exception($"Expected keyword 'is' at line {tokens.Current().Position.Line}.");
+            throw new SyntaxError(tokens.Current().Position, "Expected 'is' keyword");
         }
         
         // Get next token.
@@ -42,7 +43,7 @@ internal class Constructor: IClassMember
         // End.
         if (tokens.Current() is not Lexical.Tokens.Keywords.End)
         {
-            throw new Exception($"Expected keyword 'end' at line {tokens.Current().Position.Line}.");
+            throw new SyntaxError(tokens.Current().Position, "Expected 'end' keyword");
         }
     
         // Get next token.

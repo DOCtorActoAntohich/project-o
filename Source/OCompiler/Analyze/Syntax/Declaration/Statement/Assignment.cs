@@ -1,5 +1,6 @@
 using System;
 using OCompiler.Analyze.Lexical.Tokens.Delimiters;
+using OCompiler.Exceptions;
 using OCompiler.Utils;
 
 namespace OCompiler.Analyze.Syntax.Declaration.Statement;
@@ -35,7 +36,7 @@ internal class Assignment : IStatement
         // Expression.
         if (!Expression.Expression.TryParse(tokens, out Expression.Expression? value))
         {
-            throw new Exception($"Expected expression at line {tokens.Current().Position.Line}.");
+            throw new SyntaxError(tokens.Current().Position, "Expected expression");
         }
         
         assignment = new Assignment(variable!, value!);

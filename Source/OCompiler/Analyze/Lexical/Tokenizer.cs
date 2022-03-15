@@ -3,6 +3,7 @@ using System.IO;
 using System.Text;
 using System.Collections.Generic;
 using OCompiler.Extensions;
+using OCompiler.Exceptions;
 
 namespace OCompiler.Analyze.Lexical
 {
@@ -65,7 +66,7 @@ namespace OCompiler.Analyze.Lexical
             bool parseSuccess = Tokens.Token.TryParse(CurrentPosition, currentTerm, out var token);
             if (!parseSuccess)
             {
-                throw new Exception($"Unable to parse token '{currentTerm}' at line {CurrentPosition.Line}");
+                throw new ParseError(CurrentPosition, $"Unable to parse token '{currentTerm}'");
             }
             UpdatePosition(currentTerm);
             return token;
@@ -82,8 +83,8 @@ namespace OCompiler.Analyze.Lexical
                 {
                     Tokens.CommentDelimiters.LineStart => "\n",
                     Tokens.CommentDelimiters.BlockStart => Tokens.CommentDelimiters.BlockEnd.Literal,
-                    Tokens.CommentDelimiters.BlockEnd => throw new Exception($"Unexpected end of comment at line {_currentLine}"),
-                    _ => throw new Exception($"Unknown comment delimiter at line {_currentLine}")
+                    Tokens.CommentDelimiters.BlockEnd => throw new SyntaxError(CurrentPosition, $"Unexpected end of comment"),
+                    _ => throw new ParseError(CurrentPosition, $"Unknown comment delimiter")
                 };
                 try
                 {
@@ -94,7 +95,7 @@ namespace OCompiler.Analyze.Lexical
                 {
                     if (startDelimiter is Tokens.CommentDelimiters.BlockStart)
                     {
-                        throw new Exception($"Unterminated block comment started at line {_currentLine}, reached end of file");
+                        throw new SyntaxError(CurrentPosition, $"Unterminated block comment, reached end of file");
                     }
                 }
 
@@ -118,7 +119,7 @@ namespace OCompiler.Analyze.Lexical
                 }
                 catch (EndOfStreamException)
                 {
-                    throw new Exception($"Unterminated string started at line {_currentLine}, reached end of file");
+                    throw new SyntaxError(CurrentPosition, $"Unterminated string, reached end of file");
                 }
 
                 token = new Tokens.StringLiteral(

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using OCompiler.Analyze.Lexical.Tokens;
+using OCompiler.Exceptions;
 using OCompiler.Utils;
 
 namespace OCompiler.Analyze.Syntax.Declaration.Class.Member.Method;
@@ -25,7 +26,7 @@ internal class Method: IClassMember
         // Name.
         if (tokens.Next() is not Identifier name)
         {
-            throw new Exception($"Expected method name at line {tokens.Current().Position.Line}.");
+            throw new SyntaxError(tokens.Current().Position, $"Expected method name");
         }
         
         // Get next token.
@@ -41,7 +42,7 @@ internal class Method: IClassMember
             // Return type.
             if (tokens.Next() is not Identifier)
             {
-                throw new Exception($"Expected class name at line {tokens.Current().Position.Line}.");
+                throw new SyntaxError(tokens.Current().Position, "Expected class name");
             }
             
             returnType = (Identifier)tokens.Current();
@@ -52,7 +53,7 @@ internal class Method: IClassMember
         // Is.
         if (tokens.Current() is not Lexical.Tokens.Keywords.Is)
         {
-            throw new Exception($"Expected keyword 'is' at line {tokens.Current().Position.Line}.");
+            throw new SyntaxError(tokens.Current().Position, "Expected 'is' keyword");
         }
         
         // Get next token.
@@ -63,7 +64,7 @@ internal class Method: IClassMember
         // End.
         if (tokens.Current() is not Lexical.Tokens.Keywords.End)
         {
-            throw new Exception($"Expected keyword 'end' at line {tokens.Current().Position.Line}.");
+            throw new SyntaxError(tokens.Current().Position, "Expected 'end' keyword");
         }
         
         // Get next token.

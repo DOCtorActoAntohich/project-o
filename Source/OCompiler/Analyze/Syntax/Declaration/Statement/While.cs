@@ -1,5 +1,7 @@
 using System;
 using System.Text;
+
+using OCompiler.Exceptions;
 using OCompiler.Utils;
 
 namespace OCompiler.Analyze.Syntax.Declaration.Statement;
@@ -23,13 +25,13 @@ internal class While : IStatement
         // Try parse expression.
         if (!Declaration.Expression.Expression.TryParse(tokens, out Expression.Expression? expression))
         {
-            throw new Exception($"Expression expected at line {tokens.Current().Position.Line}.");
+            throw new SyntaxError(tokens.Current().Position, "Expected expression");
         }
         
         // Keyword.
         if (tokens.Current() is not Lexical.Tokens.Keywords.Loop)
         {
-            throw new Exception($"Keyword 'loop' expected at line {tokens.Current().Position.Line}.");
+            throw new SyntaxError(tokens.Current().Position, "Expected 'loop' keyword");
         }
         
         // Get next token.
@@ -40,7 +42,7 @@ internal class While : IStatement
         // Keyword.
         if (tokens.Current() is not Lexical.Tokens.Keywords.End)
         {
-            throw new Exception($"Keyword 'end' expected at line {tokens.Current().Position.Line}.");
+            throw new SyntaxError(tokens.Current().Position, "Expected 'end' keyword");
         }
         
         // Get next token.

@@ -1,6 +1,7 @@
 using System;
 using OCompiler.Analyze.Lexical.Tokens;
 using OCompiler.Analyze.Syntax.Declaration.Statement;
+using OCompiler.Exceptions;
 using OCompiler.Utils;
 
 namespace OCompiler.Analyze.Syntax.Declaration;
@@ -22,13 +23,13 @@ internal class Variable : IBodyStatement
         // Parse name.
         if (tokens.Next() is not Identifier name)
         {
-            throw new Exception($"Expected variable name at line {tokens.Current().Position.Line}.");
+            throw new SyntaxError(tokens.Current().Position, "Expected variable name");
         }
         
         // Assign delimiter.
         if (tokens.Next() is not Lexical.Tokens.Delimiters.Colon)
         {
-            throw new Exception($"Expected expression at line {tokens.Current().Position.Line}.");
+            throw new SyntaxError(tokens.Current().Position, "Expected expression");
         }
 
         // Get next token.
@@ -37,7 +38,7 @@ internal class Variable : IBodyStatement
         // Expression.
         if (!Declaration.Expression.Expression.TryParse(tokens, out Expression.Expression? expression))
         {
-            throw new Exception($"Expected expression at line {tokens.Current().Position.Line}.");
+            throw new SyntaxError(tokens.Current().Position, "Expected expression");
         }
 
         variable = new Variable(name, expression!);
