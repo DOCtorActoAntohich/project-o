@@ -11,38 +11,42 @@ namespace OCompiler.CodeGeneration;
 
 internal static partial class CompileUnit
 {
-    private static CodeExpression[] ParseCallArgumentList(IEnumerable<Expression> arguments)
+    private static IEnumerable<CodeStatement> ParsedBody(Body body)
     {
-        return arguments.Select(ParseRvalueExpression).ToArray();
+        var statements = new List<CodeStatement>();
+        foreach (var statement in body)
+        {
+            var parsedStatement = ParsedCodeStatement(statement);
+            statements.Add(parsedStatement);
+        }
+        
+        return statements.ToArray();
     }
     
-    private static CodeStatement ParseCodeStatement(IBodyStatement statement)
+    private static CodeStatement ParsedCodeStatement(IBodyStatement statement)
     {
         // Todo remove prints
+        Console.WriteLine(statement);
         switch (statement)
         {
             case Return @return:
                 Console.WriteLine("3 done");
-                return ParseReturnStatement(@return);
+                return ParsedReturnStatement(@return);
             
             case If @if:
                 Console.WriteLine("4 done");
-                return ParseIfStatement(@if);
+                return ParsedIfStatement(@if);
             
             case While @while:
                 Console.WriteLine("5 done");
-                return ParseWhileStatement(@while);
+                return ParsedWhileStatement(@while);
             
             case Variable variable:
                 Console.WriteLine(1);
-                break;
+                return ParsedVariableDeclaration(variable);
             
             case Assignment assignment:
                 Console.WriteLine(2);
-                break;
-            
-            case Call call:
-                Console.WriteLine(6);
                 break;
             
             case Expression expression:
@@ -57,11 +61,22 @@ internal static partial class CompileUnit
     }
     
 
-    private static CodeStatement ParseIfStatement(If @if)
+    private static CodeStatement ParsedReturnStatement(Return @return)
+    {
+        if (@return.ReturnValue == null)
+        {
+            return new CodeMethodReturnStatement();
+        }
+
+        var returnValue = ParsedRvalueExpression(@return.ReturnValue);
+        return new CodeMethodReturnStatement(returnValue);
+    }
+    
+    private static CodeStatement ParsedIfStatement(If @if)
     {
         var ifCode = new CodeConditionStatement
         {
-            Condition = ParseRvalueExpression(@if.Condition)
+            Condition = ParsedRvalueExpression(@if.Condition)
         };
 
         foreach (var statement in ParsedBody(@if.Body))
@@ -82,11 +97,11 @@ internal static partial class CompileUnit
         return ifCode;
     }
 
-    private static CodeStatement ParseWhileStatement(While @while)
+    private static CodeStatement ParsedWhileStatement(While @while)
     {
         var whileCode = new CodeIterationStatement
         {
-            TestExpression = ParseRvalueExpression(@while.Condition)
+            TestExpression = ParsedRvalueExpression(@while.Condition)
         };
 
         foreach (var statement in ParsedBody(@while.Body))
@@ -97,26 +112,19 @@ internal static partial class CompileUnit
         return whileCode;
     }
 
-    private static CodeStatement ParseReturnStatement(Return @return)
-    {
-        if (@return.ReturnValue == null)
-        {
-            return new CodeMethodReturnStatement();
-        }
 
-        var returnValue = ParseRvalueExpression(@return.ReturnValue);
-        return new CodeMethodReturnStatement(returnValue);
-    }
-
-    private static IEnumerable<CodeStatement> ParsedBody(Body body)
+    private static CodeStatement ParsedVariableDeclaration(Variable variable)
     {
-        var statements = new List<CodeStatement>();
-        foreach (var statement in body)
+        var a = new CodeVariableDeclarationStatement
         {
-            var parsedStatement = ParseCodeStatement(statement);
-            statements.Add(parsedStatement);
-        }
-        
-        return statements.ToArray();
+            Name = variable.Identifier.Literal,
+            Type = variable.Expression.Type,
+            InitExpression = ParsedRvalueExpression(variable.Expression)
+        };
+
+        Console.WriteLine(variable.Expression);
+        //a.Name = variable.Identifier.
+
+        return a;
     }
 }

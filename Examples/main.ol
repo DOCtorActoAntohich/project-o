@@ -21,6 +21,8 @@ class OtherClass is
   method GetCoolNumber : Integer is
     var a : 994
     var b : 925
+    var c : 900
+    c := a.Plus(b)
     return a.Mod(b)
   end
 

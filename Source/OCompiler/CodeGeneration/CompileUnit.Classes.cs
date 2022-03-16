@@ -65,7 +65,6 @@ internal static partial class CompileUnit
         var parent = classInfo.BaseClass switch
         {
             ClassInfo parentInfo => new CodeTypeReference(parentInfo.Name),
-            Type type            => new CodeTypeReference(type),
             _ => new CodeTypeReference(typeof(object))
         };
         

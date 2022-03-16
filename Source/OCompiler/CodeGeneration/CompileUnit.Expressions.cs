@@ -1,5 +1,7 @@
 using System;
 using System.CodeDom;
+using System.Collections.Generic;
+using System.Linq;
 using OCompiler.Analyze.Lexical.Tokens.Keywords;
 using OCompiler.Analyze.Syntax.Declaration.Expression;
 using OCompiler.Analyze.Syntax.Declaration.Statement;
@@ -10,7 +12,7 @@ internal static partial class CompileUnit
 {
     // Very versatile; can be used not only as init expression, but
     // also as a method argument, if-while bool expression, etc.
-    private static CodeExpression ParseRvalueExpression(Expression expression)
+    private static CodeExpression ParsedRvalueExpression(Expression expression)
     {
         return expression switch
         {
@@ -62,5 +64,10 @@ internal static partial class CompileUnit
         }
 
         return new CodeExpression();
+    }
+    
+    private static CodeExpression[] ParseCallArgumentList(IEnumerable<Expression> arguments)
+    {
+        return arguments.Select(ParsedRvalueExpression).ToArray();
     }
 }

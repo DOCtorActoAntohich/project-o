@@ -15,7 +15,7 @@ internal static partial class CompileUnit
             Name = parsedField.Name,
             Type = new CodeTypeReference(parsedField.Type),
             Attributes = MemberAttributes.Public,
-            InitExpression = ParseRvalueExpression(parsedField.Expression.Expression)
+            InitExpression = ParsedRvalueExpression(parsedField.Expression.Expression)
         };
         
         typeDeclaration.Members.Add(field);
