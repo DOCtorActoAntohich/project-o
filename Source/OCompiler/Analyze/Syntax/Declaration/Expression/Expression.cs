@@ -89,6 +89,12 @@ internal class Expression: IBodyStatement
     public override string ToString()
     {
         string child = Child is null ? "" : $".{Child}";
+
+        if (Token is StringLiteral)
+        {
+            return $"\"{Token.Literal}\"{child}";
+        }
+        
         return $"{Token.Literal}{child}";
     }
 }

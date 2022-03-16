@@ -26,6 +26,8 @@ internal class Body : IEnumerable<IBodyStatement>
 
     }
 
+    public bool IsEmpty => _members.Count == 0;
+    
     public void AddBaseConstructorCall()
     {
         if (_members.Count == 0 || !_members.Any(p => p is Call call && call.Token is Lexical.Tokens.Keywords.Base))

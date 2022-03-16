@@ -68,8 +68,15 @@ internal class Constructor: IClassMember
     public string ToString(string prefix)
     {
         var @string = new StringBuilder();
-        
-        @string.AppendLine($"Constructor({Method.Parameters.ToString(Parameters)})");
+
+        var definition = $"Constructor({Method.Parameters.ToString(Parameters)})";
+
+        if (Body.IsEmpty)
+        {
+            @string.Append(definition);
+            return @string.ToString();
+        }
+        @string.AppendLine();
         @string.Append(Body.ToString(prefix));
 
         return @string.ToString();

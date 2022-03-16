@@ -38,7 +38,12 @@ public class String : AnyRef
         Value = p._value.ToString();
     }
 
-
+    
+    public Boolean Equal(String other)
+    {
+        return new Boolean(Value == other.Value);
+    }
+    
     public Integer ToInteger()
     {
         return new Integer(int.Parse(Value));

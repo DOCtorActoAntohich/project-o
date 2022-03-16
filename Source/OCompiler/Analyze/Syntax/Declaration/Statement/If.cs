@@ -78,7 +78,7 @@ internal class If : IStatement
         @string.AppendLine($"if {Condition}");
 
 
-        if (ElseBody is null)
+        if (ElseBody.IsEmpty)
         {
             @string.Append(Body.ToString(prefix));
             return @string.ToString();
