@@ -11,19 +11,19 @@ using Microsoft.CodeAnalysis.Emit;
 
 namespace OCompiler.CodeGeneration.Translation.CSharp;
 
-internal class Compiler
+internal class CodeGenerator
 {
     private readonly MemoryStream _compiledAssembly;
     private EmitResult _result = null!;
     public bool Success => _result.Success;
 
-    public Compiler(Code code)
+    public CodeGenerator(Code code)
     {
         _compiledAssembly = new MemoryStream();
         CompileCode(code);
     }
 
-    ~Compiler()
+    ~CodeGenerator()
     {
         _compiledAssembly.Close();
     }

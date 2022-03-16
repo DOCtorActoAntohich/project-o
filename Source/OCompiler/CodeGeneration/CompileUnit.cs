@@ -3,8 +3,13 @@ using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
 using OCompiler.Analyze.Semantics;
+using OCompiler.Analyze.Semantics.Callable;
 using OCompiler.Analyze.Semantics.Class;
+using OCompiler.Analyze.Syntax.Declaration;
+using OCompiler.Analyze.Syntax.Declaration.Class.Member;
 using OCompiler.Analyze.Syntax.Declaration.Expression;
+using OCompiler.Analyze.Syntax.Declaration.Statement;
+using OCompiler.StandardLibrary.CodeDom;
 using DomAnyRef = OCompiler.StandardLibrary.CodeDom.Reference.AnyRef;
 using DomIO     = OCompiler.StandardLibrary.CodeDom.Reference.IO;
 using DomString = OCompiler.StandardLibrary.CodeDom.Reference.String;
@@ -110,11 +115,16 @@ internal static class CompileUnit
     {
         foreach (var field in classInfo.Fields)
         { 
-            typeDeclaration.AddParsedClassFields(field);
+            typeDeclaration.AddParsedClassField(field);
+        }
+
+        foreach (var constructor in classInfo.Constructors)
+        {
+            typeDeclaration.AddParsedClassConstructor(constructor);
         }
     }
 
-    private static void AddParsedClassFields(this CodeTypeDeclaration typeDeclaration, ParsedFieldInfo parsedField)
+    private static void AddParsedClassField(this CodeTypeDeclaration typeDeclaration, ParsedFieldInfo parsedField)
     {
         var field = new CodeMemberField
         {
@@ -175,5 +185,45 @@ internal static class CompileUnit
                 return ParseChainAccess(accessedField, expression.Child);
             }
         }
+    }
+
+    private static void AddParsedClassConstructor(
+        this CodeTypeDeclaration typeDeclaration,
+        ParsedConstructorInfo parsedCtor)
+    {
+        var ctor = Base.EmptyPublicConstructor();
+
+        foreach (var statement in parsedCtor.Body)
+        {
+            var parsedStatement = ParseCodeStatement(statement);
+            ctor.Statements.Add(parsedStatement);
+        }
+
+        typeDeclaration.Members.Add(ctor);
+    }
+
+    private static CodeExpression ParseCodeStatement(IBodyStatement statement)
+    {
+        switch (statement)
+        {
+            case Variable variable:
+                break;
+            case Assignment assignment:
+                break;
+            case Return @return:
+                break;
+            case If @if:
+                break;
+            case While @while:
+                break;
+            case Call call:
+                break;
+            case Expression expression:
+                break;
+            default:
+                throw new Exception($"Unknown statement: {statement}");
+        }
+
+        return new CodeExpression();
     }
 }

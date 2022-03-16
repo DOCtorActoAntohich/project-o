@@ -3,6 +3,8 @@ using System.Linq;
 using OCompiler.Analyze.Lexical;
 using OCompiler.Analyze.Semantics;
 using OCompiler.Analyze.Syntax;
+using OCompiler.CodeGeneration;
+using OCompiler.CodeGeneration.Translation.CSharp;
 using OCompiler.Utils;
 
 namespace OCompiler.Pipeline
@@ -31,6 +33,13 @@ namespace OCompiler.Pipeline
 
             var validator = new TreeValidator(tokenTree);
             Console.WriteLine(validator.GetValidationInfo());
+            
+            Console.WriteLine("\n\n\n");
+
+            var compileUnit = CompileUnit.FromAnnotatedSyntaxTree(validator);
+            //var csharpCode = new Code(compileUnit);
+            //var compiler = new CodeGenerator(csharpCode);
+            //compiler.Build("mogus/bin/mogus.exe");
         }
     }
 }
