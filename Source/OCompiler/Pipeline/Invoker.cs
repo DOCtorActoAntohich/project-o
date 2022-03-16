@@ -69,8 +69,8 @@ internal class Invoker
             parsedArgs.Add(token switch
             {
                 BooleanLiteral boolean => ("Boolean", new Boolean(boolean is True)),
-                IntegerLiteral integer => ("Integer", new Integer(integer.Value)),
                 RealLiteral real       => ("Real",    new Real(real.Value)),
+                IntegerLiteral integer => ("Integer", new Integer(integer.Value)),
                 _                      => ("String",  new String(token.Literal))
             });
         }
