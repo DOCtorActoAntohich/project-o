@@ -15,7 +15,7 @@
 
         public override string ToString()
         {
-            return $"({Line}, {Column})";
+            return $"Line {Line}, column {Column}";
         }
     }
 }
