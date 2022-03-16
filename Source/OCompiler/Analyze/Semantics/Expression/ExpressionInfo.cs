@@ -1,4 +1,5 @@
 ﻿using OCompiler.Analyze.Lexical.Tokens;
+using OCompiler.Analyze.Semantics.Callable;
 using OCompiler.Analyze.Semantics.Class;
 using OCompiler.Analyze.Syntax.Declaration.Expression;
 
@@ -41,6 +42,7 @@ internal class ExpressionInfo
         {
             Identifier identifier => ResolveType(identifier.Literal),
             Lexical.Tokens.Keywords.This => Context.CurrentClass.Name,
+            Lexical.Tokens.Keywords.Base => ResolveBaseReference(),
             IntegerLiteral => "Integer",
             BooleanLiteral => "Boolean",
             StringLiteral => "String",
@@ -128,6 +130,7 @@ internal class ExpressionInfo
         }
         return type;
     }
+
     private string ResolveType(string classOrVariable)
     {
         if (Context.Classes!.ClassExists(classOrVariable))
@@ -156,6 +159,20 @@ internal class ExpressionInfo
             localVarInfo.ValidateExpression();
         }
         return localVarInfo.Type!;
+    }
+
+    private string ResolveBaseReference()
+    {
+        if (Context.CurrentClass.BaseClass == null)
+        {
+            throw new Exception($"Class {Context.CurrentClass.Name} is not inherited from anything");
+        }
+        if (Context.CurrentMethod is not ParsedConstructorInfo)
+        {
+            throw new Exception("Cannot refer to base class outside of a class constructor.");
+        }
+
+        return Context.CurrentClass.BaseClass!.Name;
     }
 
     private string ValidateAndGetType()

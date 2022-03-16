@@ -28,6 +28,7 @@ internal abstract class CallableInfo
                 AddParameters(constructor.Parameters);
                 AddLocalVariables();
                 Body.AddTrailingReturn();
+                Body.AddBaseConstructorCall();
                 break;
             case Method method:
                 Callable = method;
@@ -49,7 +50,7 @@ internal abstract class CallableInfo
         foreach (var parameter in parameters)
         {
             var paramInfo = new ParsedParameterInfo(parameter);
-            if (Parameters.Where(p => p.Name == paramInfo.Name).Any())
+            if (Parameters.Any(p => p.Name == paramInfo.Name))
             {
                 throw new Exception($"Parameter name {paramInfo.Name} is a duplicate");
             }
