@@ -104,12 +104,14 @@ public static class Integer
 
     private static void AddToRealMethod(this CodeTypeDeclaration integerType)
     {
-        var creationParam = new CodeMethodInvokeExpression(
-            Base.ReferenceInternalValue(), "ToReal");
-        var returnValue = new CodeObjectCreateExpression(DomReal.FullTypeName, creationParam);
+        var convertType = new CodeTypeReferenceExpression(typeof(System.Convert));
+        var @double = new CodeMethodInvokeExpression(
+            convertType, "ToDouble", Base.ReferenceInternalValue());
+
+        var returnValue = new CodeObjectCreateExpression(DomReal.FullTypeName, @double);
         var returnStatement = new CodeMethodReturnStatement(returnValue);
 
-        var toRealMethod = Base.EmptyPublicMethod(DomReal.FullTypeName, "ToDouble");
+        var toRealMethod = Base.EmptyPublicMethod(DomReal.FullTypeName, "ToReal");
         toRealMethod.Statements.Add(returnStatement);
 
         integerType.Members.Add(toRealMethod);
