@@ -10,6 +10,11 @@ namespace OCompiler.CodeGeneration;
 
 internal partial class CompileUnit
 {
+    private CodeExpression ParsedLvalueExpression(Expression expression)
+    {
+        return new CodeExpression();
+    }
+    
     private CodeExpression ParsedRvalueExpression(Expression expression)
     {
         return expression switch
@@ -52,18 +57,7 @@ internal partial class CompileUnit
             }
         }
     }
-    
-    private CodeExpression ParseAssignmentExpression(Assignment assignment)
-    {
-        CodeExpression lhs;
-        if (assignment.Variable.Token is This)
-        {
-            lhs = new CodeThisReferenceExpression();
-        }
 
-        return new CodeExpression();
-    }
-    
     private CodeExpression[] ParseCallArgumentList(IEnumerable<Expression> arguments)
     {
         return arguments.Select(ParsedRvalueExpression).ToArray();

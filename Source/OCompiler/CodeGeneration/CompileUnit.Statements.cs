@@ -1,6 +1,10 @@
 using System;
 using System.CodeDom;
 using System.Collections.Generic;
+using System.Linq;
+using OCompiler.Analyze.Semantics;
+using OCompiler.Analyze.Semantics.Class;
+using OCompiler.Analyze.Semantics.Expression;
 using OCompiler.Analyze.Syntax.Declaration;
 using OCompiler.Analyze.Syntax.Declaration.Expression;
 using OCompiler.Analyze.Syntax.Declaration.Statement;
@@ -11,51 +15,23 @@ internal partial class CompileUnit
 {
     private IEnumerable<CodeStatement> ParsedBody(Body body)
     {
-        var statements = new List<CodeStatement>();
-        foreach (var statement in body)
-        {
-            var parsedStatement = ParsedCodeStatement(statement);
-            statements.Add(parsedStatement);
-        }
-        
-        return statements.ToArray();
+        return body.Select(ParsedCodeStatement).ToArray();
     }
     
     private CodeStatement ParsedCodeStatement(IBodyStatement statement)
     {
         // Todo remove prints
         Console.WriteLine(statement);
-        switch (statement)
+        return statement switch
         {
-            case Return @return:
-                Console.WriteLine("3 done");
-                return ParsedReturnStatement(@return);
-            
-            case If @if:
-                Console.WriteLine("4 done");
-                return ParsedIfStatement(@if);
-            
-            case While @while:
-                Console.WriteLine("5 done");
-                return ParsedWhileStatement(@while);
-            
-            case Variable variable:
-                Console.WriteLine(1);
-                return ParsedVariableDeclaration(variable);
-            
-            case Assignment assignment:
-                Console.WriteLine(2);
-                break;
-            
-            case Expression expression:
-                Console.WriteLine(7);
-                break;
-            
-            default:
-                throw new Exception($"Unknown statement: {statement}");
-        }
-
-        return new CodeStatement();
+            Return @return => ParsedReturnStatement(@return),
+            If @if => ParsedIfStatement(@if),
+            While @while => ParsedWhileStatement(@while),
+            Variable variable => ParsedVariableDeclarationStatement(variable),
+            Assignment assignment => ParsedAssignmentStatement(assignment),
+            Expression expression => ParsedRvalueExpressionStatement(expression),
+            _ => throw new Exception($"Unknown statement: {statement}")
+        };
     }
     
 
@@ -111,19 +87,27 @@ internal partial class CompileUnit
     }
 
 
-    private CodeStatement ParsedVariableDeclaration(Variable variable)
+    private CodeStatement ParsedVariableDeclarationStatement(Variable variable)
     {
-        var a = new CodeVariableDeclarationStatement
+        var variableExpressionInfo = new ExpressionInfo(variable.Expression, CurrentContext());
+
+        return new CodeVariableDeclarationStatement
         {
             Name = variable.Identifier.Literal,
-            //Type = variable.Expression.Type,
+            Type = new CodeTypeReference(variableExpressionInfo.Type),
             InitExpression = ParsedRvalueExpression(variable.Expression)
         };
-        
+    }
 
-        Console.WriteLine(variable.Expression);
-        //a.Name = variable.Identifier.
+    private CodeStatement ParsedAssignmentStatement(Assignment assignment)
+    {
+        var lvalue = ParsedLvalueExpression(assignment.Variable);
+        var rvalue = ParsedRvalueExpression(assignment.Value);
+        return new CodeAssignStatement(lvalue, rvalue);
+    }
 
-        return a;
+    private CodeStatement ParsedRvalueExpressionStatement(Expression expression)
+    {
+        return new CodeExpressionStatement(ParsedRvalueExpression(expression));
     }
 }

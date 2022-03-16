@@ -1,5 +1,7 @@
 using System.CodeDom;
 using OCompiler.Analyze.Semantics;
+using OCompiler.Analyze.Semantics.Callable;
+using OCompiler.Analyze.Semantics.Class;
 
 namespace OCompiler.CodeGeneration;
 
@@ -9,14 +11,9 @@ internal partial class CompileUnit
 
     private readonly CodeNamespace _codeNamespace;
 
-    private CodeTypeDeclaration _currentTypeDeclaration;
-    private CodeMemberMethod _currentCallable;
-    
+
     public CompileUnit(TreeValidator ast)
     {
-        _currentTypeDeclaration = new CodeTypeDeclaration();
-        _currentCallable = new CodeMemberMethod();
-        
         _codeNamespace = new CodeNamespace(ResultingNamespace);
         AddAllClasses(ast);
     }

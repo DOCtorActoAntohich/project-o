@@ -1,7 +1,12 @@
 class Main is
+  var mogus : 9
   this is
     var a : 7
     IO.WriteLine(Calculator().magic(a).ToString())
+    a := Integer(5).Plus(Integer(7)).Plus(Integer(8))
+    this.mogus := Integer(5).Plus(Integer(7)).Plus(Integer(8))
+    var printer : IO
+    printer.WriteLine(this.mogus.ToString())
   end
 end
 

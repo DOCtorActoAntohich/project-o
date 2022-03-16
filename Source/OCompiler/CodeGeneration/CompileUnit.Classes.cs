@@ -1,6 +1,8 @@
 using System;
 using System.CodeDom;
+using System.Linq;
 using OCompiler.Analyze.Semantics;
+using OCompiler.Analyze.Semantics.Callable;
 using OCompiler.Analyze.Semantics.Class;
 using DomClass  = OCompiler.StandardLibrary.CodeDom.Reference.Class;
 using DomAnyRef = OCompiler.StandardLibrary.CodeDom.Reference.AnyRef;
@@ -17,6 +19,22 @@ namespace OCompiler.CodeGeneration;
 
 internal partial class CompileUnit
 {
+    private CodeTypeDeclaration _currentTypeDeclaration = null!;
+    private CodeMemberMethod _currentCallable = null!;
+    private ParsedClassInfo _currentClassInfo = null!;
+    private CallableInfo _currentCallableInfo = null!;
+
+    private Context CurrentContext()
+    {
+        return new Context(_currentClassInfo, _currentCallableInfo);
+    }
+
+    private bool CurrentCallableHasParameter(string parameterName)
+    {
+        return _currentCallableInfo.Parameters.Any(parameterInfo => parameterInfo.Name == parameterName);
+    }
+    
+    
     private void AddAllClasses(TreeValidator ast)
     {
         foreach (var classInfo in ast.ValidatedClasses)
@@ -97,6 +115,8 @@ internal partial class CompileUnit
     
     private void AddParsedClassContents(ParsedClassInfo classInfo)
     {
+        _currentClassInfo = classInfo;
+        
         foreach (var field in classInfo.Fields)
         {
             AddParsedClassField(field);

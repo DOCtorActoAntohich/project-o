@@ -29,6 +29,7 @@ internal partial class CompileUnit
             ParsedConstructorInfo => DomBase.EmptyPublicConstructor(),
             _ => throw new Exception($"Unknown callable")
         };
+        _currentCallableInfo = callableInfo;
         
         FillParsedCallable(callableInfo);
         
