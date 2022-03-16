@@ -48,6 +48,16 @@ public static class String
             Attributes = MemberAttributes.Public,
         };
     }
+
+    private static CodeMemberMethod EmptyPublicMethod(string returnType, string name)
+    {
+        return new CodeMemberMethod()
+        {
+            Name = name,
+            ReturnType = new CodeTypeReference(returnType),
+            Attributes = MemberAttributes.Public
+        };
+    }
     
     
     private static void AddInternalConstructor(this CodeTypeDeclaration stringType)
@@ -135,8 +145,66 @@ public static class String
     }
 
 
+    private static void AddToStringMethod(this CodeTypeDeclaration stringType)
+    {
+        var returnValue = new CodeObjectCreateExpression(FullTypeName, ReferenceInternalValue());
+        var returnStatement = new CodeMethodReturnStatement(returnValue);
+
+        var toStringMethod = EmptyPublicMethod(FullTypeName, "ToString");
+        toStringMethod.Statements.Add(returnStatement);
+
+        stringType.Members.Add(toStringMethod);
+    }
+
+    private static CodeMethodInvokeExpression ParseInternalValueInType(System.Type type)
+    {
+        var typeRef = new CodeTypeReferenceExpression(type);
+        return new CodeMethodInvokeExpression(
+            typeRef, "Parse", ReferenceInternalValue());
+    }
     private static void AddToIntegerMethod(this CodeTypeDeclaration stringType)
     {
+        var parseInt = ParseInternalValueInType(typeof(int));
+        var returnValue = new CodeObjectCreateExpression(DomInt.FullTypeName, parseInt);
+        var returnStatement = new CodeMethodReturnStatement(returnValue);
         
+        var toIntegerMethod = EmptyPublicMethod(DomInt.FullTypeName, "ToInteger");
+        toIntegerMethod.Statements.Add(returnStatement);
+
+        stringType.Members.Add(toIntegerMethod);
+    }
+    
+    private static void AddToRealMethod(this CodeTypeDeclaration stringType)
+    {
+        var parseFloat = ParseInternalValueInType(typeof(float));
+        var returnValue = new CodeObjectCreateExpression(DomReal.FullTypeName, parseFloat);
+        var returnStatement = new CodeMethodReturnStatement(returnValue);
+        
+        var toRealMethod = EmptyPublicMethod(DomReal.FullTypeName, "ToReal");
+        toRealMethod.Statements.Add(returnStatement);
+
+        stringType.Members.Add(toRealMethod);
+    }
+    
+    private static void AddToBooleanMethod(this CodeTypeDeclaration stringType)
+    {
+        var parseBool = ParseInternalValueInType(typeof(bool));
+        var returnValue = new CodeObjectCreateExpression(DomBool.FullTypeName, parseBool);
+        var returnStatement = new CodeMethodReturnStatement(returnValue);
+        
+        var toBooleanMethod = EmptyPublicMethod(DomBool.FullTypeName, "ToBoolean");
+        toBooleanMethod.Statements.Add(returnStatement);
+
+        stringType.Members.Add(toBooleanMethod);
+    }
+    
+    private static void AddAtMethod(this CodeTypeDeclaration stringType)
+    {
+        // TODO implement this method.
+    }
+    
+    private static void AddConcatenateMethod(this CodeTypeDeclaration stringType)
+    {
+        // TODO implement this method.
     }
 }
