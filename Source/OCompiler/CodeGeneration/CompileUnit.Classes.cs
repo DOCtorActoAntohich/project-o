@@ -2,8 +2,10 @@ using System;
 using System.CodeDom;
 using OCompiler.Analyze.Semantics;
 using OCompiler.Analyze.Semantics.Class;
+using DomClass  = OCompiler.StandardLibrary.CodeDom.Reference.Class;
 using DomAnyRef = OCompiler.StandardLibrary.CodeDom.Reference.AnyRef;
 using DomIO     = OCompiler.StandardLibrary.CodeDom.Reference.IO;
+using DomTime   = OCompiler.StandardLibrary.CodeDom.Reference.Time;
 using DomString = OCompiler.StandardLibrary.CodeDom.Reference.String;
 using DomAnyVal = OCompiler.StandardLibrary.CodeDom.Value.AnyValue;
 using DomBool   = OCompiler.StandardLibrary.CodeDom.Value.Boolean;
@@ -76,9 +78,11 @@ internal partial class CompileUnit
     {
         return builtClassInfo.Name switch
         {
+            DomClass.TypeName  => DomClass.Generate(),
             DomAnyRef.TypeName => DomAnyRef.Generate(),
             DomString.TypeName => DomString.Generate(),
             DomIO.TypeName     => DomIO.Generate(),
+            DomTime.TypeName   => DomTime.Generate(),
             
             DomAnyVal.TypeName => DomAnyVal.Generate(),
             DomBool.TypeName   => DomBool.Generate(),

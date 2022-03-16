@@ -2,7 +2,7 @@ using System.CodeDom;
 
 namespace OCompiler.StandardLibrary.CodeDom.Reference;
 
-public class Class
+public static class Class
 {
     public const string TypeName = "Class";
     public const string FullTypeName = $"{Base.Namespace}.{TypeName}";

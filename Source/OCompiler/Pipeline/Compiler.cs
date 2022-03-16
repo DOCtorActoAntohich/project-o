@@ -40,6 +40,8 @@ namespace OCompiler.Pipeline
 
             var validator = new TreeValidator(tokenTree);
 
+            var compileUnit = new CompileUnit(validator); 
+            
             var generator = new Emitter(validator.ValidatedClasses);
             return generator.Assembly;
         }
