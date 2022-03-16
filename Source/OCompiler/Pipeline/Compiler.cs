@@ -5,6 +5,7 @@ using System.Reflection;
 using OCompiler.Analyze.Lexical;
 using OCompiler.Analyze.Semantics;
 using OCompiler.Analyze.Syntax;
+using OCompiler.Exceptions;
 using OCompiler.Generate;
 using OCompiler.Utils;
 
@@ -28,7 +29,7 @@ namespace OCompiler.Pipeline
             var tokenTree = new Tree(new TokenEnumerator(tokens));
             if (tokenTree.IsEmpty)
             {
-                throw new Exception("No classes.");
+                throw new AnalyzeError("No classes.");
             }
             
             Console.WriteLine(tokenTree.ToString());

@@ -6,6 +6,8 @@ using OCompiler.Analyze.Semantics.Expression;
 using OCompiler.Analyze.Syntax.Declaration;
 using OCompiler.Analyze.Syntax.Declaration.Class.Member;
 using OCompiler.Analyze.Syntax.Declaration.Class.Member.Method;
+using OCompiler.Exceptions;
+using OCompiler.Exceptions.Semantic;
 
 namespace OCompiler.Analyze.Semantics.Callable;
 
@@ -41,7 +43,7 @@ internal abstract class CallableInfo
                 }
                 break;
             default:
-                throw new Exception("Attempt to create CallableInfo not with constructor or method.");
+                throw new CompilerInternalError("Attempt to create CallableInfo not with constructor or method.");
         }
     }
 
@@ -52,7 +54,7 @@ internal abstract class CallableInfo
             var paramInfo = new ParsedParameterInfo(parameter);
             if (Parameters.Any(p => p.Name == paramInfo.Name))
             {
-                throw new Exception($"Parameter name {paramInfo.Name} is a duplicate");
+                throw new NameCollisionError(parameter.Name.Position, $"Parameter name {paramInfo.Name} is a duplicate");
             }
             Parameters.Add(paramInfo);
         }

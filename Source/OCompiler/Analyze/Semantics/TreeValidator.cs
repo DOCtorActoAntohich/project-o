@@ -8,6 +8,8 @@ using OCompiler.Analyze.Syntax.Declaration.Statement;
 using OCompiler.Analyze.Semantics.Class;
 using OCompiler.Analyze.Semantics.Expression;
 using OCompiler.Analyze.Semantics.Callable;
+using OCompiler.Exceptions;
+using OCompiler.Exceptions.Semantic;
 
 namespace OCompiler.Analyze.Semantics;
 
@@ -113,7 +115,7 @@ internal class TreeValidator
                 new ExpressionInfo(expression, new Context(classInfo, callable)).ValidateExpression();
                 break;
             default:
-                throw new Exception($"Unknown IBodyStatement: {statement}");
+                throw new CompilerInternalError($"Unknown IBodyStatement: {statement}");
         }
     }
 
@@ -126,7 +128,10 @@ internal class TreeValidator
         }
         if (callable.HasParameter(variableName))
         {
-            throw new Exception($"Cannot create variable, name {variableName} is already used by a method parameter");
+            throw new NameCollisionError(
+                variable.Identifier.Position,
+                $"Cannot create variable, name {variable.Identifier.Literal} is already used by a class"
+            );
         }
         if (!callable.LocalVariables.TryGetValue(variableName, out var varInfo))
         {
@@ -147,7 +152,7 @@ internal class TreeValidator
 
         if (variableOrField.Token is not Lexical.Tokens.Keywords.This || variableOrField.Child.Child != null)
         {
-            throw new Exception($"Fields of other classes cannot be changed directly");
+            throw new AccessViolationError(variableOrField.Token.Position, $"Fields of other classes cannot be changed directly");
         }
 
         ValidateFieldAssignment(variableOrField.Child.Token.Literal, assignment.Value, classInfo, callable);
@@ -166,13 +171,13 @@ internal class TreeValidator
         }
         if (!callable.LocalVariables.TryGetValue(variableName, out var varInfo))
         {
-            throw new Exception($"Variable {variableName} must be declared before assignment");
+            throw new UnknownNameError(value.Token.Position, $"Variable {variableName} must be declared before assignment");
         }
 
         var valueInfo = new ExpressionInfo(value, new Context(classInfo, callable));
         if (valueInfo.Type != varInfo.Type)
         {
-            throw new Exception($"Cannot assign value of type {valueInfo.Type} to a variable {variableName} of type {varInfo.Type}");
+            throw new TypeError(value.Token.Position, $"Cannot assign value of type {valueInfo.Type} to a variable of type {varInfo.Type}");
         }
     }
 
@@ -186,13 +191,13 @@ internal class TreeValidator
         var field = classInfo.GetFieldInfo(fieldName);
         if (field == null)
         {
-            throw new Exception($"Field {fieldName} must be declared before assignment");
+            throw new UnknownNameError(value.Token.Position, $"Field {fieldName} must be declared before assignment");
         }
 
         var valueInfo = new ExpressionInfo(value, new Context(classInfo, callable));
         if (valueInfo.Type != field.Expression.Type)
         {
-            throw new Exception($"Cannot assign value of type {valueInfo.Type} to a field {fieldName} of type {field.Expression.Type}");
+            throw new TypeError(value.Token.Position, $"Cannot assign value of type {valueInfo.Type} to a field of type {field.Expression.Type}");
         }
     }
 
@@ -224,7 +229,7 @@ internal class TreeValidator
         {
             ParsedConstructorInfo => "Void",
             ParsedMethodInfo method => method.ReturnType,
-            _ => throw new Exception($"Unknown CallableInfo type: {callable}"),
+            _ => throw new CompilerInternalError($"Unknown CallableInfo type: {callable}"),
         };
 
         string returnType = "Void";
@@ -236,7 +241,8 @@ internal class TreeValidator
         }
         if (returnType != methodReturnType)
         {
-            throw new Exception(
+            throw new TypeError(
+                @return.Position,
                 methodReturnType == "Void" ?
                 $"Cannot use value of type {returnType} as a return value, expected return without an object" :
                 $"Cannot use value of type {returnType} as a return value, expected {methodReturnType}"
@@ -250,7 +256,7 @@ internal class TreeValidator
         conditionInfo.ValidateExpression();
         if (conditionInfo.Type != "Boolean")
         {
-            throw new Exception($"Cannot use value of type {conditionInfo.Type} as a condition, it must be a Boolean");
+            throw new TypeError(condition.Token.Position, $"Cannot use value of type {conditionInfo.Type} as a condition, it must be a Boolean");
         }
     }
 }

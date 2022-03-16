@@ -1,7 +1,8 @@
-using System;
 using System.Collections.Generic;
 using System.Text;
+
 using OCompiler.Analyze.Syntax.Declaration.Class.Member.Method;
+using OCompiler.Analyze.Lexical;
 using OCompiler.Exceptions;
 using OCompiler.Utils;
 
@@ -13,7 +14,10 @@ internal class Constructor: IClassMember
     
     public Body Body { get; }
 
-    public static Constructor EmptyConstructor = new(new(), new());
+    public TokenPosition Position { get; }
+    
+
+    public static Constructor EmptyConstructor = new(new(), new(), new());
     
     public static bool TryParse(TokenEnumerator tokens, out Constructor? constructor)
     {
@@ -23,6 +27,7 @@ internal class Constructor: IClassMember
             constructor = null;
             return false;
         }
+        var position = tokens.Current().Position;
         
         // Get next token.
         tokens.Next();
@@ -49,14 +54,15 @@ internal class Constructor: IClassMember
         // Get next token.
         tokens.Next();
         
-        constructor = new Constructor(parameters, body!);
+        constructor = new Constructor(parameters, body, position);
         return true;
     }
 
-    private Constructor(List<Parameter> parameters, Body body)
+    private Constructor(List<Parameter> parameters, Body body, TokenPosition position)
     {
         Parameters = parameters;
         Body = body;
+        Position = position;
     }
     
     public string ToString(string prefix)

@@ -2,6 +2,7 @@
 
 using OCompiler.Analyze.Semantics.Callable;
 using OCompiler.Analyze.Semantics.Class;
+using OCompiler.Exceptions;
 
 namespace OCompiler.Analyze.Semantics;
 

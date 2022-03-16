@@ -2,6 +2,8 @@
 using OCompiler.Analyze.Semantics.Callable;
 using OCompiler.Analyze.Semantics.Class;
 using OCompiler.Analyze.Syntax.Declaration.Expression;
+using OCompiler.Exceptions;
+using OCompiler.Exceptions.Semantic;
 
 using System;
 using System.Collections.Generic;
@@ -40,14 +42,14 @@ internal class ExpressionInfo
     {
         var type = Expression.Token switch
         {
-            Identifier identifier => ResolveType(identifier.Literal),
+            Identifier identifier => ResolveType(identifier),
             Lexical.Tokens.Keywords.This => Context.Class.Name,
             Lexical.Tokens.Keywords.Base => ResolveBaseReference(),
             IntegerLiteral => "Integer",
             BooleanLiteral => "Boolean",
             StringLiteral => "String",
             RealLiteral => "Real",
-            _ => throw new Exception($"Unexpected Primary expression: {Expression}")
+            _ => throw new CompilerInternalError($"Unexpected Primary expression: {Expression}")
         };
 
         var primaryClass = ClassTree.TraversedClasses[type];
@@ -63,7 +65,7 @@ internal class ExpressionInfo
             }
             if (argTypes.Count > 0 && !primaryClass.HasConstructor(argTypes))
             {
-                throw new Exception($"Couldn't find a constructor to call: {constructorCall}");
+                throw new UnknownNameError(constructorCall.Token.Position, $"Couldn't find a constructor to call: {constructorCall}");
             }
         }
 
@@ -87,7 +89,7 @@ internal class ExpressionInfo
                     var fieldName = childExpression.Token.Literal;
                     if (!primaryClass.HasField(fieldName))
                     {
-                        throw new Exception($"Couldn't find a field {fieldName} in type {type}");
+                        throw new UnknownNameError(childExpression.Token.Position, $"Couldn't find a field {fieldName} in type {type}");
                     }
 
                     switch (primaryClass)
@@ -101,12 +103,12 @@ internal class ExpressionInfo
                             type = builtClass.GetFieldType(fieldName)!;
                             break;
                         default:
-                            throw new Exception($"Unknown ClassInfo object: {primaryClass}");
+                            throw new CompilerInternalError($"Unknown ClassInfo object: {primaryClass}");
                     }
                     primaryClass = ClassTree.TraversedClasses[type];
                     break;
                 default:
-                    throw new Exception($"Unknown Expression type: {childInfo.Expression}");
+                    throw new CompilerInternalError($"Unknown Expression type: {childInfo.Expression}");
             }
             childInfo = childInfo.GetChildInfo();
         }
@@ -126,20 +128,20 @@ internal class ExpressionInfo
         if (type == null)
         {
             var argsStr = string.Join(", ", argTypes);
-            throw new Exception($"Couldn't find a method for call {call.Token.Literal}({argsStr}) on type {primaryClass.Name}");
+            throw new UnknownNameError(call.Token.Position, $"Couldn't find a method for call {call.Token.Literal}({argsStr}) on type {primaryClass.Name}");
         }
         return type;
     }
-
-    private string ResolveType(string classOrVariable)
+    private string ResolveType(Identifier identifier)
     {
+        var classOrVariable = identifier.Literal;
         if (ClassTree.ClassExists(classOrVariable))
         {
             return classOrVariable;
         }
         if (Context.Callable == null)
         {
-            throw new Exception($"Unknown class {classOrVariable}");
+            throw new UnknownNameError(identifier.Position, $"Unknown class {classOrVariable}");
         }
 
         var methodParameterType = Context.Callable.GetParameterType(classOrVariable);
@@ -150,7 +152,7 @@ internal class ExpressionInfo
 
         if (!Context.Callable.LocalVariables.ContainsKey(classOrVariable))
         {
-            throw new Exception($"Use of unassigned variable {classOrVariable}");
+            throw new UnknownNameError(identifier.Position, $"Use of unassigned variable {classOrVariable}");
         }
 
         var localVarInfo = Context.Callable.LocalVariables[classOrVariable];

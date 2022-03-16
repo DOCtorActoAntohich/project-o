@@ -6,6 +6,7 @@ using System.Text;
 using OCompiler.Analyze.Semantics.Callable;
 using OCompiler.Analyze.Syntax.Declaration.Class.Member;
 using OCompiler.Analyze.Syntax.Declaration.Class.Member.Method;
+using OCompiler.Exceptions.Semantic;
 
 namespace OCompiler.Analyze.Semantics.Class;
 
@@ -48,7 +49,7 @@ internal class ParsedClassInfo : ClassInfo
             {
                 var argsStr = string.Join(", ", parameterTypes);
                 var @return = methodInfo.ReturnType == "Void" ? "" : $"-> {methodInfo.ReturnType}"; 
-                throw new Exception($"Method {methodName}({argsStr}) {@return} defined more than once in class {Name}");
+                throw new NameCollisionError(method.Name.Position, $"Method {methodName}({argsStr}) {@return} defined more than once in class {Name}");
             }
             Methods.Add(methodInfo);
         }
@@ -61,7 +62,7 @@ internal class ParsedClassInfo : ClassInfo
             var fieldInfo = new ParsedFieldInfo(field, Context);
             if (Fields.Any(f => f.Name == fieldInfo.Name))
             {
-                throw new Exception($"Field {fieldInfo.Name} defined more than once in class {Name}");
+                throw new NameCollisionError(field.Identifier.Position, $"Field {fieldInfo.Name} defined more than once in class {Name}");
             }
             Fields.Add(fieldInfo);
         }
@@ -76,7 +77,7 @@ internal class ParsedClassInfo : ClassInfo
             if (HasConstructor(parameterTypes))
             {
                 var argsStr = string.Join(", ", parameterTypes);
-                throw new Exception($"Constructor {Name}({argsStr}) defined more than once in class {Name}");
+                throw new NameCollisionError(constructor.Position, $"Constructor {Name}({argsStr}) defined more than once in class {Name}");
             }
             Constructors.Add(constructorInfo);
         }

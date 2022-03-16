@@ -61,7 +61,7 @@ internal class Invoker
         var parsedArgs = new List<(string, object)>();
         foreach (var arg in args)
         {
-            if (!Token.TryParse(0, arg, out var token))
+            if (!Token.TryParse(new(), arg, out var token))
             {
                 parsedArgs.Add(("String", arg));
                 continue;
