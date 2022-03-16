@@ -11,6 +11,8 @@ public static class Integer
     public static CodeTypeDeclaration Generate()
     {
         var integerType = Base.NewPublicTypeDeclaration(TypeName);
+        integerType.IsStruct = true;
+        integerType.IsClass = false;
         
         integerType.Members.Add(Base.CreateInternalValue(typeof(int)));
 

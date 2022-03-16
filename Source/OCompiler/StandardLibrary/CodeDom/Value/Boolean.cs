@@ -11,6 +11,8 @@ public static class Boolean
     public static CodeTypeDeclaration Generate()
     {
         var booleanType = Base.NewPublicTypeDeclaration(TypeName);
+        booleanType.IsStruct = true;
+        booleanType.IsClass = false;
         
         booleanType.Members.Add(Base.CreateInternalValue(typeof(bool)));
         

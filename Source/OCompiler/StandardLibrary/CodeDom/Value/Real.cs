@@ -11,6 +11,8 @@ public class Real
     public static CodeTypeDeclaration Generate()
     {
         var realType = Base.NewPublicTypeDeclaration(TypeName);
+        realType.IsStruct = true;
+        realType.IsClass = false;
         
         realType.Members.Add(Base.CreateInternalValue(typeof(double)));
 

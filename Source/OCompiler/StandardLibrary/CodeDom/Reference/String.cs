@@ -14,6 +14,7 @@ public static class String
     public static CodeTypeDeclaration Generate()
     {
         var stringType = Base.NewPublicTypeDeclaration(TypeName);
+        stringType.BaseTypes.Add(new CodeTypeReference(DomAnyRef.TypeName));
 
         stringType.Members.Add(Base.CreateInternalValue(typeof(string)));
         
