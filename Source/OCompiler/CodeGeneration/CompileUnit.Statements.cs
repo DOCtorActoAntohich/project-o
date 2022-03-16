@@ -2,7 +2,9 @@ using System;
 using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
+using OCompiler.Analyze.Semantics;
 using OCompiler.Analyze.Semantics.Callable;
+using OCompiler.Analyze.Semantics.Expression;
 using OCompiler.Analyze.Syntax.Declaration;
 using OCompiler.Analyze.Syntax.Declaration.Expression;
 using OCompiler.Analyze.Syntax.Declaration.Statement;
@@ -121,6 +123,7 @@ internal static partial class CompileUnit
             Type = variable.Expression.Type,
             InitExpression = ParsedRvalueExpression(variable.Expression)
         };
+        var aa = new ExpressionInfo(variable.Expression, new Context())
 
         Console.WriteLine(variable.Expression);
         //a.Name = variable.Identifier.
