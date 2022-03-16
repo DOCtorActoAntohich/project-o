@@ -15,6 +15,7 @@ using OCompiler.Analyze.Syntax.Declaration.Statement;
 using OCompiler.StandardLibrary.Type.Reference;
 using OCompiler.StandardLibrary.Type.Value;
 using Boolean = OCompiler.StandardLibrary.Type.Value.Boolean;
+using Class = OCompiler.StandardLibrary.Type.Class;
 using If = OCompiler.Analyze.Syntax.Declaration.Statement.If;
 using Return = OCompiler.Analyze.Syntax.Declaration.Statement.Return;
 using String = OCompiler.StandardLibrary.Type.Reference.String;
@@ -158,21 +159,34 @@ internal class Emitter
 
     private FieldInfo? GetField(string @class, string name)
     {
+        if (_standardTypes.ContainsKey(@class))
+        {
+            return _standardTypes[@class].GetField(name);
+        }
+        
         if (_fieldBuilders.ContainsKey(@class) && _fieldBuilders[@class].ContainsKey(name))
         {
             return _fieldBuilders[@class][name];
         }
 
-        if (_standardTypes.ContainsKey(@class))
+        if (GetType(@class) is {BaseType: { } baseType})
         {
-            return _standardTypes[@class].GetField(name);
+            return GetField(baseType.Name, name);
         }
-
+        
         return null;
     }
     
     private MethodInfo? GetMethod(string @class, string name, Type[] parameters)
     {
+        if (_standardTypes.ContainsKey(@class))
+        {
+            return _standardTypes[@class].GetMethod(
+                name, 
+                BindingFlags.Instance | BindingFlags.Public, parameters
+            );
+        }
+        
         if (
             _methodBuilders.ContainsKey(@class) && 
             _methodBuilders[@class].ContainsKey(name) && 
@@ -182,11 +196,21 @@ internal class Emitter
             return _methodBuilders[@class][name][parameters];
         }
         
-        return GetType(@class)?.GetMethod(name, BindingFlags.Instance | BindingFlags.Public, parameters);
+        if (GetType(@class) is {BaseType: {} baseType})
+        {
+            return GetMethod(baseType.Name, name, parameters);
+        }
+
+        return null;
     }
 
     private ConstructorInfo? GetConstructor(string @class, Type[] parameters)
     {
+        if (_standardTypes.ContainsKey(@class))
+        {
+            return _standardTypes[@class].GetConstructor(parameters);
+        }
+        
         if (
             _constructorBuilders.ContainsKey(@class) &&
             _constructorBuilders[@class].ContainsKey(parameters)
@@ -195,7 +219,12 @@ internal class Emitter
             return _constructorBuilders[@class][parameters];
         }
         
-        return GetType(@class)?.GetConstructor(parameters);
+        if (GetType(@class) is {BaseType: {} baseType})
+        {
+            return GetConstructor(baseType.Name, parameters);
+        }
+
+        return null;
     }
     
     private Type[] GetParameters(List<ParsedParameterInfo> parameters)
@@ -567,6 +596,25 @@ internal class Emitter
         // Method or constructor call.
         if (expression is Call call)
         {
+            // var typeName = call.Token.Literal;
+            if (call.Token is Base)
+            {
+                if (currentType is not null)
+                {
+                    throw new Exception("Current type must be null.");
+                }
+                
+                if (type.BaseType is null)
+                {
+                    throw new Exception("No class to inherit from.");
+                }
+                    
+                // Load 'this' reference.
+                generator.Emit(OpCodes.Ldarg_0);
+                // Push ref.
+                scope.Push();
+            }
+            
             // Estimate all callable types.
             var parameterTypes = new List<Type>();
             foreach (var argument in call.Arguments)
@@ -583,7 +631,21 @@ internal class Emitter
                 );
             }
             
-            if (currentType is null)
+            // Inheritance.
+            if (call.Token is Base)
+            {
+                generator.Emit(
+                    OpCodes.Call, 
+                    GetConstructor(type.BaseType!.Name, parameterTypes.ToArray()) ?? throw new Exception(
+                        $"Constructor not found: {parameterTypes}"
+                    )
+                );
+                
+                // Pop ref.
+                scope.Pop();
+            }
+            // Construction call.
+            else if (currentType is null)
             {
                 // Type of object that will be created.
                 currentType = GetType(call.Token.Literal) ?? throw new Exception(
