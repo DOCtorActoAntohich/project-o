@@ -1,10 +1,6 @@
 {
   "$schema": "http://json.schemastore.org/launchsettings.json",
   "profiles": {
-    "Without generics and inheritance": {
-      "commandName": "Project",
-      "commandLineArgs": "$(SolutionDir)/Examples/simple.ol Main"
-    },
     "TicTacToe": {
       "commandName": "Project",
       "commandLineArgs": "$(SolutionDir)/Examples/tic-tac-toe.ol TicTacToe"
@@ -13,10 +9,6 @@
       "commandName": "Project",
       "commandLineArgs": "$(SolutionDir)/Examples/strings.ol Main"
     },
-    "Unterminated comment": {
-      "commandName": "Project",
-      "commandLineArgs": "$(SolutionDir)/Examples/wrong_comment.ol Main"
-    },
     "Unterminated string": {
       "commandName": "Project",
       "commandLineArgs": "$(SolutionDir)/Examples/wrong_string.ol Main"
@@ -24,6 +16,10 @@
     "Sum of two numbers": {
       "commandName": "Project",
       "commandLineArgs": "$(SolutionDir)/Examples/sum-of-two.ol Main 42 90"
+    },
+    "Chain calls": {
+      "commandName": "Project",
+      "commandLineArgs": "$(SolutionDir)/Examples/chain-calls.ol Main 7"
     }
   }
 }
