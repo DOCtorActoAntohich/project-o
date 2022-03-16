@@ -35,6 +35,7 @@ namespace OCompiler.Analyze.Lexical.Tokens
             RegisterToken<Keywords.Else>();
             RegisterToken<Keywords.Class>();
             RegisterToken<Keywords.Extends>();
+            RegisterToken<Keywords.Base>();
             RegisterToken<Keywords.This>();
             RegisterToken<Keywords.Method>();
             RegisterToken<Keywords.Is>();

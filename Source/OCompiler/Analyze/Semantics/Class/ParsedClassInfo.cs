@@ -59,7 +59,7 @@ internal class ParsedClassInfo : ClassInfo
         foreach (var field in fields)
         {
             var fieldInfo = new ParsedFieldInfo(field, Context);
-            if (Fields.Where(f => f.Name == fieldInfo.Name).Any())
+            if (Fields.Any(f => f.Name == fieldInfo.Name))
             {
                 throw new Exception($"Field {fieldInfo.Name} defined more than once in class {Name}");
             }

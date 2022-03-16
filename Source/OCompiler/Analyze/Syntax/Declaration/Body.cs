@@ -1,7 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
+using OCompiler.Analyze.Syntax.Declaration.Expression;
 using OCompiler.Analyze.Syntax.Declaration.Statement;
 using OCompiler.Utils;
 
@@ -22,6 +24,14 @@ internal class Body : IEnumerable<IBodyStatement>
     public Body()
     {
 
+    }
+
+    public void AddBaseConstructorCall()
+    {
+        if (_members.Count == 0 || !_members.Any(p => p is Call call && call.Token is Lexical.Tokens.Keywords.Base))
+        {
+            _members.Insert(0, Call.EmptyBaseCall);
+        }
     }
 
     public void AddTrailingReturn()

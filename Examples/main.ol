@@ -11,7 +11,17 @@ class OtherClass is
   var unusedfield : "cool language"
   var somestring   : "weird language"
 
+  this(new: String) is
+    this.somestring := new
+  end
+
   method GetCoolNumber(a: Integer, b: Integer) : Integer is
     return a.Mod(b)
+  end
+end
+
+class What extends OtherClass is
+  this(new: String) is
+    base(new)
   end
 end
