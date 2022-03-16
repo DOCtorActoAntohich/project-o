@@ -8,8 +8,8 @@ namespace OCompiler.Extensions
     {
         public static bool IsIdentifierOrNumber(this char c)
         {
-            // '.' is included for Real numbers
-            return char.IsLetterOrDigit(c) || c == '.' || c == '_';
+            // '.' is included for Real numbers, '-' for negatives
+            return char.IsLetterOrDigit(c) || c == '.' || c == '_' || c == '-';
         }
         public static bool IsIdentifierOrNumber(this string s)
         {
@@ -55,7 +55,7 @@ namespace OCompiler.Extensions
         {
             foreach (char c in literal)
             {
-                if (!(char.IsDigit(c) || c == '.'))
+                if (!(char.IsDigit(c) || c == '.' || c == '-'))
                     return false;
             }
             return literal.TryCastToDouble(out double _);
@@ -69,7 +69,7 @@ namespace OCompiler.Extensions
         {
             foreach (char c in literal)
             {
-                if (!char.IsDigit(c))
+                if (!(char.IsDigit(c) || c == '-'))
                     return false;
             }
             return literal.TryCastToInteger(out int _);

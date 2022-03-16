@@ -15,7 +15,7 @@
     },
     "Sum of two numbers": {
       "commandName": "Project",
-      "commandLineArgs": "$(SolutionDir)/Examples/sum-of-two.ol Main 42 90"
+      "commandLineArgs": "$(SolutionDir)/Examples/sum-of-two.ol Main 42 -84"
     },
     "Chain calls": {
       "commandName": "Project",
