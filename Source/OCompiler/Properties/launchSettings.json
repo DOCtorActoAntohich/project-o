@@ -5,6 +5,10 @@
       "commandName": "Project",
       "commandLineArgs": "$(SolutionDir)/Examples/simple.ol Main"
     },
+    "TicTacToe": {
+      "commandName": "Project",
+      "commandLineArgs": "$(SolutionDir)/Examples/tic-tac-toe.ol TicTacToe"
+    },
     "String and comments": {
       "commandName": "Project",
       "commandLineArgs": "$(SolutionDir)/Examples/strings.ol Main"
