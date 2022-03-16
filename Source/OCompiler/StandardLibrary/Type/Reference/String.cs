@@ -62,7 +62,7 @@ public class String : AnyRef
 
     public String At(Integer index)
     {
-        return new String(Value[index.Value..index.Value]);
+        return new String(Value[index.Value..(index.Value + 1)]);
     }
 
     public String Concatenate(String other)

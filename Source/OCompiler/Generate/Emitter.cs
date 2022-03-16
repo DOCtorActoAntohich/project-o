@@ -695,7 +695,7 @@ internal class Emitter
             {
                 case StringLiteral stringLiteral:
                     currentType = typeof(String);
-                    generator.Emit(OpCodes.Ldstr, stringLiteral.EscapedLiteral);
+                    generator.Emit(OpCodes.Ldstr, stringLiteral.Literal);
                     generator.Emit(OpCodes.Newobj, GetConstructor(currentType.Name, new [] {typeof(string)})!);
                     // Push value.
                     scope.Push();
