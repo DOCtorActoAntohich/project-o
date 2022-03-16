@@ -4,12 +4,10 @@ using System.Collections.Generic;
 using System.Linq;
 using OCompiler.Analyze.Semantics;
 using OCompiler.Analyze.Semantics.Class;
-using OCompiler.Analyze.Semantics.Expression;
 using OCompiler.Analyze.Syntax.Declaration.Expression;
 using DomAnyRef = OCompiler.StandardLibrary.CodeDom.Reference.AnyRef;
 using DomIO     = OCompiler.StandardLibrary.CodeDom.Reference.IO;
 using DomString = OCompiler.StandardLibrary.CodeDom.Reference.String;
-
 using DomAnyVal = OCompiler.StandardLibrary.CodeDom.Value.AnyValue;
 using DomBool   = OCompiler.StandardLibrary.CodeDom.Value.Boolean;
 using DomInt    = OCompiler.StandardLibrary.CodeDom.Value.Integer;
@@ -129,6 +127,8 @@ internal static class CompileUnit
         typeDeclaration.Members.Add(field);
     }
 
+    // Very versatile; can be used not only as init expression, but
+    // also as a method argument, if-while bool expression, etc.
     private static CodeExpression ParseVariableInitExpression(Expression expression)
     {
         return expression switch
