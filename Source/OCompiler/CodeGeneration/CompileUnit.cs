@@ -6,7 +6,6 @@ using OCompiler.Analyze.Semantics;
 using OCompiler.Analyze.Semantics.Callable;
 using OCompiler.Analyze.Semantics.Class;
 using OCompiler.Analyze.Syntax.Declaration;
-using OCompiler.Analyze.Syntax.Declaration.Class.Member;
 using OCompiler.Analyze.Syntax.Declaration.Expression;
 using OCompiler.Analyze.Syntax.Declaration.Statement;
 using OCompiler.StandardLibrary.CodeDom;
@@ -17,6 +16,7 @@ using DomAnyVal = OCompiler.StandardLibrary.CodeDom.Value.AnyValue;
 using DomBool   = OCompiler.StandardLibrary.CodeDom.Value.Boolean;
 using DomInt    = OCompiler.StandardLibrary.CodeDom.Value.Integer;
 using DomReal   = OCompiler.StandardLibrary.CodeDom.Value.Real;
+using DomVoid   = OCompiler.StandardLibrary.CodeDom.Value.Void;
 
 namespace OCompiler.CodeGeneration;
 
@@ -70,7 +70,7 @@ internal static class CompileUnit
             case BuiltClassInfo builtInClass:
                 @namespace.Types.Add(GetBuiltClass(builtInClass));
                 break;
-            
+
             case ParsedClassInfo newClass:
                 typeDeclaration.AddParsedClassContents(newClass);
                 break;
@@ -106,6 +106,8 @@ internal static class CompileUnit
             DomBool.TypeName   => DomBool.Generate(),
             DomInt.TypeName    => DomInt.Generate(),
             DomReal.TypeName   => DomReal.Generate(),
+            
+            DomVoid.TypeName   => DomVoid.Generate(), // bad.
             
             _ => throw new Exception($"SUS! This class is not found among Built-Ins: {builtClassInfo.Name}")
         };
