@@ -24,17 +24,18 @@ namespace OCompiler.Pipeline
             var tokenizer = new Tokenizer(SourceFilePath);
             var tokens = tokenizer.GetTokens().ToList();
             Formatter.ShowHighlightedCode(tokens);
+            Console.WriteLine();
 
             var tokenTree = new Tree(new TokenEnumerator(tokens));
             if (tokenTree.IsEmpty)
             {
                 throw new Exception("No classes.");
             }
-            
-            Console.WriteLine(tokenTree.ToString());
+
+            Formatter.ShowAST(tokenTree);
+            Console.WriteLine();
 
             var validator = new TreeValidator(tokenTree);
-            Console.WriteLine(validator.GetValidationInfo());
 
             var generator = new Emitter(validator.ValidatedClasses);
             return generator.Assembly;
