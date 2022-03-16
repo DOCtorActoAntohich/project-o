@@ -26,6 +26,14 @@ public static class String
         stringType.AddRealConstructor();
         stringType.AddBooleanConstructor();
         
+        stringType.AddToStringMethod();
+        stringType.AddToIntegerMethod();
+        stringType.AddToRealMethod();
+        stringType.AddToBooleanMethod();
+        
+        stringType.AddAtMethod();
+        stringType.AddConcatenateMethod();
+
         return stringType;
     }
 
