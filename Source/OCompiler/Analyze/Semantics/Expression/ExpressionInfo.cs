@@ -130,7 +130,7 @@ internal class ExpressionInfo
     }
     private string ResolveType(string classOrVariable)
     {
-        if (Context.Classes!.ContainsKey(classOrVariable))
+        if (Context.Classes!.ClassExists(classOrVariable))
         {
             return classOrVariable;
         }

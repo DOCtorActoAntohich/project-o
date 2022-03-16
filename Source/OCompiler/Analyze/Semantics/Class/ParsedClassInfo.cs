@@ -12,7 +12,6 @@ namespace OCompiler.Analyze.Semantics.Class;
 internal class ParsedClassInfo : ClassInfo
 {
     public override Syntax.Declaration.Class.Class? Class { get; }
-    public override ClassInfo? BaseClass { get; }
     public List<ParsedMethodInfo> Methods { get; } = new();
     public List<ParsedFieldInfo> Fields { get; } = new();
     public List<ParsedConstructorInfo> Constructors { get; } = new();
@@ -30,10 +29,7 @@ internal class ParsedClassInfo : ClassInfo
 
         Name = parsedClass.Name.Literal;
         Class = parsedClass;
-        if (parsedClass.Extends != null)
-        {
-            BaseClass = GetByName(parsedClass.Extends.Literal);
-        }
+        BaseClass = parsedClass.Extends == null ? GetByName("Class") : GetByName(parsedClass.Extends.Literal);
     }
 
     protected ParsedClassInfo()
@@ -104,6 +100,12 @@ internal class ParsedClassInfo : ClassInfo
         }
 
         var newInfo = new ParsedClassInfo(parsedClass);
+        foreach (var derivedClass in parsedClasses.Values.Where(
+            c => c.BaseClass != null && c.BaseClass.Name == name
+        ))
+        {
+            derivedClass.BaseClass = newInfo;
+        }
         parsedClasses[name] = newInfo;
         return newInfo;
     }
@@ -126,12 +128,17 @@ internal class ParsedClassInfo : ClassInfo
 
     public override string? GetMethodReturnType(string name, List<string> argumentTypes)
     {
-        var method = Methods.Where(
+        var type = Methods.Where(
             m => m.Name == name &&
             m.Parameters.Select(p => p.Type).SequenceEqual(argumentTypes)
-        ).FirstOrDefault();
+        ).FirstOrDefault()?.ReturnType;
 
-        return method?.ReturnType;
+        if (type == null && BaseClass != null)
+        {
+            type = BaseClass.GetMethodReturnType(name, argumentTypes);
+        }
+
+        return type;
     }
 
     public bool HasMethod(string name, List<string> argumentTypes)
@@ -143,17 +150,25 @@ internal class ParsedClassInfo : ClassInfo
     public ParsedFieldInfo? GetFieldInfo(string name)
     {
         var field = Fields.Where(f => f.Name == name).FirstOrDefault();
+        if (field == null && BaseClass is ParsedClassInfo parsedBaseClass) {
+            field = parsedBaseClass.GetFieldInfo(name);
+        }
         return field;
     }
 
     public override string? GetFieldType(string name)
     {
-        return GetFieldInfo(name)?.Type;
+        var type = GetFieldInfo(name)?.Type;
+        if (type == null && BaseClass != null)
+        {
+            type = BaseClass.GetFieldType(name);
+        }
+        return type;
     }
 
     public override bool HasField(string name)
     {
-        return GetFieldInfo(name) != null;
+        return GetFieldType(name) != null;
     }
 
     public void AddFieldType(string name, string type)
@@ -174,15 +189,15 @@ internal class ParsedClassInfo : ClassInfo
         return constructor != null;
     }
 
-    public override string ToString()
+    public override string ToString(bool includeBase = true)
     {
         StringBuilder @string = new();
         @string.Append("Parsed class ");
         @string.Append(Name);
-        if (BaseClass != null)
+        if (includeBase && BaseClass != null)
         {
             @string.Append(" extends ");
-            @string.Append(BaseClass);
+            @string.Append(BaseClass.Name);
         }
         return @string.ToString();
     }

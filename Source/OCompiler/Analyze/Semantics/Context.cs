@@ -9,10 +9,10 @@ namespace OCompiler.Analyze.Semantics;
 internal class Context
 {
     public ParsedClassInfo CurrentClass { get; }
-    public Dictionary<string, ClassInfo>? Classes { get; private set; }
+    public ClassTree? Classes { get; private set; }
     public CallableInfo? CurrentMethod { get; }
 
-    public Context(ParsedClassInfo currentClass, Dictionary<string, ClassInfo>? classes = null, CallableInfo? currentMethod = null)
+    public Context(ParsedClassInfo currentClass, ClassTree? classes = null, CallableInfo? currentMethod = null)
     {
         CurrentClass = currentClass;
         CurrentMethod = currentMethod;
@@ -22,17 +22,18 @@ internal class Context
         }
     }
 
-    public void AddClasses(Dictionary<string, ClassInfo> classes)
+    public void AddClasses(ClassTree classes)
     {
         Classes = classes;
     }
 
     public ClassInfo GetClassByName(string name)
     {
-        if (Classes!.TryGetValue(name, out var classInfo))
+        var classInfo = Classes![name];
+        if (classInfo == null)
         {
-            return classInfo;
+            throw new Exception($"Unknown type: {name}");
         }
-        throw new Exception($"Unknown type: {name}");
+        return classInfo;
     }
 }
