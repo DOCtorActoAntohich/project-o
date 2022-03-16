@@ -1,19 +1,15 @@
 using System;
 using System.CodeDom;
 using System.Collections.Generic;
-using System.Linq;
-using OCompiler.Analyze.Semantics;
-using OCompiler.Analyze.Semantics.Callable;
-using OCompiler.Analyze.Semantics.Expression;
 using OCompiler.Analyze.Syntax.Declaration;
 using OCompiler.Analyze.Syntax.Declaration.Expression;
 using OCompiler.Analyze.Syntax.Declaration.Statement;
 
 namespace OCompiler.CodeGeneration;
 
-internal static partial class CompileUnit
+internal partial class CompileUnit
 {
-    private static IEnumerable<CodeStatement> ParsedBody(Body body)
+    private IEnumerable<CodeStatement> ParsedBody(Body body)
     {
         var statements = new List<CodeStatement>();
         foreach (var statement in body)
@@ -25,7 +21,7 @@ internal static partial class CompileUnit
         return statements.ToArray();
     }
     
-    private static CodeStatement ParsedCodeStatement(IBodyStatement statement)
+    private CodeStatement ParsedCodeStatement(IBodyStatement statement)
     {
         // Todo remove prints
         Console.WriteLine(statement);
@@ -63,7 +59,7 @@ internal static partial class CompileUnit
     }
     
 
-    private static CodeStatement ParsedReturnStatement(Return @return)
+    private CodeStatement ParsedReturnStatement(Return @return)
     {
         if (@return.ReturnValue == null)
         {
@@ -74,7 +70,7 @@ internal static partial class CompileUnit
         return new CodeMethodReturnStatement(returnValue);
     }
     
-    private static CodeStatement ParsedIfStatement(If @if)
+    private CodeStatement ParsedIfStatement(If @if)
     {
         var ifCode = new CodeConditionStatement
         {
@@ -99,7 +95,7 @@ internal static partial class CompileUnit
         return ifCode;
     }
 
-    private static CodeStatement ParsedWhileStatement(While @while)
+    private CodeStatement ParsedWhileStatement(While @while)
     {
         var whileCode = new CodeIterationStatement
         {
@@ -115,7 +111,7 @@ internal static partial class CompileUnit
     }
 
 
-    private static CodeStatement ParsedVariableDeclaration(Variable variable)
+    private CodeStatement ParsedVariableDeclaration(Variable variable)
     {
         var a = new CodeVariableDeclarationStatement
         {

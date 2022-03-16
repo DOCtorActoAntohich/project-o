@@ -2,13 +2,13 @@ using System;
 using System.CodeDom;
 using OCompiler.Analyze.Semantics;
 using OCompiler.Analyze.Semantics.Callable;
-using OCompiler.StandardLibrary.CodeDom;
+using DomBase = OCompiler.StandardLibrary.CodeDom.Base;
 
 namespace OCompiler.CodeGeneration;
 
-internal static partial class CompileUnit
+internal partial class CompileUnit
 {
-    private static void AddParsedClassField(this CodeTypeDeclaration typeDeclaration, ParsedFieldInfo parsedField)
+    private void AddParsedClassField(ParsedFieldInfo parsedField)
     {
         var field = new CodeMemberField
         {
@@ -18,34 +18,34 @@ internal static partial class CompileUnit
             InitExpression = ParsedRvalueExpression(parsedField.Expression.Expression)
         };
         
-        typeDeclaration.Members.Add(field);
+        _currentTypeDeclaration.Members.Add(field);
     }
 
-    private static void AddParsedCallable(this CodeTypeDeclaration typeDeclaration, CallableInfo callableInfo)
+    private void AddParsedCallable(CallableInfo callableInfo)
     {
-        var callable = callableInfo switch
+        _currentCallable = callableInfo switch
         {
-            ParsedMethodInfo methodInfo => Base.EmptyPublicMethod(methodInfo.ReturnType, methodInfo.Name),
-            ParsedConstructorInfo => Base.EmptyPublicConstructor(),
+            ParsedMethodInfo methodInfo => DomBase.EmptyPublicMethod(methodInfo.ReturnType, methodInfo.Name),
+            ParsedConstructorInfo => DomBase.EmptyPublicConstructor(),
             _ => throw new Exception($"Unknown callable")
         };
         
-        callable.FillParsedCallable(callableInfo);
+        FillParsedCallable(callableInfo);
         
-        typeDeclaration.Members.Add(callable);
+        _currentTypeDeclaration.Members.Add(_currentCallable);
     }
 
-    private static void FillParsedCallable(this CodeMemberMethod callable, CallableInfo callableInfo)
+    private void FillParsedCallable(CallableInfo callableInfo)
     {
         foreach (var parameter in callableInfo.Parameters)
         {
             var p = new CodeParameterDeclarationExpression(parameter.Type, parameter.Name);
-            callable.Parameters.Add(p);
+            _currentCallable.Parameters.Add(p);
         }
 
         foreach (var statement in ParsedBody(callableInfo.Body))
         {
-            callable.Statements.Add(statement);
+            _currentCallable.Statements.Add(statement);
         }
     }
 }

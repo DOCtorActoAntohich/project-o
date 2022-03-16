@@ -8,11 +8,9 @@ using OCompiler.Analyze.Syntax.Declaration.Statement;
 
 namespace OCompiler.CodeGeneration;
 
-internal static partial class CompileUnit
+internal partial class CompileUnit
 {
-    // Very versatile; can be used not only as init expression, but
-    // also as a method argument, if-while bool expression, etc.
-    private static CodeExpression ParsedRvalueExpression(Expression expression)
+    private CodeExpression ParsedRvalueExpression(Expression expression)
     {
         return expression switch
         {
@@ -22,7 +20,7 @@ internal static partial class CompileUnit
         };
     }
     
-    private static CodeExpression ParseConstructorCall(Call call)
+    private CodeExpression ParseConstructorCall(Call call)
     {
         var type = new CodeTypeReference(call.Token.Literal);
         var arguments = ParseCallArgumentList(call.Arguments);
@@ -33,7 +31,7 @@ internal static partial class CompileUnit
         return chainedAccess;
     }
     
-    private static CodeExpression ParseChainAccess(CodeExpression starterObject, Expression? expression)
+    private CodeExpression ParseChainAccess(CodeExpression starterObject, Expression? expression)
     {
         switch (expression)
         {
@@ -55,7 +53,7 @@ internal static partial class CompileUnit
         }
     }
     
-    private static CodeExpression ParseAssignmentExpression(Assignment assignment)
+    private CodeExpression ParseAssignmentExpression(Assignment assignment)
     {
         CodeExpression lhs;
         if (assignment.Variable.Token is This)
@@ -66,7 +64,7 @@ internal static partial class CompileUnit
         return new CodeExpression();
     }
     
-    private static CodeExpression[] ParseCallArgumentList(IEnumerable<Expression> arguments)
+    private CodeExpression[] ParseCallArgumentList(IEnumerable<Expression> arguments)
     {
         return arguments.Select(ParsedRvalueExpression).ToArray();
     }

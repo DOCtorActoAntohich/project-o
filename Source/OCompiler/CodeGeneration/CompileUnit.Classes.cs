@@ -13,64 +13,65 @@ using DomVoid   = OCompiler.StandardLibrary.CodeDom.Value.Void;
 
 namespace OCompiler.CodeGeneration;
 
-internal static partial class CompileUnit
+internal partial class CompileUnit
 {
-    private static void AddAllClasses(this CodeNamespace @namespace, TreeValidator ast)
+    private void AddAllClasses(TreeValidator ast)
     {
         foreach (var classInfo in ast.ValidatedClasses)
         {
-            @namespace.AddClassInfo(classInfo);
+            AddClassInfo(classInfo);
         }
     }
     
-    private static void AddClassInfo(this CodeNamespace @namespace, ClassInfo classInfo)
+    private void AddClassInfo(ClassInfo classInfo)
     {
-        var typeDeclaration = new CodeTypeDeclaration(classInfo.Name)
+        _currentTypeDeclaration = new CodeTypeDeclaration(classInfo.Name)
         {
             Attributes = MemberAttributes.Public
         };
+        
 
         if (classInfo.IsValueType())
         {
-            typeDeclaration.IsClass  = false;
-            typeDeclaration.IsStruct = true;
+            _currentTypeDeclaration.IsClass  = false;
+            _currentTypeDeclaration.IsStruct = true;
         }
         else if (classInfo.BaseClass != null)
         {
-            typeDeclaration.IsClass  = true;
-            typeDeclaration.IsStruct = false;
-            typeDeclaration.AddBaseClass(classInfo);
+            _currentTypeDeclaration.IsClass  = true;
+            _currentTypeDeclaration.IsStruct = false;
+            AddBaseClass(classInfo);
         }
 
 
         switch (classInfo)
         {
             case BuiltClassInfo builtInClass:
-                @namespace.Types.Add(GetBuiltClass(builtInClass));
+                _codeNamespace.Types.Add(GetBuiltClass(builtInClass));
                 break;
 
             case ParsedClassInfo newClass:
-                typeDeclaration.AddParsedClassContents(newClass);
+                AddParsedClassContents(newClass);
                 break;
             
             default:
                 throw new Exception($"Class `{classInfo.Name}` was not found in StdLib, nor in OLang file.");
         }
         
-        @namespace.Types.Add(typeDeclaration);
+        _codeNamespace.Types.Add(_currentTypeDeclaration);
     }
-
-    private static void AddBaseClass(this CodeTypeDeclaration typeDeclaration, ClassInfo classInfo)
+    
+    private void AddBaseClass(ClassInfo classInfo)
     {
         var parent = classInfo.BaseClass switch
         {
-            ClassInfo parentInfo => new CodeTypeReference(parentInfo.Name),
+            { } parentInfo => new CodeTypeReference(parentInfo.Name),
             _ => new CodeTypeReference(typeof(object))
         };
         
-        typeDeclaration.BaseTypes.Add(parent);
+        _currentTypeDeclaration.BaseTypes.Add(parent);
     }
-
+    
     private static CodeTypeDeclaration GetBuiltClass(BuiltClassInfo builtClassInfo)
     {
         return builtClassInfo.Name switch
@@ -89,22 +90,22 @@ internal static partial class CompileUnit
             _ => throw new Exception($"SUS! This class is not found among Built-Ins: {builtClassInfo.Name}")
         };
     }
-
-    private static void AddParsedClassContents(this CodeTypeDeclaration typeDeclaration, ParsedClassInfo classInfo)
+    
+    private void AddParsedClassContents(ParsedClassInfo classInfo)
     {
         foreach (var field in classInfo.Fields)
         {
-            typeDeclaration.AddParsedClassField(field);
+            AddParsedClassField(field);
         }
         
         foreach (var constructor in classInfo.Constructors)
         {
-            typeDeclaration.AddParsedCallable(constructor);
+            AddParsedCallable(constructor);
         }
 
         foreach (var method in classInfo.Methods)
         {
-            typeDeclaration.AddParsedCallable(method);
+            AddParsedCallable(method);
         }
     }
 }

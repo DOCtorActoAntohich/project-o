@@ -3,18 +3,29 @@ using OCompiler.Analyze.Semantics;
 
 namespace OCompiler.CodeGeneration;
 
-internal static partial class CompileUnit
+internal partial class CompileUnit
 {
     public const string ResultingNamespace = "OLang";
 
+    private readonly CodeNamespace _codeNamespace;
+
+    private CodeTypeDeclaration _currentTypeDeclaration;
+    private CodeMemberMethod _currentCallable;
     
-    public static CodeCompileUnit FromAnnotatedSyntaxTree(TreeValidator ast)
+    public CompileUnit(TreeValidator ast)
+    {
+        _currentTypeDeclaration = new CodeTypeDeclaration();
+        _currentCallable = new CodeMemberMethod();
+        
+        _codeNamespace = new CodeNamespace(ResultingNamespace);
+        AddAllClasses(ast);
+    }
+
+    public CodeCompileUnit BuiltIn()
     {
         var compileUnit = new CodeCompileUnit();
-        
-        var @namespace = new CodeNamespace(ResultingNamespace);
-        @namespace.AddAllClasses(ast);
-        compileUnit.Namespaces.Add(@namespace);
+
+        compileUnit.Namespaces.Add(_codeNamespace);
         
         return compileUnit;
     }
