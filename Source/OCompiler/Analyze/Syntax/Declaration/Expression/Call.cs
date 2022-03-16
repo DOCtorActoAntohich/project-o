@@ -23,6 +23,7 @@ internal class Call : Expression
 
     public override string ToString()
     {
-        return $"{Token.Literal}{Declaration.Expression.Arguments.ToString(Arguments)}";
+        string child = Child is null ? "" : $".{Child}";
+        return $"{Token.Literal}{Declaration.Expression.Arguments.ToString(Arguments)}{child}";
     }
 }
