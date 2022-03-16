@@ -3,26 +3,42 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
+using OCompiler.Exceptions;
 
 namespace OCompiler.Analyze.Semantics.Class;
 
 internal class BuiltClassInfo : ClassInfo
 {
     public override Type Class { get; }
-    public override Type? BaseClass { get; }
     public List<MethodInfo> Methods { get; }
     public List<FieldInfo> Fields { get; }
     public List<ConstructorInfo> Constructors { get; }
-    public static Dictionary<string, ClassInfo> StandardClasses { get; private set; }
+    public static Dictionary<string, ClassInfo> StandardClasses { get; private set; } = new();
 
-    public BuiltClassInfo(Type builtClassType)
+    private BuiltClassInfo(Type builtClassType)
     {
         Class = builtClassType;
-        BaseClass = builtClassType.BaseType;
         Name = builtClassType.Name;
+        if (builtClassType.BaseType != null && builtClassType.BaseType != typeof(object))
+        {
+            BaseClass = GetByType(builtClassType.BaseType);
+        }
+
         Methods = builtClassType.GetRuntimeMethods().ToList();
         Fields = builtClassType.GetRuntimeFields().ToList();
         Constructors = builtClassType.GetConstructors().ToList();
+    }
+
+    public static BuiltClassInfo GetByType(Type type)
+    {
+        if (
+            StandardClasses.Values.Where(c => ((BuiltClassInfo)c).Class == type).FirstOrDefault()
+            is not BuiltClassInfo existingClassInfo
+        )
+        {
+            return new BuiltClassInfo(type);
+        }
+        return existingClassInfo;
     }
 
     static BuiltClassInfo()
@@ -52,6 +68,15 @@ internal class BuiltClassInfo : ClassInfo
         return method?.ReturnType.Name;
     }
 
+    public override ConstructorInfo? GetConstructor(List<string> argumentTypes)
+    {
+        var constructor = Constructors.Where(
+            c => c.GetParameters().Select(p => p.ParameterType.Name).SequenceEqual(argumentTypes)
+        ).FirstOrDefault();
+
+        return constructor;
+    }
+
     public override string? GetFieldType(string name)
     {
         var field = Fields.Where(f => f.Name == name).FirstOrDefault();
@@ -65,23 +90,15 @@ internal class BuiltClassInfo : ClassInfo
 
     public override bool HasConstructor(List<string> argumentTypes)
     {
-        var candidates = Constructors.Where(
-            c => c.GetParameters().Select(p => p.ParameterType.Name).SequenceEqual(argumentTypes)
-        ).ToList();
-        if (candidates.Count > 1)
-        {
-            throw new Exception($"More than one constructor matches signature {Name}({string.Join(",", argumentTypes)})");
-        }
-
-        return candidates.Count == 1;
+        return GetConstructor(argumentTypes) != null;
     }
 
-    public override string ToString()
+    public override string ToString(bool includeBase = true)
     {
         StringBuilder @string = new();
         @string.Append("Standard library class ");
         @string.Append(Name);
-        if (BaseClass != null && BaseClass != typeof(object))
+        if (includeBase && BaseClass != null && BaseClass.Class as Type != typeof(object))
         {
             @string.Append(" extends ");
             @string.Append(BaseClass.Name);

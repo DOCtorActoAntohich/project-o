@@ -7,7 +7,7 @@ public class Integer : AnyValue
     // System.Int32 (hopefully).
     internal int Value { get; }
 
-    internal Integer(int p)
+    public Integer(int p)
     {
         Value = p;
     }

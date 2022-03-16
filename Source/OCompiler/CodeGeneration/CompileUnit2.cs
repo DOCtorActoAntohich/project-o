@@ -9,12 +9,12 @@ internal partial class CompileUnit2
 
     private readonly CodeNamespace _codeNamespace;
 
-    private CodeTypeDeclaration _typeDeclaration;
+    private CodeTypeDeclaration _currentTypeDeclaration;
     
     public CompileUnit2(TreeValidator ast)
     {
         _codeNamespace = new CodeNamespace(ResultingNamespace);
-        _typeDeclaration = new CodeTypeDeclaration();
+        _currentTypeDeclaration = new CodeTypeDeclaration();
 
         AddAllClasses(ast);
     }

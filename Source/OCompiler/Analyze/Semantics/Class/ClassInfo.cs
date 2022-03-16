@@ -1,50 +1,33 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
+using DomAnyVal = OCompiler.StandardLibrary.CodeDom.Value.AnyValue;
 
 namespace OCompiler.Analyze.Semantics.Class;
 
 internal abstract class ClassInfo
 {
     public abstract object? Class { get; }
-    public abstract object? BaseClass { get; }
-    public string Name { get; protected init; } = "";
+    public ClassInfo? BaseClass { get; protected set; }
+    public List<ClassInfo> DerivedClasses { get; } = new();
+    public string Name { get; protected set; } = "";
 
     public abstract string? GetMethodReturnType(string name, List<string> argumentTypes);
+    public abstract object? GetConstructor(List<string> argumentTypes);
     public abstract string? GetFieldType(string name);
     public abstract bool HasField(string name);
     public abstract bool HasConstructor(List<string> argumentTypes);
+    public abstract string ToString(bool includeBase);
 
     public bool IsValueType()
     {
-        var parentClass = BaseClass;
-        if (BaseClass == null)
+        var parent = BaseClass;
+        while (parent != null)
         {
-            return false;
-        }
-
-        ClassInfo? parent;
-        switch (BaseClass)
-        {
-            case ClassInfo p:
-                parent = p;
-                break;
-            case Type type:
-                return type.IsValueType;
-            default:
-                return false;
-        }
-        
-        while (parent.BaseClass != null)
-        {
-            switch (parent.BaseClass)
+            if (parent.Name == DomAnyVal.TypeName)
             {
-                case ClassInfo info:
-                    parent = info;
-                    break;
-                case Type t:
-                    return t.IsValueType;
+                return true;
             }
+
+            parent = parent.BaseClass;
         }
 
         return false;
@@ -52,10 +35,6 @@ internal abstract class ClassInfo
     
     public override string ToString()
     {
-        StringBuilder @string = new();
-        @string.Append("Unknown class [");
-        @string.Append(Class);
-        @string.Append(']');
-        return @string.ToString();
+        return ToString(true);
     }
 }

@@ -7,8 +7,12 @@ namespace OCompiler.Pipeline
 {
     internal static class Formatter
     {
-        public static void ShowHighlightedCode(IEnumerable<Token> tokens)
+        public static void ShowHighlightedCode(IEnumerable<Token> tokens, bool withHint = true)
         {
+            if (withHint)
+            {
+                Console.WriteLine("Highlighted code:");
+            }
             foreach (var token in tokens)
             {
                 Console.ForegroundColor = GetConsoleColor(token);
@@ -22,13 +26,22 @@ namespace OCompiler.Pipeline
         {
             foreach (var token in tokens)
             {
-                Console.Write($"{token.StartOffset}-{token.StartOffset + token.Length}:".PadLeft(10));
+                Console.Write($"{token.Position}:".PadRight(8));
                 Console.ForegroundColor = GetConsoleColor(token);
                 var tokenOutput = token is Whitespace or EndOfFile ? "" : $" '{token.Literal}'";
                 Console.Write(tokenOutput.PadRight(15));
                 Console.ForegroundColor = ConsoleColor.Gray;
                 Console.WriteLine(token.GetType().Name.PadRight(15));
             }
+        }
+
+        public static void ShowAST(Analyze.Syntax.Tree tree, bool withHint = true)
+        {
+            if (withHint)
+            {
+                Console.WriteLine("Syntax tree:");
+            }
+            Console.WriteLine(tree.ToString());
         }
 
         private static ConsoleColor GetConsoleColor(Token token) => token switch

@@ -7,8 +7,8 @@
             Delimiters.StringQuoteEscape.Literal
         );
 
-        public StringLiteral(long startOffset, string literal) : base(literal) {
-            StartOffset = startOffset;
+        public StringLiteral(TokenPosition position, string literal) : base(literal) {
+            Position = position;
         }
     }
 }

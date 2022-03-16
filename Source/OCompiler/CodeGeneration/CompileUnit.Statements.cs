@@ -120,10 +120,10 @@ internal static partial class CompileUnit
         var a = new CodeVariableDeclarationStatement
         {
             Name = variable.Identifier.Literal,
-            Type = variable.Expression.Type,
+            //Type = variable.Expression.Type,
             InitExpression = ParsedRvalueExpression(variable.Expression)
         };
-        var aa = new ExpressionInfo(variable.Expression, new Context())
+        
 
         Console.WriteLine(variable.Expression);
         //a.Name = variable.Identifier.

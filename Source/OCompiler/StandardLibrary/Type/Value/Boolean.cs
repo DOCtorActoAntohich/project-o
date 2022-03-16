@@ -4,50 +4,50 @@ namespace OCompiler.StandardLibrary.Type.Value;
 
 public class Boolean : AnyValue
 {
-    internal bool Value { get; }
+    public bool _value;
 
-    internal Boolean(bool p)
+    public Boolean(bool p)
     {
-        Value = p;
+        _value = p;
     }
 
 
     public Boolean(Boolean p)
     {
-        Value = p.Value;
+        _value = p._value;
     }
 
 
     public Integer ToInteger()
     {
-        return Value ?
+        return _value ?
             new Integer(1) :
             new Integer(0);
     }
 
     public new String ToString()
     {
-        return new String(Value.ToString());
+        return new String(_value.ToString());
     }
 
 
     public Boolean Or(Boolean p)
     {
-        return new Boolean(Value | p.Value);
+        return new Boolean(_value | p._value);
     }
 
     public Boolean And(Boolean p)
     {
-        return new Boolean(Value & p.Value);
+        return new Boolean(_value & p._value);
     }
 
     public Boolean Xor(Boolean p)
     {
-        return new Boolean(Value ^ p.Value);
+        return new Boolean(_value ^ p._value);
     }
 
     public Boolean Not()
     {
-        return new Boolean(!Value);
+        return new Boolean(!_value);
     }
 }

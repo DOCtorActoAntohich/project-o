@@ -3,13 +3,16 @@ using System.IO;
 using System.Text;
 using System.Collections.Generic;
 using OCompiler.Extensions;
+using OCompiler.Exceptions;
 
 namespace OCompiler.Analyze.Lexical
 {
     class Tokenizer
     {
         public string SourcePath { get; }
-        private long _position;
+        private TokenPosition CurrentPosition => new(_currentLine, _currentColumn);
+
+        private long _currentColumn;
         private long _currentLine;
 
         public Tokenizer(string sourcePath)
@@ -19,7 +22,7 @@ namespace OCompiler.Analyze.Lexical
 
         public IEnumerable<Tokens.Token> GetTokens()
         {
-            _position = 0;
+            _currentColumn = 0;
             _currentLine = 1;
             Tokens.Token token;
             using var file = new StreamReader(SourcePath, Encoding.UTF8);
@@ -31,29 +34,41 @@ namespace OCompiler.Analyze.Lexical
             while (token is not Tokens.EndOfFile);
         }
 
+        private void UpdatePosition(string parsedTerm)
+        {
+            var newlineCount = parsedTerm.Count('\n');
+            if (newlineCount == 0)
+            {
+                _currentColumn += parsedTerm.Length;
+                return;
+            }
+
+            _currentLine += newlineCount;
+            _currentColumn = parsedTerm.Length - parsedTerm.LastIndexOf('\n');
+        }
+
         private Tokens.Token GetTokenCandidate(StreamReader stream)
         {
             if (stream.EndOfStream)
             {
-                return new Tokens.EndOfFile(_position);
+                return new Tokens.EndOfFile(CurrentPosition);
             }
 
             // Read until we find a valid token or whitespace
             var currentTerm = ReadWhile(stream, term => (
-                !Tokens.Token.TryParse(_position, term, out var _) &&
+                !Tokens.Token.TryParse(CurrentPosition, term, out var _) &&
                 (term.Length == 0 || !char.IsWhiteSpace(term[^1]))
             ), strict: false);
 
             // Proceed reading while it still represents a valid token
-            currentTerm += ReadWhile(stream, suffix => Tokens.Token.TryParse(_position, currentTerm + suffix, out var _), strict: false);
+            currentTerm += ReadWhile(stream, suffix => Tokens.Token.TryParse(CurrentPosition, currentTerm + suffix, out var _), strict: false);
 
-            bool parseSuccess = Tokens.Token.TryParse(_position, currentTerm, out var token);
+            bool parseSuccess = Tokens.Token.TryParse(CurrentPosition, currentTerm, out var token);
             if (!parseSuccess)
             {
-                throw new Exception($"Unable to parse token '{currentTerm}' at line {_currentLine}");
+                throw new ParseError(CurrentPosition, $"Unable to parse token '{currentTerm}'");
             }
-            _position += currentTerm.Length;
-            _currentLine += currentTerm.Count('\n');
+            UpdatePosition(currentTerm);
             return token;
         }
 
@@ -68,20 +83,19 @@ namespace OCompiler.Analyze.Lexical
                 {
                     Tokens.CommentDelimiters.LineStart => "\n",
                     Tokens.CommentDelimiters.BlockStart => Tokens.CommentDelimiters.BlockEnd.Literal,
-                    Tokens.CommentDelimiters.BlockEnd => throw new Exception($"Unexpected end of comment at line {_currentLine}"),
-                    _ => throw new Exception($"Unknown comment delimiter at line {_currentLine}")
+                    Tokens.CommentDelimiters.BlockEnd => throw new SyntaxError(CurrentPosition, $"Unexpected end of comment"),
+                    _ => throw new ParseError(CurrentPosition, $"Unknown comment delimiter")
                 };
                 try
                 {
                     var comment = ReadUntilSuffix(stream, commentEnd);
-                    _position += comment.Length;
-                    _currentLine += comment.Count('\n');
+                    UpdatePosition(comment);
                 }
                 catch (EndOfStreamException)
                 {
                     if (startDelimiter is Tokens.CommentDelimiters.BlockStart)
                     {
-                        throw new Exception($"Unterminated block comment started at line {_currentLine}, reached end of file");
+                        throw new SyntaxError(CurrentPosition, $"Unterminated block comment, reached end of file");
                     }
                 }
 
@@ -105,16 +119,15 @@ namespace OCompiler.Analyze.Lexical
                 }
                 catch (EndOfStreamException)
                 {
-                    throw new Exception($"Unterminated string started at line {_currentLine}, reached end of file");
+                    throw new SyntaxError(CurrentPosition, $"Unterminated string, reached end of file");
                 }
 
                 token = new Tokens.StringLiteral(
-                    _position,
+                    CurrentPosition,
                     stringContent.RemoveSuffix(stringBoundary).Replace(stringEscape, stringBoundary)
                 );
 
-                _position += stringContent.Length;
-                _currentLine += stringContent.Count('\n');
+                UpdatePosition(stringContent);
             }
 
             return token;

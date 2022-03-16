@@ -8,34 +8,28 @@ using OCompiler.Analyze.Syntax.Declaration.Statement;
 using OCompiler.Analyze.Semantics.Class;
 using OCompiler.Analyze.Semantics.Expression;
 using OCompiler.Analyze.Semantics.Callable;
+using OCompiler.Exceptions;
+using OCompiler.Exceptions.Semantic;
 
 namespace OCompiler.Analyze.Semantics;
 
 internal class TreeValidator
 {
-    public List<ClassInfo> ValidatedClasses => new(_knownClasses.Values);
-
-    private readonly Dictionary<string, ClassInfo> _knownClasses = new(BuiltClassInfo.StandardClasses);
+    private readonly ClassTree _knownClasses;
+    public List<ClassInfo> ValidatedClasses => new(_knownClasses);
 
     public TreeValidator(Tree syntaxTree)
     {
-        LearnAllClasses(syntaxTree);
-        foreach (var @class in syntaxTree)
+        _knownClasses = new ClassTree(syntaxTree);
+        foreach (var @class in _knownClasses)
         {
-            var parsedClass = ParsedClassInfo.GetByClass(@class);
+            if (@class is not ParsedClassInfo parsedClass)
+            {
+                continue;
+            }
             ValidateConstructors(parsedClass);
             ValidateMethods(parsedClass);
             ValidateFields(parsedClass);
-        }
-    }
-
-    private void LearnAllClasses(Tree syntaxTree)
-    {
-        foreach (var @class in syntaxTree)
-        {
-            var parsedClass = ParsedClassInfo.GetByClass(@class);
-            _knownClasses.Add(parsedClass.Name, parsedClass);
-            parsedClass.Context.AddClasses(_knownClasses);
         }
     }
 
@@ -43,9 +37,9 @@ internal class TreeValidator
     {
         StringBuilder @string = new();
         @string.AppendLine("Known classes:");
-        foreach (var (name, classInfo) in _knownClasses)
+        foreach (var classInfo in _knownClasses)
         {
-            @string.Append(name);
+            @string.Append(classInfo.Name);
             @string.Append(" (");
             @string.Append(classInfo.ToString());
             @string.AppendLine(")");
@@ -77,7 +71,7 @@ internal class TreeValidator
             {
                 continue;
             }
-            field.Type = field.Expression.Type;
+            field.Expression.ValidateExpression();
             Console.WriteLine($"Warning: unused field {field.Name} of type {field.Type}");
         }
     }
@@ -118,23 +112,31 @@ internal class TreeValidator
                 ValidateReturn(@return, classInfo, callable);
                 break;
             case Syntax.Declaration.Expression.Expression expression:
-                new ExpressionInfo(expression, new Context(classInfo, _knownClasses, callable)).ValidateExpression();
+                new ExpressionInfo(expression, new Context(classInfo, callable)).ValidateExpression();
                 break;
             default:
-                throw new Exception($"Unknown IBodyStatement: {statement}");
+                throw new CompilerInternalError($"Unknown IBodyStatement: {statement}");
         }
     }
 
     public void ValidateVariable(Variable variable, ParsedClassInfo classInfo, CallableInfo callable)
     {
-        if (_knownClasses.ContainsKey(variable.Identifier.Literal))
+        var variableName = variable.Identifier.Literal;
+        if (ClassTree.ClassExists(variableName))
         {
-            throw new Exception($"Cannot create variable, name {variable.Identifier.Literal} is already used by a class");
+            throw new Exception($"Cannot create variable, name {variableName} is already used by a class");
         }
-        if (!callable.LocalVariables.TryGetValue(variable.Identifier.Literal, out var varInfo))
+        if (callable.HasParameter(variableName))
         {
-            varInfo = new ExpressionInfo(variable.Expression, new Context(classInfo, _knownClasses, callable));
-            callable.LocalVariables.Add(variable.Identifier.Literal, varInfo);
+            throw new NameCollisionError(
+                variable.Identifier.Position,
+                $"Cannot create variable, name {variable.Identifier.Literal} is already used by a class"
+            );
+        }
+        if (!callable.LocalVariables.TryGetValue(variableName, out var varInfo))
+        {
+            varInfo = new ExpressionInfo(variable.Expression, new Context(classInfo, callable));
+            callable.LocalVariables.Add(variableName, varInfo);
         }
         varInfo.ValidateExpression();
     }
@@ -150,7 +152,7 @@ internal class TreeValidator
 
         if (variableOrField.Token is not Lexical.Tokens.Keywords.This || variableOrField.Child.Child != null)
         {
-            throw new Exception($"Fields of other classes cannot be changed directly");
+            throw new AccessViolationError(variableOrField.Token.Position, $"Fields of other classes cannot be changed directly");
         }
 
         ValidateFieldAssignment(variableOrField.Child.Token.Literal, assignment.Value, classInfo, callable);
@@ -163,15 +165,19 @@ internal class TreeValidator
         CallableInfo callable
     )
     {
+        if (callable.HasParameter(variableName))
+        {
+            throw new Exception($"Cannot assign a value to the method parameter {variableName}");
+        }
         if (!callable.LocalVariables.TryGetValue(variableName, out var varInfo))
         {
-            throw new Exception($"Variable {variableName} must be declared before assignment");
+            throw new UnknownNameError(value.Token.Position, $"Variable {variableName} must be declared before assignment");
         }
 
-        var valueInfo = new ExpressionInfo(value, new Context(classInfo, _knownClasses, callable));
+        var valueInfo = new ExpressionInfo(value, new Context(classInfo, callable));
         if (valueInfo.Type != varInfo.Type)
         {
-            throw new Exception($"Cannot assign value of type {valueInfo.Type} to a variable of type {varInfo.Type}");
+            throw new TypeError(value.Token.Position, $"Cannot assign value of type {valueInfo.Type} to a variable of type {varInfo.Type}");
         }
     }
 
@@ -185,13 +191,13 @@ internal class TreeValidator
         var field = classInfo.GetFieldInfo(fieldName);
         if (field == null)
         {
-            throw new Exception($"Field {fieldName} must be declared before assignment");
+            throw new UnknownNameError(value.Token.Position, $"Field {fieldName} must be declared before assignment");
         }
 
-        var valueInfo = new ExpressionInfo(value, new Context(classInfo, _knownClasses, callable));
+        var valueInfo = new ExpressionInfo(value, new Context(classInfo, callable));
         if (valueInfo.Type != field.Expression.Type)
         {
-            throw new Exception($"Cannot assign value of type {valueInfo.Type} to a field of type {field.Expression.Type}");
+            throw new TypeError(value.Token.Position, $"Cannot assign value of type {valueInfo.Type} to a field of type {field.Expression.Type}");
         }
     }
 
@@ -223,19 +229,20 @@ internal class TreeValidator
         {
             ParsedConstructorInfo => "Void",
             ParsedMethodInfo method => method.ReturnType,
-            _ => throw new Exception($"Unknown CallableInfo type: {callable}"),
+            _ => throw new CompilerInternalError($"Unknown CallableInfo type: {callable}"),
         };
 
         string returnType = "Void";
         if (@return.ReturnValue != null)
         {
-            var returnInfo = new ExpressionInfo(@return.ReturnValue, new Context(classInfo, _knownClasses, callable));
+            var returnInfo = new ExpressionInfo(@return.ReturnValue, new Context(classInfo, callable));
             returnInfo.ValidateExpression();
             returnType = returnInfo.Type!;
         }
         if (returnType != methodReturnType)
         {
-            throw new Exception(
+            throw new TypeError(
+                @return.Position,
                 methodReturnType == "Void" ?
                 $"Cannot use value of type {returnType} as a return value, expected return without an object" :
                 $"Cannot use value of type {returnType} as a return value, expected {methodReturnType}"
@@ -245,11 +252,11 @@ internal class TreeValidator
 
     public void ValidateCondition(Syntax.Declaration.Expression.Expression condition, ParsedClassInfo classInfo, CallableInfo callable)
     {
-        var conditionInfo = new ExpressionInfo(condition, new Context(classInfo, _knownClasses, callable));
+        var conditionInfo = new ExpressionInfo(condition, new Context(classInfo, callable));
         conditionInfo.ValidateExpression();
         if (conditionInfo.Type != "Boolean")
         {
-            throw new Exception($"Cannot use value of type {conditionInfo.Type} as a condition, it must be a Boolean");
+            throw new TypeError(condition.Token.Position, $"Cannot use value of type {conditionInfo.Type} as a condition, it must be a Boolean");
         }
     }
 }

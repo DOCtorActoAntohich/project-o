@@ -1,38 +1,25 @@
 ﻿using System;
-using System.Collections.Generic;
 
 using OCompiler.Analyze.Semantics.Callable;
 using OCompiler.Analyze.Semantics.Class;
+using OCompiler.Exceptions;
 
 namespace OCompiler.Analyze.Semantics;
 
 internal class Context
 {
-    public ParsedClassInfo CurrentClass { get; }
-    public Dictionary<string, ClassInfo>? Classes { get; private set; }
-    public CallableInfo? CurrentMethod { get; }
+    public ParsedClassInfo Class { get; }
+    public CallableInfo? Callable { get; }
 
-    public Context(ParsedClassInfo currentClass, Dictionary<string, ClassInfo>? classes = null, CallableInfo? currentMethod = null)
+    public Context(ParsedClassInfo currentClass, CallableInfo? currentCallable = null)
     {
-        CurrentClass = currentClass;
-        CurrentMethod = currentMethod;
-        if (classes != null)
-        {
-            Classes = classes;
-        }
+        Class = currentClass;
+        Callable = currentCallable;
     }
 
-    public void AddClasses(Dictionary<string, ClassInfo> classes)
+    public Context WithCallable(CallableInfo callable)
     {
-        Classes = classes;
-    }
-
-    public ClassInfo GetClassByName(string name)
-    {
-        if (Classes!.TryGetValue(name, out var classInfo))
-        {
-            return classInfo;
-        }
-        throw new Exception($"Unknown type: {name}");
+        // Create a copy of current context and add a callable to it.
+        return new(Class, callable);
     }
 }

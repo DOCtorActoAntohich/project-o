@@ -7,6 +7,8 @@ internal class Call : Expression
 {
     public List<Expression> Arguments { get; }
 
+    public static Call EmptyBaseCall = new(new Lexical.Tokens.Keywords.Base(), new());
+
     public Call(Token token, List<Expression> arguments, Expression? parent = null, Expression? child = null) :
         base(token, child, parent)
     {

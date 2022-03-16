@@ -6,14 +6,13 @@ using System.Text;
 using OCompiler.Analyze.Semantics.Callable;
 using OCompiler.Analyze.Syntax.Declaration.Class.Member;
 using OCompiler.Analyze.Syntax.Declaration.Class.Member.Method;
-using Boolean = OCompiler.StandardLibrary.Type.Value.Boolean;
+using OCompiler.Exceptions.Semantic;
 
 namespace OCompiler.Analyze.Semantics.Class;
 
 internal class ParsedClassInfo : ClassInfo
 {
     public override Syntax.Declaration.Class.Class? Class { get; }
-    public override ClassInfo? BaseClass { get; }
     public List<ParsedMethodInfo> Methods { get; } = new();
     public List<ParsedFieldInfo> Fields { get; } = new();
     public List<ParsedConstructorInfo> Constructors { get; } = new();
@@ -27,13 +26,11 @@ internal class ParsedClassInfo : ClassInfo
         AddMethods(parsedClass.Methods);
         AddFields(parsedClass.Fields);
         AddConstructors(parsedClass.Constructors);
+        AddDefaultConstructor();
 
         Name = parsedClass.Name.Literal;
         Class = parsedClass;
-        if (parsedClass.Extends != null)
-        {
-            BaseClass = GetByName(parsedClass.Extends.Literal);
-        }
+        BaseClass = parsedClass.Extends == null ? GetByName("Class") : GetByName(parsedClass.Extends.Literal);
     }
 
     protected ParsedClassInfo()
@@ -52,7 +49,7 @@ internal class ParsedClassInfo : ClassInfo
             {
                 var argsStr = string.Join(", ", parameterTypes);
                 var @return = methodInfo.ReturnType == "Void" ? "" : $"-> {methodInfo.ReturnType}"; 
-                throw new Exception($"Method {methodName}({argsStr}) {@return} defined more than once in class {Name}");
+                throw new NameCollisionError(method.Name.Position, $"Method {methodName}({argsStr}) {@return} defined more than once in class {Name}");
             }
             Methods.Add(methodInfo);
         }
@@ -63,9 +60,9 @@ internal class ParsedClassInfo : ClassInfo
         foreach (var field in fields)
         {
             var fieldInfo = new ParsedFieldInfo(field, Context);
-            if (Fields.Where(f => f.Name == fieldInfo.Name).Any())
+            if (Fields.Any(f => f.Name == fieldInfo.Name))
             {
-                throw new Exception($"Field {fieldInfo.Name} defined more than once in class {Name}");
+                throw new NameCollisionError(field.Identifier.Position, $"Field {fieldInfo.Name} defined more than once in class {Name}");
             }
             Fields.Add(fieldInfo);
         }
@@ -80,10 +77,19 @@ internal class ParsedClassInfo : ClassInfo
             if (HasConstructor(parameterTypes))
             {
                 var argsStr = string.Join(", ", parameterTypes);
-                throw new Exception($"Constructor {Name}({argsStr}) defined more than once in class {Name}");
+                throw new NameCollisionError(constructor.Position, $"Constructor {Name}({argsStr}) defined more than once in class {Name}");
             }
             Constructors.Add(constructorInfo);
         }
+    }
+
+    private void AddDefaultConstructor()
+    {
+        if (HasConstructor(new()))
+        {
+            return;
+        }
+        Constructors.Add(new ParsedConstructorInfo(Constructor.EmptyConstructor, Context));
     }
 
     public static ParsedClassInfo GetByClass(Syntax.Declaration.Class.Class parsedClass)
@@ -95,6 +101,12 @@ internal class ParsedClassInfo : ClassInfo
         }
 
         var newInfo = new ParsedClassInfo(parsedClass);
+        foreach (var derivedClass in ParsedClasses.Values.Where(
+            c => c.BaseClass != null && c.BaseClass.Name == name
+        ))
+        {
+            derivedClass.BaseClass = newInfo;
+        }
         ParsedClasses[name] = newInfo;
         return newInfo;
     }
@@ -117,12 +129,26 @@ internal class ParsedClassInfo : ClassInfo
 
     public override string? GetMethodReturnType(string name, List<string> argumentTypes)
     {
-        var method = Methods.Where(
+        var type = Methods.Where(
             m => m.Name == name &&
             m.Parameters.Select(p => p.Type).SequenceEqual(argumentTypes)
+        ).FirstOrDefault()?.ReturnType;
+
+        if (type == null && BaseClass != null)
+        {
+            type = BaseClass.GetMethodReturnType(name, argumentTypes);
+        }
+
+        return type;
+    }
+
+    public override ParsedConstructorInfo? GetConstructor(List<string> argumentTypes)
+    {
+        var constructor = Constructors.Where(
+            c => c.Parameters.Select(p => p.Type).SequenceEqual(argumentTypes)
         ).FirstOrDefault();
 
-        return method?.ReturnType;
+        return constructor;
     }
 
     public bool HasMethod(string name, List<string> argumentTypes)
@@ -134,17 +160,25 @@ internal class ParsedClassInfo : ClassInfo
     public ParsedFieldInfo? GetFieldInfo(string name)
     {
         var field = Fields.Where(f => f.Name == name).FirstOrDefault();
+        if (field == null && BaseClass is ParsedClassInfo parsedBaseClass) {
+            field = parsedBaseClass.GetFieldInfo(name);
+        }
         return field;
     }
 
     public override string? GetFieldType(string name)
     {
-        return GetFieldInfo(name)?.Type;
+        var type = GetFieldInfo(name)?.Type;
+        if (type == null && BaseClass != null)
+        {
+            type = BaseClass.GetFieldType(name);
+        }
+        return type;
     }
 
     public override bool HasField(string name)
     {
-        return GetFieldInfo(name) != null;
+        return GetFieldType(name) != null;
     }
 
     public void AddFieldType(string name, string type)
@@ -152,28 +186,24 @@ internal class ParsedClassInfo : ClassInfo
         var field = Fields.Where(f => f.Name == name).FirstOrDefault();
         if (field != null && field.Type == null)
         {
-            field.Type = type;
+            field.Expression.ValidateExpression();
         }
     }
 
     public override bool HasConstructor(List<string> argumentTypes)
     {
-        var constructor = Constructors.Where(
-            c => c.Parameters.Select(p => p.Type).SequenceEqual(argumentTypes)
-        ).FirstOrDefault();
-
-        return constructor != null;
+        return GetConstructor(argumentTypes) != null;
     }
 
-    public override string ToString()
+    public override string ToString(bool includeBase = true)
     {
         StringBuilder @string = new();
         @string.Append("Parsed class ");
         @string.Append(Name);
-        if (BaseClass != null)
+        if (includeBase && BaseClass != null)
         {
             @string.Append(" extends ");
-            @string.Append(BaseClass);
+            @string.Append(BaseClass.Name);
         }
         return @string.ToString();
     }

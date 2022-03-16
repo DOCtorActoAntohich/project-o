@@ -1,6 +1,6 @@
 ﻿using OCompiler.Analyze.Syntax.Declaration.Class.Member.Method;
 
-namespace OCompiler.Analyze.Semantics;
+namespace OCompiler.Analyze.Semantics.Callable;
 
 internal class ParsedParameterInfo
 {

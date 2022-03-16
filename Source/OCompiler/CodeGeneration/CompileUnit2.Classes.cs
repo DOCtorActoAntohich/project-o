@@ -25,7 +25,7 @@ internal partial class CompileUnit2
     
     private void AddClassInfo(ClassInfo classInfo)
     {
-        _typeDeclaration = new CodeTypeDeclaration(classInfo.Name)
+        _currentTypeDeclaration = new CodeTypeDeclaration(classInfo.Name)
         {
             Attributes = MemberAttributes.Public
         };
@@ -33,13 +33,13 @@ internal partial class CompileUnit2
 
         if (classInfo.IsValueType())
         {
-            _typeDeclaration.IsClass  = false;
-            _typeDeclaration.IsStruct = true;
+            _currentTypeDeclaration.IsClass  = false;
+            _currentTypeDeclaration.IsStruct = true;
         }
         else if (classInfo.BaseClass != null)
         {
-            _typeDeclaration.IsClass  = true;
-            _typeDeclaration.IsStruct = false;
+            _currentTypeDeclaration.IsClass  = true;
+            _currentTypeDeclaration.IsStruct = false;
             AddBaseClass(classInfo);
         }
 
@@ -58,7 +58,7 @@ internal partial class CompileUnit2
                 throw new Exception($"Class `{classInfo.Name}` was not found in StdLib, nor in OLang file.");
         }
         
-        _codeNamespace.Types.Add(_typeDeclaration);
+        _codeNamespace.Types.Add(_currentTypeDeclaration);
     }
     
     private void AddBaseClass(ClassInfo classInfo)
@@ -69,7 +69,7 @@ internal partial class CompileUnit2
             _ => new CodeTypeReference(typeof(object))
         };
         
-        _typeDeclaration.BaseTypes.Add(parent);
+        _currentTypeDeclaration.BaseTypes.Add(parent);
     }
     
     private static CodeTypeDeclaration GetBuiltClass(BuiltClassInfo builtClassInfo)
@@ -95,17 +95,17 @@ internal partial class CompileUnit2
     {
         foreach (var field in classInfo.Fields)
         {
-            _typeDeclaration.AddParsedClassField(field);
+            AddParsedClassField(field);
         }
         
         foreach (var constructor in classInfo.Constructors)
         {
-            _typeDeclaration.AddParsedCallable(constructor);
+            AddParsedCallable(constructor);
         }
 
         foreach (var method in classInfo.Methods)
         {
-            _typeDeclaration.AddParsedCallable(method);
+            AddParsedCallable(method);
         }
     }
 }
