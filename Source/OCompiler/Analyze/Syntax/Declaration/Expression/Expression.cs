@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using OCompiler.Analyze.Lexical.Tokens;
+using OCompiler.Exceptions;
 using OCompiler.Utils;
 
 namespace OCompiler.Analyze.Syntax.Declaration.Expression;
@@ -8,12 +9,20 @@ namespace OCompiler.Analyze.Syntax.Declaration.Expression;
 internal class Expression: IBodyStatement
 {
     public Expression? Parent { get; private set; }
-    public Expression? Child { get; private set; }
+    public Expression? Child { get; set; }
     public Token Token { get; }
     
     public static bool TryParse(TokenEnumerator tokens, out Expression? expression)
     {
-        if (tokens.Current() is not (Identifier or StringLiteral or RealLiteral or IntegerLiteral or BooleanLiteral or Lexical.Tokens.Keywords.This))
+        if (tokens.Current() is not (
+            Identifier or 
+            StringLiteral or 
+            RealLiteral or 
+            IntegerLiteral or 
+            BooleanLiteral or 
+            Lexical.Tokens.Keywords.This or 
+            Lexical.Tokens.Keywords.Base
+        ))
         {
             expression = null;
             return false;
@@ -46,7 +55,7 @@ internal class Expression: IBodyStatement
         // Try parse child.
         if (!TryParse(tokens, out Expression? child))
         {
-            throw new Exception($"Expected expression at position {tokens.Current().StartOffset}.");
+            throw new SyntaxError(tokens.Current().Position, "Expected expression");
         }
 
         expression.Child = child;
@@ -55,13 +64,23 @@ internal class Expression: IBodyStatement
         return true;
     }
 
-    protected Expression(Token name, Expression? child = null, Expression? parent = null)
+    public Expression(Token name, Expression? child = null, Expression? parent = null)
     {
         Parent = parent;
         Child = child;
         Token = name;
     }
-    
+
+    public Call ReplaceWithCall()
+    {
+        var call = new Call(this);
+        if (Parent != null)
+        {
+            Parent.Child = call;
+        }
+        return call;
+    }
+
     public string ToString(string _)
     {
         return ToString();
@@ -70,6 +89,12 @@ internal class Expression: IBodyStatement
     public override string ToString()
     {
         string child = Child is null ? "" : $".{Child}";
+
+        if (Token is StringLiteral)
+        {
+            return $"\"{Token.Literal}\"{child}";
+        }
+        
         return $"{Token.Literal}{child}";
     }
 }

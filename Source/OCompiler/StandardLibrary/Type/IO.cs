@@ -3,21 +3,21 @@ using Void = OCompiler.StandardLibrary.Type.Value.Void;
 
 namespace OCompiler.StandardLibrary.Type.Reference;
 
-public static class IO
+public class IO : Class
 {
-    static Void Write(String str)
+    public Void Write(String str)
     {
         Console.Write(str.Value);
         return new Void();
     }
     
-    static Void WriteLine(String str)
+    public Void WriteLine(String str)
     {
         Console.WriteLine(str.Value);
         return new Void();
     }
 
-    static String ReadLine()
+    public String ReadLine()
     {
         var result = Console.ReadLine();
         if (result == null)

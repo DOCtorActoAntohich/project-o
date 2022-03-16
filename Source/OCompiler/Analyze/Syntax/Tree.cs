@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Text;
 using OCompiler.Analyze.Syntax.Declaration.Class;
+using OCompiler.Exceptions;
 using OCompiler.Utils;
 
 

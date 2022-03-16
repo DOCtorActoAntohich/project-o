@@ -1,8 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+
 using OCompiler.Analyze.Lexical;
-using OCompiler.Analyze.Lexical.Tokens;
+using OCompiler.Analyze.Semantics;
 using OCompiler.Analyze.Syntax;
+using OCompiler.Exceptions;
+using OCompiler.Generate;
 using OCompiler.Utils;
 
 namespace OCompiler.Pipeline
@@ -10,26 +14,32 @@ namespace OCompiler.Pipeline
     internal class Compiler
     {
         public string SourceFilePath { get; }
+
         public Compiler(string sourceFilePath)
         {
             SourceFilePath = sourceFilePath;
         }
 
-        public void Run()
+        public Assembly Run()
         {
             var tokenizer = new Tokenizer(SourceFilePath);
-            //var tokens = tokenizer.GetTokens().ToList();
-            //Formatter.ShowHighlightedCode(tokens);
-            //Formatter.ShowTokens(tokens);
-            IEnumerable<Token> tokens = tokenizer.GetTokens();
+            var tokens = tokenizer.GetTokens().ToList();
+            Formatter.ShowHighlightedCode(tokens);
+            Console.WriteLine();
 
             var tokenTree = new Tree(new TokenEnumerator(tokens));
             if (tokenTree.IsEmpty)
             {
-                throw new Exception("No classes.");
+                throw new AnalyzeError("No classes.");
             }
-            
-            Console.Write(tokenTree.ToString());
+
+            Formatter.ShowAST(tokenTree);
+            Console.WriteLine();
+
+            var validator = new TreeValidator(tokenTree);
+
+            var generator = new Emitter(validator.ValidatedClasses);
+            return generator.Assembly;
         }
     }
 }

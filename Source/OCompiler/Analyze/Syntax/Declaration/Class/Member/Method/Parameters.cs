@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+
+using OCompiler.Exceptions;
 using OCompiler.Utils;
 
 namespace OCompiler.Analyze.Syntax.Declaration.Class.Member.Method;
@@ -34,7 +36,7 @@ internal static class Parameters
 
         if (tokens.Current() is not Lexical.Tokens.Delimiters.RightParenthesis)
         {
-            throw new Exception($"Expected ')' at position {tokens.Current().StartOffset}.");
+            throw new SyntaxError(tokens.Current().Position, "Expected ')'");
         }
         
         // Get next token.

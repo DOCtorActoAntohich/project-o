@@ -2,9 +2,9 @@
 {
     internal class EndOfFile : Token
     {
-        public EndOfFile(long position) : base("")
+        public EndOfFile(TokenPosition position) : base("")
         {
-            StartOffset = position;
+            Position = position;
         }
     }
 }

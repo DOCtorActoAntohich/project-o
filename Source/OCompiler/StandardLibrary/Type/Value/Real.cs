@@ -8,7 +8,7 @@ public class Real : AnyValue
 {
     internal double Value { get; }
     
-    internal Real(double p)
+    public Real(double p)
     {
         Value = p;
     }

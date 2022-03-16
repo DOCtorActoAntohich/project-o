@@ -1,12 +1,6 @@
-﻿using OCompiler.StandardLibrary.Type.Reference;
+﻿namespace OCompiler.StandardLibrary.Type.Value;
 
-namespace OCompiler.StandardLibrary.Type.Value;
-
-public abstract class AnyValue
+public abstract class AnyValue : Class
 {
-    public new String ToString()
-    {
-        return new String();
-    }
 }
 

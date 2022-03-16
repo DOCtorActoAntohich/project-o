@@ -1,5 +1,6 @@
 using System;
 using OCompiler.Analyze.Lexical.Tokens;
+using OCompiler.Exceptions;
 using OCompiler.Utils;
 
 namespace OCompiler.Analyze.Syntax.Declaration.Class.Member.Method;
@@ -21,13 +22,13 @@ internal class Parameter
         // Colon.
         if (tokens.Next() is not Lexical.Tokens.Delimiters.Colon)
         {
-            throw new Exception($"Expected ':' at position {tokens.Current().StartOffset}.");
+            throw new SyntaxError(tokens.Current().Position, "Expected ':'");
         }
         
         // Type.
         if (tokens.Next() is not Identifier type)
         {
-            throw new Exception($"Expected class name at position {tokens.Current().StartOffset}.");
+            throw new SyntaxError(tokens.Current().Position, "Expected class name");
         }
         
         // Get next token.

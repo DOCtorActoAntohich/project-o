@@ -1,3 +1,4 @@
+using OCompiler.Analyze.Lexical;
 using OCompiler.Utils;
 
 namespace OCompiler.Analyze.Syntax.Declaration.Statement;
@@ -5,6 +6,9 @@ namespace OCompiler.Analyze.Syntax.Declaration.Statement;
 internal class Return : IStatement
 {
     public Expression.Expression? ReturnValue { get; }
+    public TokenPosition Position { get; }
+
+    public static Return EmptyReturn => new(null, new());
 
     public static bool TryParse(TokenEnumerator tokens, out Return? @return)
     {
@@ -14,17 +18,18 @@ internal class Return : IStatement
             @return = null;
             return false;
         }
-        
+        var position = tokens.Current().Position;
         // Get next token.
         tokens.Next();
         _ = Expression.Expression.TryParse(tokens, out Expression.Expression? expression);
 
-        @return = new Return(expression);
+        @return = new Return(expression, position);
         return true;
     }
 
-    private Return(Expression.Expression? returnValue) {
+    private Return(Expression.Expression? returnValue, TokenPosition position) {
         ReturnValue = returnValue;
+        Position = position;
     }
     
     public string ToString(string _)
