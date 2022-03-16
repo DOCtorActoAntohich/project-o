@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using OCompiler.Analyze.Lexical.Tokens.Keywords;
 using OCompiler.Analyze.Syntax.Declaration.Expression;
-using OCompiler.Analyze.Syntax.Declaration.Statement;
 
 namespace OCompiler.CodeGeneration;
 
@@ -12,6 +11,28 @@ internal partial class CompileUnit
 {
     private CodeExpression ParsedLvalueExpression(Expression expression)
     {
+        if (expression.Token is This)
+        {
+            var @this = new CodeThisReferenceExpression();
+        }
+
+        if (expression.Child != null)
+        {
+            
+        }
+        
+        
+        
+        Console.WriteLine("MOGUSMOGUSMOGSU");
+        var pa = expression;
+        while (pa != null)
+        {
+            Console.WriteLine(pa.Parent?.Token.Literal);
+            Console.Write(pa.Token);
+            Console.WriteLine(" " + pa.Token.Literal);
+            pa = pa.Child;
+        }
+
         return new CodeExpression();
     }
     

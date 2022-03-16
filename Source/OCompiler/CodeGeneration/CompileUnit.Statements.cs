@@ -20,7 +20,7 @@ internal partial class CompileUnit
     private CodeStatement ParsedCodeStatement(IBodyStatement statement)
     {
         // Todo remove prints
-        Console.WriteLine(statement);
+        //Console.WriteLine(statement);
         return statement switch
         {
             Return @return => ParsedReturnStatement(@return),
