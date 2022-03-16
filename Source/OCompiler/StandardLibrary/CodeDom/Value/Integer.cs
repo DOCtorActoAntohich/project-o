@@ -1,5 +1,8 @@
 using System.CodeDom;
 using DomString = OCompiler.StandardLibrary.CodeDom.Reference.String;
+using DomInt = OCompiler.StandardLibrary.CodeDom.Value.Integer;
+using DomReal = OCompiler.StandardLibrary.CodeDom.Value.Real;
+using DomBool = OCompiler.StandardLibrary.CodeDom.Value.Boolean;
 
 namespace OCompiler.StandardLibrary.CodeDom.Value;
 
@@ -14,7 +17,7 @@ public static class Integer
         var integerType = Base.NewPublicTypeDeclaration(TypeName);
         integerType.IsStruct = true;
         integerType.IsClass = false;
-        
+
         integerType.Members.Add(Base.CreateInternalValue(typeof(int)));
 
         integerType.AddInternalConstructor();
@@ -23,7 +26,10 @@ public static class Integer
         integerType.AddToStringMethod();
         integerType.AddToRealMethod();
         integerType.AddToBooleanMethod();
-        integerType.AddNegativeMethod();
+        integerType.AddNegationMethod();
+
+        integerType.AddMaxMethod();
+        integerType.AddMinMethod();
 
         integerType.AddIntegerOperatorMethod(CodeBinaryOperatorType.Add, "Plus");
         integerType.AddIntegerOperatorMethod(CodeBinaryOperatorType.Subtract, "Minus");
@@ -100,10 +106,10 @@ public static class Integer
     {
         var creationParam = new CodeMethodInvokeExpression(
             Base.ReferenceInternalValue(), "ToReal");
-        var returnValue = new CodeObjectCreateExpression(DomString.FullTypeName, creationParam);
+        var returnValue = new CodeObjectCreateExpression(DomReal.FullTypeName, creationParam);
         var returnStatement = new CodeMethodReturnStatement(returnValue);
 
-        var toRealMethod = Base.EmptyPublicMethod(DomString.FullTypeName, "ToReal");
+        var toRealMethod = Base.EmptyPublicMethod(DomReal.FullTypeName, "ToDouble");
         toRealMethod.Statements.Add(returnStatement);
 
         integerType.Members.Add(toRealMethod);
@@ -113,16 +119,16 @@ public static class Integer
     {
         var creationParam = new CodeMethodInvokeExpression(
             Base.ReferenceInternalValue(), "ToBoolean");
-        var returnValue = new CodeObjectCreateExpression(DomString.FullTypeName, creationParam);
+        var returnValue = new CodeObjectCreateExpression(DomBool.FullTypeName, creationParam);
         var returnStatement = new CodeMethodReturnStatement(returnValue);
 
-        var toBooleanMethod = Base.EmptyPublicMethod(DomString.FullTypeName, "ToBoolean");
+        var toBooleanMethod = Base.EmptyPublicMethod(DomBool.FullTypeName, "ToBoolean");
         toBooleanMethod.Statements.Add(returnStatement);
 
         integerType.Members.Add(toBooleanMethod);
     }
 
-    private static void AddNegativeMethod(this CodeTypeDeclaration integerType)
+    private static void AddNegationMethod(this CodeTypeDeclaration integerType)
     {
         const string rhsOperandName = "number";
 
@@ -138,7 +144,32 @@ public static class Integer
         negativeMethod.Statements.Add(returnStatement);
 
         integerType.Members.Add(negativeMethod);
-
     }
-}
 
+    private static void AddMaxMethod(this CodeTypeDeclaration integerType)
+    {
+        var creationParam = new CodeMethodInvokeExpression(
+            Base.ReferenceInternalValue(), "Max");
+        var returnValue = new CodeObjectCreateExpression(DomBool.FullTypeName, creationParam);
+        var returnStatement = new CodeMethodReturnStatement(returnValue);
+
+        var maxMethod = Base.EmptyPublicMethod(DomInt.FullTypeName, "MaxValue");
+        maxMethod.Statements.Add(returnStatement);
+
+        integerType.Members.Add(maxMethod);
+    }
+
+    private static void AddMinMethod(this CodeTypeDeclaration integerType)
+    {
+        var creationParam = new CodeMethodInvokeExpression(
+            Base.ReferenceInternalValue(), "Min");
+        var returnValue = new CodeObjectCreateExpression(DomBool.FullTypeName, creationParam);
+        var returnStatement = new CodeMethodReturnStatement(returnValue);
+
+        var minMethod = Base.EmptyPublicMethod(DomInt.FullTypeName, "MinValue");
+        minMethod.Statements.Add(returnStatement);
+
+        integerType.Members.Add(minMethod);
+    }
+
+}
