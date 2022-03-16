@@ -97,15 +97,15 @@ internal static partial class CompileUnit
         {
             typeDeclaration.AddParsedClassField(field);
         }
-
+        
         foreach (var constructor in classInfo.Constructors)
         {
-            typeDeclaration.AddParsedClassConstructor(constructor);
+            typeDeclaration.AddParsedCallable(constructor);
         }
 
         foreach (var method in classInfo.Methods)
         {
-            typeDeclaration.AddMethod(method);
+            typeDeclaration.AddParsedCallable(method);
         }
     }
 }
