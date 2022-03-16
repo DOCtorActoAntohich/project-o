@@ -1,7 +1,19 @@
+using System.CodeDom;
+
 namespace OCompiler.StandardLibrary.CodeDom.Value;
 
-public class Integer
+public static class Integer
 {
     public const string TypeName = "Integer";
     public const string FullTypeName = $"{Base.Namespace}.{TypeName}";
+
+
+    public static CodeTypeDeclaration Generate()
+    {
+        var integerType = Base.NewPublicTypeDeclaration(TypeName);
+        
+        integerType.Members.Add(Base.CreateInternalValue(typeof(int)));
+
+        return integerType;
+    }
 }
