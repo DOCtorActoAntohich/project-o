@@ -13,29 +13,21 @@ namespace OCompiler.Analyze.Semantics;
 
 internal class TreeValidator
 {
-    public List<ClassInfo> ValidatedClasses => new(_knownClasses.Values);
-
-    private readonly Dictionary<string, ClassInfo> _knownClasses = new(BuiltClassInfo.StandardClasses);
+    private readonly ClassTree _knownClasses;
+    public List<ClassInfo> ValidatedClasses => new(_knownClasses);
 
     public TreeValidator(Tree syntaxTree)
     {
-        LearnAllClasses(syntaxTree);
-        foreach (var @class in syntaxTree)
+        _knownClasses = new ClassTree(syntaxTree);
+        foreach (var @class in _knownClasses)
         {
-            var parsedClass = ParsedClassInfo.GetByClass(@class);
+            if (@class is not ParsedClassInfo parsedClass)
+            {
+                continue;
+            }
             ValidateConstructors(parsedClass);
             ValidateMethods(parsedClass);
             ValidateFields(parsedClass);
-        }
-    }
-
-    private void LearnAllClasses(Tree syntaxTree)
-    {
-        foreach (var @class in syntaxTree)
-        {
-            var parsedClass = ParsedClassInfo.GetByClass(@class);
-            _knownClasses.Add(parsedClass.Name, parsedClass);
-            parsedClass.Context.AddClasses(_knownClasses);
         }
     }
 
@@ -43,9 +35,9 @@ internal class TreeValidator
     {
         StringBuilder @string = new();
         @string.AppendLine("Known classes:");
-        foreach (var (name, classInfo) in _knownClasses)
+        foreach (var classInfo in _knownClasses)
         {
-            @string.Append(name);
+            @string.Append(classInfo.Name);
             @string.Append(" (");
             @string.Append(classInfo.ToString());
             @string.AppendLine(")");
@@ -128,7 +120,7 @@ internal class TreeValidator
     public void ValidateVariable(Variable variable, ParsedClassInfo classInfo, CallableInfo callable)
     {
         var variableName = variable.Identifier.Literal;
-        if (_knownClasses.ContainsKey(variableName))
+        if (_knownClasses.ClassExists(variableName))
         {
             throw new Exception($"Cannot create variable, name {variableName} is already used by a class");
         }

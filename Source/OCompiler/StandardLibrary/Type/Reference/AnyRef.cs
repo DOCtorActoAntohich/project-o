@@ -1,9 +1,5 @@
 namespace OCompiler.StandardLibrary.Type.Reference;
 
-public abstract class AnyRef
+public abstract class AnyRef: Class
 {
-    public new String ToString()
-    {
-        return new String();
-    }
 }
