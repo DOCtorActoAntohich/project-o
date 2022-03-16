@@ -2,8 +2,6 @@ using System;
 using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
-using OCompiler.Analyze.Semantics;
-using OCompiler.Analyze.Semantics.Class;
 using OCompiler.Analyze.Semantics.Expression;
 using OCompiler.Analyze.Syntax.Declaration;
 using OCompiler.Analyze.Syntax.Declaration.Expression;
@@ -15,6 +13,7 @@ internal partial class CompileUnit
 {
     private IEnumerable<CodeStatement> ParsedBody(Body body)
     {
+        // LINQ evil.
         return body.Select(ParsedCodeStatement).ToArray();
     }
     
