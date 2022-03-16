@@ -16,6 +16,7 @@ end
 class OtherClass is
   var unusedfield : "cool language"
   var somestring   : "weird language"
+  var VERY_Bad_in_t_e_g_e_r : Integer(5).Plus(Integer(7)).Plus(Integer(8))
 
   method GetCoolNumber : Integer is
     var a : 994
