@@ -3,6 +3,15 @@ using System.CodeDom;
 using OCompiler.Analyze.Semantics;
 using OCompiler.Analyze.Semantics.Class;
 
+using DomAnyRef = OCompiler.StandardLibrary.CodeDom.Reference.AnyRef;
+using DomIO     = OCompiler.StandardLibrary.CodeDom.Reference.IO;
+using DomString = OCompiler.StandardLibrary.CodeDom.Reference.String;
+
+using DomAnyVal = OCompiler.StandardLibrary.CodeDom.Value.AnyValue;
+using DomBool   = OCompiler.StandardLibrary.CodeDom.Value.Boolean;
+using DomInt    = OCompiler.StandardLibrary.CodeDom.Value.Integer;
+using DomReal   = OCompiler.StandardLibrary.CodeDom.Value.Real;
+
 namespace OCompiler.CodeGeneration;
 
 internal static class CompileUnit
@@ -52,7 +61,8 @@ internal static class CompileUnit
 
         switch (classInfo)
         {
-            case BuiltClassInfo: // They'll be generated differently, in another place.
+            case BuiltClassInfo builtInClass:
+                @namespace.Types.Add(GetBuiltClass(builtInClass));
                 break;
             
             case ParsedClassInfo newClass:
@@ -64,6 +74,23 @@ internal static class CompileUnit
         }
         
         @namespace.Types.Add(typeDeclaration);
+    }
+
+    private static CodeTypeDeclaration GetBuiltClass(BuiltClassInfo builtClassInfo)
+    {
+        return builtClassInfo.Name switch
+        {
+            DomAnyRef.TypeName => DomAnyRef.Generate(),
+            DomString.TypeName => DomString.Generate(),
+            DomIO.TypeName     => DomIO.Generate(),
+            
+            DomAnyVal.TypeName => DomAnyVal.Generate(),
+            DomBool.TypeName   => DomBool.Generate(),
+            DomInt.TypeName    => DomInt.Generate(),
+            DomReal.TypeName   => DomReal.Generate(),
+            
+            _ => throw new Exception($"SUS! This class is not found among Built-Ins: {builtClassInfo.Name}")
+        };
     }
 
     private static void AddBaseClass(this CodeTypeDeclaration typeDeclaration, ClassInfo classInfo)
