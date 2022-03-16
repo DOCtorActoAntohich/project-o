@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 using OCompiler.Analyze.Semantics.Callable;
 using OCompiler.Analyze.Semantics.Class;
@@ -8,32 +7,18 @@ namespace OCompiler.Analyze.Semantics;
 
 internal class Context
 {
-    public ParsedClassInfo CurrentClass { get; }
-    public ClassTree? Classes { get; private set; }
-    public CallableInfo? CurrentMethod { get; }
+    public ParsedClassInfo Class { get; }
+    public CallableInfo? Callable { get; }
 
-    public Context(ParsedClassInfo currentClass, ClassTree? classes = null, CallableInfo? currentMethod = null)
+    public Context(ParsedClassInfo currentClass, CallableInfo? currentCallable = null)
     {
-        CurrentClass = currentClass;
-        CurrentMethod = currentMethod;
-        if (classes != null)
-        {
-            Classes = classes;
-        }
+        Class = currentClass;
+        Callable = currentCallable;
     }
 
-    public void AddClasses(ClassTree classes)
+    public Context WithCallable(CallableInfo callable)
     {
-        Classes = classes;
-    }
-
-    public ClassInfo GetClassByName(string name)
-    {
-        var classInfo = Classes![name];
-        if (classInfo == null)
-        {
-            throw new Exception($"Unknown type: {name}");
-        }
-        return classInfo;
+        // Create a copy of current context and add a callable to it.
+        return new(Class, callable);
     }
 }

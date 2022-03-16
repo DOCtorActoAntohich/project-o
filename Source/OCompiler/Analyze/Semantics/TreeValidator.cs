@@ -69,7 +69,7 @@ internal class TreeValidator
             {
                 continue;
             }
-            field.Type = field.Expression.Type;
+            field.Expression.ValidateExpression();
             Console.WriteLine($"Warning: unused field {field.Name} of type {field.Type}");
         }
     }
@@ -110,7 +110,7 @@ internal class TreeValidator
                 ValidateReturn(@return, classInfo, callable);
                 break;
             case Syntax.Declaration.Expression.Expression expression:
-                new ExpressionInfo(expression, new Context(classInfo, _knownClasses, callable)).ValidateExpression();
+                new ExpressionInfo(expression, new Context(classInfo, callable)).ValidateExpression();
                 break;
             default:
                 throw new Exception($"Unknown IBodyStatement: {statement}");
@@ -120,7 +120,7 @@ internal class TreeValidator
     public void ValidateVariable(Variable variable, ParsedClassInfo classInfo, CallableInfo callable)
     {
         var variableName = variable.Identifier.Literal;
-        if (_knownClasses.ClassExists(variableName))
+        if (ClassTree.ClassExists(variableName))
         {
             throw new Exception($"Cannot create variable, name {variableName} is already used by a class");
         }
@@ -130,7 +130,7 @@ internal class TreeValidator
         }
         if (!callable.LocalVariables.TryGetValue(variableName, out var varInfo))
         {
-            varInfo = new ExpressionInfo(variable.Expression, new Context(classInfo, _knownClasses, callable));
+            varInfo = new ExpressionInfo(variable.Expression, new Context(classInfo, callable));
             callable.LocalVariables.Add(variableName, varInfo);
         }
         varInfo.ValidateExpression();
@@ -169,7 +169,7 @@ internal class TreeValidator
             throw new Exception($"Variable {variableName} must be declared before assignment");
         }
 
-        var valueInfo = new ExpressionInfo(value, new Context(classInfo, _knownClasses, callable));
+        var valueInfo = new ExpressionInfo(value, new Context(classInfo, callable));
         if (valueInfo.Type != varInfo.Type)
         {
             throw new Exception($"Cannot assign value of type {valueInfo.Type} to a variable {variableName} of type {varInfo.Type}");
@@ -189,7 +189,7 @@ internal class TreeValidator
             throw new Exception($"Field {fieldName} must be declared before assignment");
         }
 
-        var valueInfo = new ExpressionInfo(value, new Context(classInfo, _knownClasses, callable));
+        var valueInfo = new ExpressionInfo(value, new Context(classInfo, callable));
         if (valueInfo.Type != field.Expression.Type)
         {
             throw new Exception($"Cannot assign value of type {valueInfo.Type} to a field {fieldName} of type {field.Expression.Type}");
@@ -230,7 +230,7 @@ internal class TreeValidator
         string returnType = "Void";
         if (@return.ReturnValue != null)
         {
-            var returnInfo = new ExpressionInfo(@return.ReturnValue, new Context(classInfo, _knownClasses, callable));
+            var returnInfo = new ExpressionInfo(@return.ReturnValue, new Context(classInfo, callable));
             returnInfo.ValidateExpression();
             returnType = returnInfo.Type!;
         }
@@ -246,7 +246,7 @@ internal class TreeValidator
 
     public void ValidateCondition(Syntax.Declaration.Expression.Expression condition, ParsedClassInfo classInfo, CallableInfo callable)
     {
-        var conditionInfo = new ExpressionInfo(condition, new Context(classInfo, _knownClasses, callable));
+        var conditionInfo = new ExpressionInfo(condition, new Context(classInfo, callable));
         conditionInfo.ValidateExpression();
         if (conditionInfo.Type != "Boolean")
         {

@@ -41,7 +41,7 @@ internal class ExpressionInfo
         var type = Expression.Token switch
         {
             Identifier identifier => ResolveType(identifier.Literal),
-            Lexical.Tokens.Keywords.This => Context.CurrentClass.Name,
+            Lexical.Tokens.Keywords.This => Context.Class.Name,
             Lexical.Tokens.Keywords.Base => ResolveBaseReference(),
             IntegerLiteral => "Integer",
             BooleanLiteral => "Boolean",
@@ -50,7 +50,7 @@ internal class ExpressionInfo
             _ => throw new Exception($"Unexpected Primary expression: {Expression}")
         };
 
-        var primaryClass = Context.GetClassByName(type);
+        var primaryClass = ClassTree.TraversedClasses[type];
 
         if (Expression is Call constructorCall)
         {
@@ -75,7 +75,7 @@ internal class ExpressionInfo
             {
                 case Call call:
                     type = GetCallResultType(primaryClass, call);
-                    primaryClass = Context.GetClassByName(type);
+                    primaryClass = ClassTree.TraversedClasses[type];
                     break;
                 case Syntax.Declaration.Expression.Expression childExpression:
                     // Check if there is a method with this name and no parameters
@@ -103,7 +103,7 @@ internal class ExpressionInfo
                         default:
                             throw new Exception($"Unknown ClassInfo object: {primaryClass}");
                     }
-                    primaryClass = Context.GetClassByName(type);
+                    primaryClass = ClassTree.TraversedClasses[type];
                     break;
                 default:
                     throw new Exception($"Unknown Expression type: {childInfo.Expression}");
@@ -133,27 +133,27 @@ internal class ExpressionInfo
 
     private string ResolveType(string classOrVariable)
     {
-        if (Context.Classes!.ClassExists(classOrVariable))
+        if (ClassTree.ClassExists(classOrVariable))
         {
             return classOrVariable;
         }
-        if (Context.CurrentMethod == null)
+        if (Context.Callable == null)
         {
             throw new Exception($"Unknown class {classOrVariable}");
         }
 
-        var methodParameterType = Context.CurrentMethod.GetParameterType(classOrVariable);
+        var methodParameterType = Context.Callable.GetParameterType(classOrVariable);
         if (methodParameterType != null)
         {
             return methodParameterType;
         }
 
-        if (!Context.CurrentMethod.LocalVariables.ContainsKey(classOrVariable))
+        if (!Context.Callable.LocalVariables.ContainsKey(classOrVariable))
         {
             throw new Exception($"Use of unassigned variable {classOrVariable}");
         }
 
-        var localVarInfo = Context.CurrentMethod.LocalVariables[classOrVariable];
+        var localVarInfo = Context.Callable.LocalVariables[classOrVariable];
         if (localVarInfo.Type == null)
         {
             localVarInfo.ValidateExpression();
@@ -163,16 +163,16 @@ internal class ExpressionInfo
 
     private string ResolveBaseReference()
     {
-        if (Context.CurrentClass.BaseClass == null)
+        if (Context.Class.BaseClass == null)
         {
-            throw new Exception($"Class {Context.CurrentClass.Name} is not inherited from anything");
+            throw new Exception($"Class {Context.Class.Name} is not inherited from anything");
         }
-        if (Context.CurrentMethod is not ParsedConstructorInfo)
+        if (Context.Callable is not ParsedConstructorInfo)
         {
             throw new Exception("Cannot refer to base class outside of a class constructor.");
         }
 
-        return Context.CurrentClass.BaseClass!.Name;
+        return Context.Class.BaseClass!.Name;
     }
 
     private string ValidateAndGetType()

@@ -297,7 +297,7 @@ internal class Emitter
         var parameterTypes = GetParameters(constructor.Parameters);
         
         // Check if type exists and has a builder.
-        Type? type = GetType(constructor.Context.CurrentClass.Name);
+        Type? type = GetType(constructor.Context.Class.Name);
         if (type is not TypeBuilder)
         {
             throw new Exception($"Defining constructor on invalid builder: {type}.");
@@ -321,7 +321,7 @@ internal class Emitter
         var parameterTypes = GetParameters(method.Parameters);
         
         // Check if type exists and has a builder.
-        Type? type = GetType(method.Context.CurrentClass.Name);
+        Type? type = GetType(method.Context.Class.Name);
         if (type is not TypeBuilder)
         {
             throw new Exception($"Defining method on invalid builder: {type}.");
@@ -353,12 +353,12 @@ internal class Emitter
         if (field.Type == null)
         {
             throw new Exception(
-                $"Field {field.Name} in class {field.Context.CurrentClass.Name} has no Type."
+                $"Field {field.Name} in class {field.Context.Class.Name} has no Type."
             );
         }
         
         // Check if type exists and has a builder.
-        Type? type = GetType(field.Context.CurrentClass.Name);
+        Type? type = GetType(field.Context.Class.Name);
         if (type is not TypeBuilder)
         {
             throw new Exception($"Defining method on invalid builder: {type}.");
@@ -403,10 +403,10 @@ internal class Emitter
     private void EmitConstructor(ParsedConstructorInfo constructor)
     {
         var parameterTypes = GetParameters(constructor.Parameters);
-        var builder = _constructorBuilders[constructor.Context.CurrentClass.Name][parameterTypes];
+        var builder = _constructorBuilders[constructor.Context.Class.Name][parameterTypes];
         var generator = builder.GetILGenerator();
 
-        var context = new Context(constructor.Context.CurrentClass, constructor.Context.Classes, constructor);
+        var context = new Context(constructor.Context.Class, constructor);
         
         EmitBody(builder.DeclaringType!, context, generator, constructor.Body, new Scope());
     }
@@ -414,10 +414,10 @@ internal class Emitter
     private void EmitMethod(ParsedMethodInfo method)
     {   
         var parameterTypes = GetParameters(method.Parameters);
-        var builder = _methodBuilders[method.Context.CurrentClass.Name][method.Name][parameterTypes];
+        var builder = _methodBuilders[method.Context.Class.Name][method.Name][parameterTypes];
         var generator = builder.GetILGenerator();
 
-        var context = new Context(method.Context.CurrentClass, method.Context.Classes, method);
+        var context = new Context(method.Context.Class, method);
         
         EmitBody(builder.DeclaringType!, context, generator, method.Body, new Scope());
     }
@@ -566,7 +566,7 @@ internal class Emitter
                     );
                 }
 
-                if (context.CurrentMethod is ParsedConstructorInfo)
+                if (context.Callable is ParsedConstructorInfo)
                 {
                     // No return value on constructors.
                     generator.Emit(OpCodes.Pop);
@@ -785,7 +785,7 @@ internal class Emitter
                 // Accessing argument.
                 case Identifier name when currentType is null:
                     var index = 0;
-                    foreach (var parameter in context.CurrentMethod!.Parameters)
+                    foreach (var parameter in context.Callable!.Parameters)
                     {
                         if (parameter.Name == name.Literal)
                         {
@@ -795,12 +795,12 @@ internal class Emitter
                         index++;
                     }
 
-                    if (index == context.CurrentMethod!.Parameters.Count)
+                    if (index == context.Callable!.Parameters.Count)
                     {
                         throw new Exception($"Cannot find argument {name.Literal}");
                     }
 
-                    var parameterInfo = context.CurrentMethod!.Parameters[index];
+                    var parameterInfo = context.Callable!.Parameters[index];
                     
                     currentType = GetType(parameterInfo.Type) ?? throw new Exception(
                         $"Parameter not found: {name.Literal}"

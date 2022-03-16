@@ -10,32 +10,44 @@ namespace OCompiler.Analyze.Semantics
     {
 
         public static ClassInfo RootClass = BuiltClassInfo.StandardClasses["Class"];
-
-        private readonly Dictionary<string, ClassInfo> _knownClasses = new(BuiltClassInfo.StandardClasses);
+        public static Dictionary<string, ClassInfo> TraversedClasses { get; } = new();
 
         public ClassTree(Syntax.Tree syntaxTree)
         {
+            var classesToTraverse = new List<ClassInfo>(BuiltClassInfo.StandardClasses.Values);
+
             foreach (var @class in syntaxTree)
             {
                 var parsedClass = ParsedClassInfo.GetByClass(@class);
-                _knownClasses.Add(parsedClass.Name, parsedClass);
-                parsedClass.Context.AddClasses(this);
+                classesToTraverse.Add(parsedClass);
             }
-            AddChildren(RootClass);
+
+            AddChildren(RootClass, classesToTraverse);
+            if (classesToTraverse.Count > 0)
+            {
+                var orphanClass = classesToTraverse.First();
+                if (orphanClass.BaseClass == null)
+                {
+                    throw new System.Exception($"Class {orphanClass.Name} does not have a base class");
+                }
+                throw new System.Exception($"Class {orphanClass.BaseClass.Name} (base of {orphanClass.Name}) does not exist");
+            }
         }
 
-        private void AddChildren(ClassInfo currentClassInfo)
+        private void AddChildren(ClassInfo currentClassInfo, List<ClassInfo> remainingClasses)
         {
-            var children = _knownClasses.Values.Where(c => c.BaseClass != null && c.BaseClass.Name == currentClassInfo.Name).ToList();
+            var children = remainingClasses.Where(c => c.BaseClass != null && c.BaseClass.Name == currentClassInfo.Name).ToList();
             currentClassInfo.DerivedClasses.AddRange(children);
+            TraversedClasses.Add(currentClassInfo.Name, currentClassInfo);
+            remainingClasses.Remove(currentClassInfo);
             foreach (var childInfo in children)
             {
-                AddChildren(childInfo);
+                AddChildren(childInfo, remainingClasses);
             }
         }
 
-        public ClassInfo? this[string name] => _knownClasses.GetValueOrDefault(name);
-        public bool ClassExists(string name) => _knownClasses.ContainsKey(name);
+        public ClassInfo? this[string name] => TraversedClasses.GetValueOrDefault(name);
+        public static bool ClassExists(string name) => TraversedClasses.ContainsKey(name);
 
         public IEnumerable<ClassInfo> TraverseTree(ClassInfo currentClassInfo)
         {

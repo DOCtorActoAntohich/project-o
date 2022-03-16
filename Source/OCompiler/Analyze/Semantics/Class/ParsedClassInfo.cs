@@ -176,7 +176,7 @@ internal class ParsedClassInfo : ClassInfo
         var field = Fields.Where(f => f.Name == name).FirstOrDefault();
         if (field != null && field.Type == null)
         {
-            field.Type = type;
+            field.Expression.ValidateExpression();
         }
     }
 

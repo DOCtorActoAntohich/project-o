@@ -64,7 +64,7 @@ internal abstract class CallableInfo
         {
             if (statement is Variable variable)
             {
-                LocalVariables.Add(variable.Identifier.Literal, new ExpressionInfo(variable.Expression, Context));
+                LocalVariables.Add(variable.Identifier.Literal, new ExpressionInfo(variable.Expression, Context.WithCallable(this)));
             }
         }
     }
