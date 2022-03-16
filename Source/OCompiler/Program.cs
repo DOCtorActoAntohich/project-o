@@ -6,7 +6,8 @@ namespace OCompiler
     {
         private static void Main(string[] args)
         {
-            new Compiler(sourceFilePath: args[0], args[1], args[2..]).Run();
+            var assembly = new Compiler(sourceFilePath: args[0]).Run();
+            new Invoker(assembly, args[1], args[2..]).Run();
         }
     }
 }

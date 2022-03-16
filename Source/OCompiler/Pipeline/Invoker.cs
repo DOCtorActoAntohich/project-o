@@ -1,16 +1,42 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 using OCompiler.Analyze.Lexical.Tokens;
+using OCompiler.Analyze.Lexical.Tokens.BooleanLiterals;
 using OCompiler.Analyze.Semantics.Callable;
 using OCompiler.Analyze.Semantics.Class;
+
+using Boolean = OCompiler.StandardLibrary.Type.Value.Boolean;
+using Integer = OCompiler.StandardLibrary.Type.Value.Integer;
+using Real    = OCompiler.StandardLibrary.Type.Value.Real;
+using String  = OCompiler.StandardLibrary.Type.Reference.String;
 
 namespace OCompiler.Pipeline;
 
 internal class Invoker
 {
-    public static ParsedConstructorInfo GetEntryPoint(List<ClassInfo> allClasses, string className, string[] cmdArgs)
+    public Type TargetClass { get; }
+    public object[] Arguments { get; }
+
+    public Invoker(Assembly assembly, string className, string[] args)
+    {
+        var @class = assembly.GetType(className);
+        if (@class == null)
+        {
+            throw new Exception($"Class {className} was not found in the resulting assembly.");
+        }
+        TargetClass = @class;
+        Arguments = ParseCommandLineArgs(args).Select(pair => pair.Item2).ToArray();
+    }
+
+    public void Run()
+    {
+        Activator.CreateInstance(TargetClass, args: Arguments);
+    }
+
+    public static ParsedConstructorInfo GetEntryPoint(List<ClassInfo> allClasses, string className, string[] args)
     {
         var @class = allClasses.Where(c => c.Name == className).First();
         if (@class is not ParsedClassInfo)
@@ -18,22 +44,7 @@ internal class Invoker
             throw new Exception("Constructor of a built class cannot be used as an entry point.");
         }
 
-        var types = new List<string>();
-        foreach (var arg in cmdArgs)
-        {
-            if (Token.TryParse(0, arg, out var token))
-            {
-                types.Add(token switch
-                {
-                    BooleanLiteral => "Boolean",
-                    RealLiteral => "Real",
-                    IntegerLiteral => "Integer",
-                    _ => "String"
-                });
-                continue;
-            }
-            types.Add("String");
-        }
+        var types = new List<string>(ParseCommandLineArgs(args).Select(pair => pair.Item1));
 
         var constructor = ((ParsedClassInfo)@class).GetConstructor(types);
         if (constructor == null)
@@ -43,5 +54,26 @@ internal class Invoker
         }
 
         return constructor;
+    }
+
+    private static List<(string, object)> ParseCommandLineArgs(string[] args)
+    {
+        var parsedArgs = new List<(string, object)>();
+        foreach (var arg in args)
+        {
+            if (!Token.TryParse(0, arg, out var token))
+            {
+                parsedArgs.Add(("String", arg));
+                continue;
+            }
+            parsedArgs.Add(token switch
+            {
+                BooleanLiteral boolean => ("Boolean", new Boolean(boolean is True)),
+                IntegerLiteral integer => ("Integer", new Integer(integer.Value)),
+                RealLiteral real       => ("Real",    new Real(real.Value)),
+                _                      => ("String",  new String(token.Literal))
+            });
+        }
+        return parsedArgs;
     }
 }

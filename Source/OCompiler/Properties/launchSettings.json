@@ -3,7 +3,7 @@
   "profiles": {
     "Simple example": {
       "commandName": "Project",
-      "commandLineArgs": "$(SolutionDir)/Examples/main.ol Main"
+      "commandLineArgs": "$(SolutionDir)/Examples/main.ol Main 69 666"
     },
     "Without generics and inheritance": {
       "commandName": "Project",

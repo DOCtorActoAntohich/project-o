@@ -132,15 +132,7 @@ internal class Emitter
         }
     }
 
-    public void Run(string entryPointType = "Main", object[]? args = null)
-    {
-        var a = Activator.CreateInstance(_typeBuilders["Main"].CreateType()!, args);
-        //var a = Activator.CreateInstance(_typeBuilders["OtherClass"].CreateType()!, args);
-
-        // var b = a.GetType().GetMethod("PrintSus").Invoke(a, null);
-        //
-        // Console.WriteLine(b.GetType());
-    }
+    public Assembly Assembly => _assemblyBuilder;
     
     private Type? GetType(string name)
     {
