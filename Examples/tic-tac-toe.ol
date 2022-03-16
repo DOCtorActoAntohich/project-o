@@ -131,7 +131,7 @@ class TicTacToe is
         var bestScore : 1000
         // Zero player.
         if player.Equal(this.Zero) then
-            bestScore := Integer(0).Minus(1000)
+            bestScore := Integer.Min
         end
         
         var row : 1        
@@ -207,7 +207,7 @@ class TicTacToe is
         var bestScore : 1000
         // Zero player.
         if player.Equal(this.Zero) then
-            bestScore := Integer(0).Minus(1000)
+            bestScore := Integer.Min
         end
     
         var row : 1        
@@ -253,7 +253,7 @@ class TicTacToe is
         end
         
         // No moves available.
-        if bestScore.Equal(1000).Or(bestScore.Equal(Integer(0).Minus(1000))) then 
+        if bestScore.Equal(1000).Or(bestScore.Equal(Integer.Min)) then 
             return 0
         end
         

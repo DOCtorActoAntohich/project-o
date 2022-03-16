@@ -34,8 +34,8 @@ public class Integer : AnyValue
     }
 
 
-    public Integer Min => new Integer(int.MinValue);
-    public Integer Max => new Integer(int.MaxValue);
+    public Integer Min() => new Integer(int.MinValue);
+    public Integer Max() => new Integer(int.MaxValue);
 
     
     public Real ToReal()
