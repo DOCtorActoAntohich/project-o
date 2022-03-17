@@ -69,9 +69,9 @@ public static class Real
     }
 
     private static void AddRealOperatorMethod(
-    this CodeTypeDeclaration realType,
-    CodeBinaryOperatorType op,
-    string methodName)
+        this CodeTypeDeclaration realType,
+        CodeBinaryOperatorType op,
+        string methodName)
     {
         const string rhsOperandName = "number";
 
@@ -92,12 +92,14 @@ public static class Real
 
     private static void AddToStringMethod(this CodeTypeDeclaration realType)
     {
-        var creationParam = new CodeMethodInvokeExpression(
+        const string toStringMethodName = "ToString";
+        
+        var @string = new CodeMethodInvokeExpression(
             Base.ReferenceInternalValue(), "ToString");
-        var returnValue = new CodeObjectCreateExpression(DomString.FullTypeName, creationParam);
+        var returnValue = new CodeObjectCreateExpression(DomString.FullTypeName, @string);
         var returnStatement = new CodeMethodReturnStatement(returnValue);
 
-        var toStringMethod = Base.EmptyPublicMethod(DomString.FullTypeName, "ToString");
+        var toStringMethod = Base.EmptyPublicMethod(DomString.FullTypeName, toStringMethodName);
         toStringMethod.Statements.Add(returnStatement);
 
         realType.Members.Add(toStringMethod);
@@ -105,6 +107,8 @@ public static class Real
 
     private static void AddToIntegerMethod(this CodeTypeDeclaration realType)
     {
+        const string toIntegerMethodName = "ToInteger";
+        
         var convertType = new CodeTypeReferenceExpression(typeof(System.Convert));
         var @int = new CodeMethodInvokeExpression(
             convertType, "ToInt32", Base.ReferenceInternalValue());
@@ -112,7 +116,7 @@ public static class Real
         var returnValue = new CodeObjectCreateExpression(DomInt.FullTypeName, @int);
         var returnStatement = new CodeMethodReturnStatement(returnValue);
 
-        var toIntMethod = Base.EmptyPublicMethod(DomInt.FullTypeName, "ToInteger");
+        var toIntMethod = Base.EmptyPublicMethod(DomInt.FullTypeName, toIntegerMethodName);
         toIntMethod.Statements.Add(returnStatement);
 
         realType.Members.Add(toIntMethod);
@@ -120,14 +124,16 @@ public static class Real
 
     private static void AddToBooleanMethod(this CodeTypeDeclaration realType)
     {
+        const string toBooleanMethodName = "ToBoolean";
+        
         var convertType = new CodeTypeReferenceExpression(typeof(System.Convert));
-        var @boolean = new CodeMethodInvokeExpression(
+        var @bool = new CodeMethodInvokeExpression(
             convertType, "ToBoolean", Base.ReferenceInternalValue());
 
-        var returnValue = new CodeObjectCreateExpression(DomBool.FullTypeName, @boolean);
+        var returnValue = new CodeObjectCreateExpression(DomBool.FullTypeName, @bool);
         var returnStatement = new CodeMethodReturnStatement(returnValue);
 
-        var toBoolMethod = Base.EmptyPublicMethod(DomBool.FullTypeName, "ToBoolean");
+        var toBoolMethod = Base.EmptyPublicMethod(DomBool.FullTypeName, toBooleanMethodName);
         toBoolMethod.Statements.Add(returnStatement);
 
         realType.Members.Add(toBoolMethod);
@@ -135,6 +141,7 @@ public static class Real
 
     private static void AddNegationMethod(this CodeTypeDeclaration realType)
     {
+        const string negationMethodName = "Negative";
         const string rhsOperandName = "number";
 
         var lhs = Base.ReferenceInternalValue();
@@ -144,7 +151,7 @@ public static class Real
         var returnValue = new CodeObjectCreateExpression(FullTypeName, newValue);
         var returnStatement = new CodeMethodReturnStatement(returnValue);
 
-        var negativeMethod = Base.EmptyPublicMethod(FullTypeName, "UnaryMinus");
+        var negativeMethod = Base.EmptyPublicMethod(FullTypeName, negationMethodName);
         negativeMethod.Parameters.Add(new CodeParameterDeclarationExpression(FullTypeName, rhsOperandName));
         negativeMethod.Statements.Add(returnStatement);
 
@@ -153,12 +160,14 @@ public static class Real
 
     private static void AddMaxMethod(this CodeTypeDeclaration realType)
     {
-        var creationParam = new CodeMethodInvokeExpression(
-            Base.ReferenceInternalValue(), "MaxValue");
-        var returnValue = new CodeObjectCreateExpression(DomReal.FullTypeName, creationParam);
+        const string maxMethodName = "Max";
+        
+        var @double = new CodeTypeReferenceExpression(typeof(double));
+        var doubleMax = new CodeFieldReferenceExpression(@double, "MaxValue");
+        var returnValue = new CodeObjectCreateExpression(FullTypeName, doubleMax);
         var returnStatement = new CodeMethodReturnStatement(returnValue);
 
-        var maxMethod = Base.EmptyPublicMethod(DomReal.FullTypeName, "Max");
+        var maxMethod = Base.EmptyPublicMethod(FullTypeName, maxMethodName);
         maxMethod.Statements.Add(returnStatement);
 
         realType.Members.Add(maxMethod);
@@ -166,12 +175,14 @@ public static class Real
 
     private static void AddMinMethod(this CodeTypeDeclaration realType)
     {
-        var creationParam = new CodeMethodInvokeExpression(
-            Base.ReferenceInternalValue(), "MinValue");
-        var returnValue = new CodeObjectCreateExpression(DomReal.FullTypeName, creationParam);
+        const string minMethodName = "Min";
+        
+        var @double = new CodeTypeReferenceExpression(typeof(double));
+        var doubleMin = new CodeFieldReferenceExpression(@double, "MinValue");
+        var returnValue = new CodeObjectCreateExpression(FullTypeName, doubleMin);
         var returnStatement = new CodeMethodReturnStatement(returnValue);
 
-        var minMethod = Base.EmptyPublicMethod(DomReal.FullTypeName, "Min");
+        var minMethod = Base.EmptyPublicMethod(FullTypeName, minMethodName);
         minMethod.Statements.Add(returnStatement);
 
         realType.Members.Add(minMethod);
@@ -179,14 +190,16 @@ public static class Real
 
     private static void AddEpsilonMethod(this CodeTypeDeclaration realType)
     {
-        var creationParam = new CodeMethodInvokeExpression(
-            Base.ReferenceInternalValue(), "Epsilon");
-        var returnValue = new CodeObjectCreateExpression(DomReal.FullTypeName, creationParam);
+        const string epsilonMethodName = "Epsilon";
+        
+        var @double = new CodeTypeReferenceExpression(typeof(double));
+        var epsilon = new CodeFieldReferenceExpression(@double, "Epsilon");
+        var returnValue = new CodeObjectCreateExpression(FullTypeName, epsilon);
         var returnStatement = new CodeMethodReturnStatement(returnValue);
 
-        var minMethod = Base.EmptyPublicMethod(DomReal.FullTypeName, "Epsilon");
-        minMethod.Statements.Add(returnStatement);
-
-        realType.Members.Add(minMethod);
+        var epsilonMethod = Base.EmptyPublicMethod(FullTypeName, epsilonMethodName);
+        epsilonMethod.Statements.Add(returnStatement);
+        
+        realType.Members.Add(epsilonMethod);
     }
 }
