@@ -541,6 +541,13 @@ internal class Emitter
                 
                 break;
             case Return @return:
+                // Clear stack before return.
+                while (scope.StackSize != 0)
+                {
+                    scope.Pop();
+                    generator.Emit(OpCodes.Pop);
+                }
+                
                 if (@return.ReturnValue is not null)
                 {
                     // Load expression value to the stack.
