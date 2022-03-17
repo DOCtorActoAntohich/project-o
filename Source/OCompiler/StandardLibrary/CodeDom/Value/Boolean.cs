@@ -17,6 +17,7 @@ internal static class Boolean
         booleanType.Members.Add(Base.CreateInternalValue(typeof(bool)));
         
         booleanType.AddInternalConstructor();
+        booleanType.AddDefaultConstructor();
         booleanType.AddBooleanConstructor();
         
         booleanType.AddToStringMethod();
@@ -37,6 +38,16 @@ internal static class Boolean
         
         var ctor = Base.EmptyPublicConstructor();
         ctor.Parameters.Add(new CodeParameterDeclarationExpression(typeof(bool), paramName));
+        ctor.Statements.Add(Base.WriteToInternalValue(newValue));
+
+        booleanType.Members.Add(ctor);
+    }
+    
+    private static void AddDefaultConstructor(this CodeTypeDeclaration booleanType)
+    {
+        var newValue = new CodePrimitiveExpression(false);
+        
+        var ctor = Base.EmptyPublicConstructor();
         ctor.Statements.Add(Base.WriteToInternalValue(newValue));
 
         booleanType.Members.Add(ctor);
