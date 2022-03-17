@@ -11,4 +11,12 @@ end
 
 class Calculator extends AnyValue is
   this is end
+class Calculator is
+  method magic(num: Integer) : Integer is
+    if num.Less(5).Not then
+      var result : num.Mult(12).Minus(num.Mult(6))
+      return result
+    end
+    return num.Plus(num)
+  end
 end

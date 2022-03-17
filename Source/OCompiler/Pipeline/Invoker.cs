@@ -7,6 +7,7 @@ using OCompiler.Analyze.Lexical.Tokens;
 using OCompiler.Analyze.Lexical.Tokens.BooleanLiterals;
 using OCompiler.Analyze.Semantics.Callable;
 using OCompiler.Analyze.Semantics.Class;
+using OCompiler.Exceptions;
 
 using Boolean = OCompiler.StandardLibrary.Type.Value.Boolean;
 using Integer = OCompiler.StandardLibrary.Type.Value.Integer;
@@ -25,7 +26,7 @@ internal class Invoker
         var @class = assembly.GetType(className);
         if (@class == null)
         {
-            throw new Exception($"Class {className} was not found in the resulting assembly.");
+            throw new InvocationError($"Class {className} was not found in the resulting assembly.");
         }
         TargetClass = @class;
         Arguments = ParseCommandLineArgs(args).Select(pair => pair.Item2).ToArray();
@@ -41,7 +42,7 @@ internal class Invoker
         var @class = allClasses.Where(c => c.Name == className).First();
         if (@class is not ParsedClassInfo)
         {
-            throw new Exception("Constructor of a built class cannot be used as an entry point.");
+            throw new InvocationError("Constructor of a built class cannot be used as an entry point.");
         }
 
         var types = new List<string>(ParseCommandLineArgs(args).Select(pair => pair.Item1));
@@ -50,7 +51,7 @@ internal class Invoker
         if (constructor == null)
         {
             var argsStr = string.Join(", ", types);
-            throw new Exception($"Couldn't find a constructor to call: {className}({argsStr})");
+            throw new InvocationError($"Couldn't find a constructor to call: {className}({argsStr})");
         }
 
         return constructor;

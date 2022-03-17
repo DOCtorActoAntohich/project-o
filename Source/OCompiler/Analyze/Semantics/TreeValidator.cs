@@ -124,7 +124,10 @@ internal class TreeValidator
         var variableName = variable.Identifier.Literal;
         if (ClassTree.ClassExists(variableName))
         {
-            throw new Exception($"Cannot create variable, name {variableName} is already used by a class");
+            throw new NameCollisionError(
+                variable.Identifier.Position,
+                $"Cannot create variable, name {variableName} is already used by a class"
+            );
         }
         if (callable.HasParameter(variableName))
         {
@@ -167,7 +170,7 @@ internal class TreeValidator
     {
         if (callable.HasParameter(variableName))
         {
-            throw new Exception($"Cannot assign a value to the method parameter {variableName}");
+            throw new AccessViolationError(value.Token.Position, $"Cannot assign a value to the read-only method parameter {variableName}");
         }
         if (!callable.LocalVariables.TryGetValue(variableName, out var varInfo))
         {

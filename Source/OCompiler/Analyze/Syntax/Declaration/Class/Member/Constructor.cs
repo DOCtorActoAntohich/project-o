@@ -69,13 +69,9 @@ internal class Constructor: IClassMember
     {
         var @string = new StringBuilder();
 
-        var definition = $"Constructor({Method.Parameters.ToString(Parameters)})";
+        var definition = $"this({Method.Parameters.ToString(Parameters)})";
 
-        if (Body.IsEmpty)
-        {
-            @string.Append(definition);
-            return @string.ToString();
-        }
+        @string.Append(definition);
         @string.AppendLine();
         @string.Append(Body.ToString(prefix));
 

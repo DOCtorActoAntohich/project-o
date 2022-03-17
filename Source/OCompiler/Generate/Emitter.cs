@@ -12,6 +12,7 @@ using OCompiler.Analyze.Semantics.Expression;
 using OCompiler.Analyze.Syntax.Declaration;
 using OCompiler.Analyze.Syntax.Declaration.Expression;
 using OCompiler.Analyze.Syntax.Declaration.Statement;
+using OCompiler.Exceptions;
 using OCompiler.StandardLibrary.Type.Reference;
 using OCompiler.StandardLibrary.Type.Value;
 using Boolean = OCompiler.StandardLibrary.Type.Value.Boolean;
@@ -225,7 +226,7 @@ internal class Emitter
         var parameterTypes = new Type[parameters.Count];
         for (int i = 0; i < parameterTypes.Length; i++)
         {
-            parameterTypes[i] = GetType(parameters[i].Type) ?? throw new Exception(
+            parameterTypes[i] = GetType(parameters[i].Type) ?? throw new CompilationError(
                 $"Type not found: {parameters[i].Type}"
             );
         }
@@ -292,7 +293,7 @@ internal class Emitter
         Type? type = GetType(constructor.Context.Class.Name);
         if (type is not TypeBuilder)
         {
-            throw new Exception($"Defining constructor on invalid builder: {type}.");
+            throw new CompilationError($"Defining constructor on invalid builder: {type}.");
         }
 
         // Define.
@@ -316,7 +317,7 @@ internal class Emitter
         Type? type = GetType(method.Context.Class.Name);
         if (type is not TypeBuilder)
         {
-            throw new Exception($"Defining method on invalid builder: {type}.");
+            throw new CompilationError($"Defining method on invalid builder: {type}.");
         }
         
         // Initialize methods storage.
@@ -334,7 +335,7 @@ internal class Emitter
                 method.Name,
                 MethodAttributes.Public,
                 CallingConventions.HasThis,
-                GetType(method.ReturnType) ?? throw new Exception($"Type not found: {method.ReturnType}"),
+                GetType(method.ReturnType) ?? throw new CompilationError($"Type not found: {method.ReturnType}"),
                 parameterTypes
             )
         );
@@ -344,7 +345,7 @@ internal class Emitter
     {
         if (field.Type == null)
         {
-            throw new Exception(
+            throw new CompilationError(
                 $"Field {field.Name} in class {field.Context.Class.Name} has no Type."
             );
         }
@@ -353,13 +354,13 @@ internal class Emitter
         Type? type = GetType(field.Context.Class.Name);
         if (type is not TypeBuilder)
         {
-            throw new Exception($"Defining method on invalid builder: {type}.");
+            throw new CompilationError($"Defining method on invalid builder: {type}.");
         }
 
 
         var fieldBuilder = ((TypeBuilder) type).DefineField(
             field.Name,
-            GetType(field.Type) ?? throw new Exception($"Type not found: {field.Type}"),
+            GetType(field.Type) ?? throw new CompilationError($"Type not found: {field.Type}"),
             FieldAttributes.Public
         );
         
@@ -440,7 +441,7 @@ internal class Emitter
                 
                 // Get builder.
                 var variableBuilder = generator.DeclareLocal(
-                    GetType(variableInfo.Type) ?? throw new Exception(
+                    GetType(variableInfo.Type) ?? throw new CompilationError(
                         $"Type not found: {variable.Identifier.Literal}"
                     )
                 );
@@ -473,7 +474,7 @@ internal class Emitter
                         GetField(
                             type.Name, 
                             assignment.Variable.Child!.Token.Literal
-                        ) ?? throw new Exception(
+                        ) ?? throw new CompilationError(
                             $"Type not found: {assignment.Variable.Child!.Token.Literal}"
                         )
                     );
@@ -572,7 +573,7 @@ internal class Emitter
                 break;
             
             default:
-                throw new Exception($"Unknown IBodyStatement: {statement}");
+                throw new CompilationError($"Unknown IBodyStatement: {statement}");
         }
     }
 
@@ -593,12 +594,12 @@ internal class Emitter
             {
                 if (currentType is not null)
                 {
-                    throw new Exception("Current type must be null.");
+                    throw new CompilationError("Current type must be null.");
                 }
                 
                 if (type.BaseType is null)
                 {
-                    throw new Exception("No class to inherit from.");
+                    throw new CompilationError("No class to inherit from.");
                 }
                     
                 // Load 'this' reference.
@@ -617,7 +618,7 @@ internal class Emitter
                 // Estimate type.
                 var argumentInfo = new ExpressionInfo(argument, context);
                 parameterTypes.Add(
-                    GetType(argumentInfo.Type) ?? throw new Exception(
+                    GetType(argumentInfo.Type) ?? throw new CompilationError(
                         $"Type not found: {argumentInfo.Type}"
                     )
                 );
@@ -628,7 +629,7 @@ internal class Emitter
             {
                 generator.Emit(
                     OpCodes.Call, 
-                    GetConstructor(type.BaseType!.Name, parameterTypes.ToArray()) ?? throw new Exception(
+                    GetConstructor(type.BaseType!.Name, parameterTypes.ToArray()) ?? throw new CompilationError(
                         $"Constructor not found: {parameterTypes}"
                     )
                 );
@@ -640,14 +641,14 @@ internal class Emitter
             else if (currentType is null)
             {
                 // Type of object that will be created.
-                currentType = GetType(call.Token.Literal) ?? throw new Exception(
+                currentType = GetType(call.Token.Literal) ?? throw new CompilationError(
                     $"Type not found: {call.Token.Literal}"
                 );
                 
                 // Create new object.
                 generator.Emit(
                     OpCodes.Newobj, 
-                    GetConstructor(currentType.Name, parameterTypes.ToArray()) ?? throw new Exception(
+                    GetConstructor(currentType.Name, parameterTypes.ToArray()) ?? throw new CompilationError(
                         $"Constructor not found: {parameterTypes}"
                     )
                 );
@@ -661,7 +662,7 @@ internal class Emitter
                     currentType.Name, 
                     call.Token.Literal, 
                     parameterTypes.ToArray()
-                ) ?? throw new Exception(
+                ) ?? throw new CompilationError(
                     $"Method not found: {parameterTypes.ToArray()}"
                 );
                 currentType = method.ReturnType;
@@ -694,7 +695,7 @@ internal class Emitter
             {
                 case StringLiteral stringLiteral:
                     currentType = typeof(String);
-                    generator.Emit(OpCodes.Ldstr, stringLiteral.EscapedLiteral);
+                    generator.Emit(OpCodes.Ldstr, stringLiteral.Literal);
                     generator.Emit(OpCodes.Newobj, GetConstructor(currentType.Name, new [] {typeof(string)})!);
                     // Push value.
                     scope.Push();
@@ -738,7 +739,7 @@ internal class Emitter
                 case This:
                     if (currentType is not null)
                     {
-                        throw new Exception($"Current type should be null: {currentType}");
+                        throw new CompilationError($"Current type should be null: {currentType}");
                     }
                     
                     currentType = type;
@@ -789,12 +790,12 @@ internal class Emitter
 
                     if (index == context.Callable!.Parameters.Count)
                     {
-                        throw new Exception($"Cannot find argument {name.Literal}");
+                        throw new CompilationError($"Cannot find argument {name.Literal}");
                     }
 
                     var parameterInfo = context.Callable!.Parameters[index];
                     
-                    currentType = GetType(parameterInfo.Type) ?? throw new Exception(
+                    currentType = GetType(parameterInfo.Type) ?? throw new CompilationError(
                         $"Parameter not found: {name.Literal}"
                     );
                     // Load reference to the local variable.
@@ -806,7 +807,7 @@ internal class Emitter
                 // Accessing field of field.
                 case Identifier name:
                     // Get field.
-                    var field = GetField(currentType.Name, name.Literal) ?? throw new Exception(
+                    var field = GetField(currentType.Name, name.Literal) ?? throw new CompilationError(
                         $"Field not found: {name.Literal}"
                     );
 
@@ -822,7 +823,7 @@ internal class Emitter
                     break;
                 
                 default:
-                    throw new Exception($"Invalid expression: {expression}");
+                    throw new CompilationError($"Invalid expression: {expression}");
             }
         }
 

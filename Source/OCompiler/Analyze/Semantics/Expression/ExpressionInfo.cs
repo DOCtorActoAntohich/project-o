@@ -167,11 +167,11 @@ internal class ExpressionInfo
     {
         if (Context.Class.BaseClass == null)
         {
-            throw new Exception($"Class {Context.Class.Name} is not inherited from anything");
+            throw new CompilerInternalError($"Class {Context.Class.Name} is not inherited from anything");
         }
         if (Context.Callable is not ParsedConstructorInfo)
         {
-            throw new Exception("Cannot refer to base class outside of a class constructor.");
+            throw new AnalyzeError(Expression.Token.Position, "Cannot refer to the base class outside of a class constructor.");
         }
 
         return Context.Class.BaseClass!.Name;

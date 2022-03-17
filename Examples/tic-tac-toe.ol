@@ -44,7 +44,7 @@ class TicTacToe is
         
         // Ask hard level.
         while this.level.Greater(0).And(this.level.LessEqual(5)).Not() loop
-            IO.Write("Choose hard level (1-5) ") 
+            IO.Write("Choose difficulty level (1-5) ") 
             this.level := IO.ReadLine().ToInteger()
         end
         
@@ -131,7 +131,7 @@ class TicTacToe is
         var bestScore : 1000
         // Zero player.
         if player.Equal(this.Zero) then
-            bestScore := Integer(0).Minus(1000)
+            bestScore := Integer.Min
         end
         
         var row : 1        
@@ -207,7 +207,7 @@ class TicTacToe is
         var bestScore : 1000
         // Zero player.
         if player.Equal(this.Zero) then
-            bestScore := Integer(0).Minus(1000)
+            bestScore := Integer.Min
         end
     
         var row : 1        
@@ -253,7 +253,7 @@ class TicTacToe is
         end
         
         // No moves available.
-        if bestScore.Equal(1000).Or(bestScore.Equal(Integer(0).Minus(1000))) then 
+        if bestScore.Equal(1000).Or(bestScore.Equal(Integer.Min)) then 
             return 0
         end
         
@@ -262,27 +262,27 @@ class TicTacToe is
     
     method PrintGameField() : Void is
         this.PrintCellValue(this.cell11)
-        IO.Write("┃")
+        IO.Write("|")
         this.PrintCellValue(this.cell12)
-        IO.Write("┃")
+        IO.Write("|")
         this.PrintCellValue(this.cell13)
         IO.WriteLine("") 
         
-        IO.WriteLine("━╋━╋━")
+        IO.WriteLine("-+-+-")
         
         this.PrintCellValue(this.cell21)
-        IO.Write("┃")
+        IO.Write("|")
         this.PrintCellValue(this.cell22)
-        IO.Write("┃")
+        IO.Write("|")
         this.PrintCellValue(this.cell23)    
         IO.WriteLine("") 
     
-        IO.WriteLine("━╋━╋━")
+        IO.WriteLine("-+-+-")
         
         this.PrintCellValue(this.cell31)
-        IO.Write("┃")
+        IO.Write("|")
         this.PrintCellValue(this.cell32)
-        IO.Write("┃")
+        IO.Write("|")
         this.PrintCellValue(this.cell33)
         
         IO.WriteLine("") 
@@ -308,11 +308,11 @@ class TicTacToe is
         IO.WriteLine("Welcome to Tic-Tac-Toe v1.0!")
         IO.WriteLine("Map of the game field: ")
         IO.WriteLine("")
-        IO.WriteLine("11┃12┃13")
-        IO.WriteLine("━━╋━━╋━━")
-        IO.WriteLine("21┃22┃23")
-        IO.WriteLine("━━╋━━╋━━")
-        IO.WriteLine("31┃32┃33") 
+        IO.WriteLine("11|12|13")
+        IO.WriteLine("--+--+--")
+        IO.WriteLine("21|22|23")
+        IO.WriteLine("--+--+--")
+        IO.WriteLine("31|32|33") 
         IO.WriteLine("")
         IO.WriteLine("Good luck!")
         IO.WriteLine("")

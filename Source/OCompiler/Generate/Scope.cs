@@ -1,3 +1,5 @@
+using OCompiler.Exceptions;
+
 using System;
 using System.Collections.Generic;
 using System.Reflection.Emit;
@@ -42,7 +44,7 @@ internal class Scope
     {
         if (StackSize == 0)
         {
-            throw new Exception("Stack size is zero.");
+            throw new CompilationError("Stack size is zero.");
         }
 
         StackSize--;
