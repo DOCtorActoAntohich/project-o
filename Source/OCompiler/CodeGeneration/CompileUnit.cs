@@ -1,6 +1,8 @@
+using System;
 using System.CodeDom;
 using System.Collections.Generic;
 using OCompiler.Analyze.Semantics;
+using OCompiler.Analyze.Semantics.Class;
 
 namespace OCompiler.CodeGeneration;
 

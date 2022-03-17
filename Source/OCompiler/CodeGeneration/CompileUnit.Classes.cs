@@ -1,6 +1,5 @@
 using System;
 using System.CodeDom;
-using System.Collections.Generic;
 using OCompiler.Analyze.Semantics;
 using OCompiler.Analyze.Semantics.Class;
 using DomClass  = OCompiler.StandardLibrary.CodeDom.Reference.Class;

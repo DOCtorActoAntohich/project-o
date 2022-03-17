@@ -5,7 +5,7 @@ class Main is
 end
 
 class Newbie is
-    var age : Integer
+    var age : 0
   
     this(age: Integer) is
         this.age := age.Plus(1)
@@ -22,7 +22,7 @@ end
 
 
 class Imposter extends Newbie is
-    var foxiness: Integer
+    var foxiness: 0
 
     this(age: Integer, foxiness: Integer) is
         base(age)
@@ -54,8 +54,8 @@ end
 
 
 class SmartGuy extends Newbie is
-    var isBigBranes : Boolean
-    var susness : Integer
+    var isBigBranes : false
+    var susness : 0
     
     this(age: Integer, susness: Integer, bigBranes: Boolean) is
         base(age)
@@ -71,7 +71,7 @@ class SmartGuy extends Newbie is
         return this.age.ToReal.Mult(this.gregificationStage)
     end
     
-    method gregificationStage : Real is
+    method gregificationStage() : Real is
         return 7.0 // By this time they usually reach Gregification Stage 7.
     end
 end
@@ -82,10 +82,10 @@ class GregoriusTechneticies extends SmartGuy is
     end
     
     method beEpic(howEpic: Integer) is
-        var count : howEpic
-        var out : IO
+        var count : Integer(howEpic)
         while count.Greater(0) loop
-            out.WriteLine("Greg.")
+            IO.WriteLine("Greg.")
+            count := count.Minus(1)
         end
     end
     
@@ -93,7 +93,7 @@ class GregoriusTechneticies extends SmartGuy is
         return 999999.999999
     end
     
-    method gregificationStage : Real is
+    method gregificationStage() : Real is
         return 10.0
     end
 end
