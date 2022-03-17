@@ -8,11 +8,10 @@ on:
 
 jobs:
   linux:
-    runs-on: {{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-
+        platform: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.platform }}
     steps:
     - uses: actions/checkout@v2
     - name: Setup .NET
@@ -26,5 +25,5 @@ jobs:
     - name: Upload a Build Artifact
       uses: actions/upload-artifact@v3.0.0
       with:
-        name: OCompiler-{{ matrix.os }}
+        name: OCompiler-${{ matrix.platform }}
         path: ./Build/bin/Release/*
