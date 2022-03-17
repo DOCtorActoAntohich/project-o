@@ -16,6 +16,10 @@ internal class Code
         Text = GenerateCode(compileUnit);
     }
 
+    public Code(CompileUnit compileUnit) : this(compileUnit.BuiltIn())
+    {
+    }
+
     
     private static string GenerateCode(CodeCompileUnit compileUnit)
     {

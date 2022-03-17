@@ -23,6 +23,10 @@ internal class CodeGenerator
         CompileCode(code);
     }
 
+    public CodeGenerator(CompileUnit compileUnit) : this(new Code(compileUnit))
+    {
+    }
+
     ~CodeGenerator()
     {
         _compiledAssembly.Close();
