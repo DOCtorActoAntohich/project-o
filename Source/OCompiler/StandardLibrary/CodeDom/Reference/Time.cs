@@ -43,10 +43,13 @@ internal static class Time
             now, "Subtract", whenTheUniverseStartedExisting);
 
         var @double = new CodePropertyReferenceExpression(timeDifference, "TotalSeconds");
-        var returnValue = new CodeObjectCreateExpression(DomReal.FullTypeName, @double);
+        var convert = new CodeTypeReferenceExpression(typeof(System.Convert));
+        var @int = new CodeMethodInvokeExpression(@convert, "ToInt32", @double);
+            
+        var returnValue = new CodeObjectCreateExpression(DomInt.FullTypeName, @int);
         var returnStatement = new CodeMethodReturnStatement(returnValue);
 
-        var currentTimeMethod = Base.EmptyPublicMethod(DomReal.FullTypeName, currentTimeMethodName);
+        var currentTimeMethod = Base.EmptyPublicMethod(DomInt.FullTypeName, currentTimeMethodName);
         currentTimeMethod.Statements.Add(returnStatement);
 
         timeType.Members.Add(currentTimeMethod);

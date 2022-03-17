@@ -1,10 +1,11 @@
+using System;
 using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
 using OCompiler.Analyze.Lexical.Tokens;
 using OCompiler.Analyze.Lexical.Tokens.Keywords;
 using OCompiler.Analyze.Syntax.Declaration.Expression;
-
+using DomIO = OCompiler.StandardLibrary.CodeDom.Reference.IO;
 
 namespace OCompiler.CodeGeneration;
 
@@ -70,15 +71,15 @@ internal partial class CompileUnit
         {
             return ParsedConstructorCall(expression);
         }
-        
+
         return new CodeVariableReferenceExpression(expression.Token.Literal);
     }
     
     private CodeExpression ParsedRvalueExpression(Expression expression)
     {
-        if (expression.Token is Base)
+        if (expression.Token is Base && expression is Call call)
         {
-            return new CodeMethodInvokeExpression(new CodeThisReferenceExpression(), "ToString");
+            return ParsedBaseCall(call);
         }
         
         var referredObject = FirstRvalueExpression(expression);
@@ -109,14 +110,19 @@ internal partial class CompileUnit
         return new CodeObjectCreateExpression(
             type, TokenToPrimitiveExpression(token));
     }
-    
+
+    private CodeExpression ParsedBaseCall(Call call)
+    {
+        var ctor = (CodeConstructor?) _currentCallable;
+        foreach (var expression in ParsedRvalueCallArguments(call.Arguments))
+        {
+            ctor?.BaseConstructorArgs.Add(expression);
+        }
+
+        return EmptyExpression();
+    }
     private CodeExpression ParsedRvalueCall(CodeExpression root, Call call)
     {
-        if (call.Token is Base)
-        {
-            return root; // TODO is it param redirection when inheritance?
-        }
-        
         return new CodeMethodInvokeExpression(
             root, call.Token.Literal, ParsedRvalueCallArguments(call.Arguments));
     }
@@ -137,5 +143,10 @@ internal partial class CompileUnit
     private CodeExpression[] ParsedRvalueCallArguments(IEnumerable<Expression> arguments)
     {
         return arguments.Select(ParsedRvalueExpression).ToArray();
+    }
+
+    private CodeExpression EmptyExpression()
+    {
+        return new CodeObjectCreateExpression(DomIO.FullTypeName);
     }
 }

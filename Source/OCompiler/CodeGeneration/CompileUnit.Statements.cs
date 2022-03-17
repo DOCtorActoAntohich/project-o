@@ -6,6 +6,7 @@ using OCompiler.Analyze.Semantics.Expression;
 using OCompiler.Analyze.Syntax.Declaration;
 using OCompiler.Analyze.Syntax.Declaration.Expression;
 using OCompiler.Analyze.Syntax.Declaration.Statement;
+using OCompiler.StandardLibrary.CodeDom;
 
 namespace OCompiler.CodeGeneration;
 
@@ -45,9 +46,11 @@ internal partial class CompileUnit
     
     private CodeStatement ParsedIfStatement(If @if)
     {
+        var condition = ParsedRvalueExpression(@if.Condition);
+        var readBoolResult = new CodeFieldReferenceExpression(condition, Base.InternalValueVariableName);
         var ifCode = new CodeConditionStatement
         {
-            Condition = ParsedRvalueExpression(@if.Condition)
+            Condition = readBoolResult
         };
 
         foreach (var statement in ParsedBody(@if.Body))
@@ -70,9 +73,11 @@ internal partial class CompileUnit
 
     private CodeStatement ParsedWhileStatement(While @while)
     {
+        var condition = ParsedRvalueExpression(@while.Condition);
+        var readBoolResult = new CodeFieldReferenceExpression(condition, Base.InternalValueVariableName);
         var whileCode = new CodeIterationStatement
         {
-            TestExpression = ParsedRvalueExpression(@while.Condition)
+            TestExpression = readBoolResult
         };
 
         foreach (var statement in ParsedBody(@while.Body))

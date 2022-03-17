@@ -102,7 +102,9 @@ internal class CodeGenerator
 
         var references = GetReferencedAssemblies();
         var assemblyName = Path.GetRandomFileName();
-        var options = new CSharpCompilationOptions(OutputKind.ConsoleApplication);
+        var options = new CSharpCompilationOptions(OutputKind.ConsoleApplication)
+            .WithOverflowChecks(true)
+            .WithDeterministic(true);
         
         var compilation = CSharpCompilation.Create(
             assemblyName,

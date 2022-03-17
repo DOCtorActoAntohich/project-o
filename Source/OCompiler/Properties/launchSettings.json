@@ -21,13 +21,13 @@
       "commandName": "Project",
       "commandLineArgs": "$(SolutionDir)/Examples/chain-calls.ol Main 7"
     },
-    "Test magic": {
+    "Compilation v2 mogus": {
       "commandName": "Project",
-      "commandLineArgs": "$(SolutionDir)/Examples/simple.ol $(SolutionDir)/Build/mogus/mogus.exe Main"
+      "commandLineArgs": "$(SolutionDir)/Examples/chain-calls.ol $(SolutionDir)/Build/mogus/mogus.exe Main"
     },
     "Compilation v2 Tic-tac-toe": {
       "commandName": "Project",
-      "commandLineArgs": "$(SolutionDir)/Examples/tic-tac-toe.ol $(SolutionDir)/Build/mogus/mogus.exe Main"
+      "commandLineArgs": "$(SolutionDir)/Examples/tic-tac-toe.ol $(SolutionDir)/Build/mogus/mogus.exe TicTacToe"
     }
   }
 }

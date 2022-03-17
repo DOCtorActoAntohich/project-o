@@ -9,8 +9,7 @@ class Main is
   end
 end
 
-class Calculator extends AnyValue is
-  this is end
+
 class Calculator is
   method magic(num: Integer) : Integer is
     if num.Less(5).Not then
