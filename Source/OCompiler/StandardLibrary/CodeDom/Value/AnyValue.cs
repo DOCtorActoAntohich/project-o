@@ -11,8 +11,7 @@ internal static class AnyValue
     public static CodeTypeDeclaration Generate()
     {
         var anyValueType = Base.GenerateWithDefaultToString(TypeName);
-        anyValueType.BaseTypes.Add(new CodeTypeReference(DomClass.TypeName));
-        
+
         anyValueType.IsClass     = false;
         anyValueType.IsEnum      = false;
         anyValueType.IsInterface = false;

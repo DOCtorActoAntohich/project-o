@@ -1,6 +1,7 @@
 using System.CodeDom;
 using DomString = OCompiler.StandardLibrary.CodeDom.Reference.String;
 using DomAnyRef = OCompiler.StandardLibrary.CodeDom.Reference.AnyRef;
+using DomVoid   = OCompiler.StandardLibrary.CodeDom.Value.Void;
 
 namespace OCompiler.StandardLibrary.CodeDom.Reference;
 
@@ -11,7 +12,7 @@ internal static class IO
     
     public static CodeTypeDeclaration Generate()
     {
-        var ioType = Base.GenerateWithDefaultToString(FullTypeName);
+        var ioType = Base.GenerateWithDefaultToString(TypeName);
         ioType.BaseTypes.Add(new CodeTypeReference(DomAnyRef.FullTypeName));
         
         ioType.AddWriteMethod();
@@ -23,22 +24,18 @@ internal static class IO
 
     private static void AddWriteMethod(this CodeTypeDeclaration ioType)
     {
-        var writeMethod = new CodeMemberMethod
-        {
-            Name = "Write",
-            ReturnType = new CodeTypeReference(typeof(void)),
-            Attributes = MemberAttributes.Public
-        };
-        
-        const string argumentString = "str";
-        writeMethod.Parameters.Add(
-            new CodeParameterDeclarationExpression(
-                DomString.FullTypeName, argumentString));
+        var writeMethod = Base.EmptyPublicMethod(DomVoid.FullTypeName, "Write");
+
+        const string paramName = "str";
+        writeMethod.Parameters.Add(new CodeParameterDeclarationExpression(DomString.FullTypeName, paramName));
         
         var systemConsole = new CodeTypeReferenceExpression(typeof(System.Console));
-        writeMethod.Statements.Add(new CodeMethodInvokeExpression(
-            systemConsole, "Write",
-            new CodeArgumentReferenceExpression(argumentString)));
+        var @string = new CodeFieldReferenceExpression(
+            new CodeArgumentReferenceExpression(paramName), Base.InternalValueVariableName);
+        var printingStatement = new CodeMethodInvokeExpression(systemConsole, "Write", @string);
+        
+        writeMethod.Statements.Add(printingStatement);
+        writeMethod.Statements.Add(Base.ReturnVoid());
 
         ioType.Members.Add(writeMethod);
     }
@@ -46,34 +43,25 @@ internal static class IO
     
     private static void AddWriteLineMethod(this CodeTypeDeclaration ioType)
     {
-        var writeLineMethod = new CodeMemberMethod
-        {
-            Name = "WriteLine",
-            ReturnType = new CodeTypeReference(typeof(void)),
-            Attributes = MemberAttributes.Public
-        };
-        
-        const string argumentString = "str";
-        writeLineMethod.Parameters.Add(
-            new CodeParameterDeclarationExpression(
-                DomString.FullTypeName, argumentString));
+        var writeLineMethod = Base.EmptyPublicMethod(DomVoid.FullTypeName, "WriteLine");
+
+        const string paramName = "str";
+        writeLineMethod.Parameters.Add(new CodeParameterDeclarationExpression(DomString.FullTypeName, paramName));
         
         var systemConsole = new CodeTypeReferenceExpression(typeof(System.Console));
-        writeLineMethod.Statements.Add(new CodeMethodInvokeExpression(
-            systemConsole, "WriteLine",
-            new CodeArgumentReferenceExpression(argumentString)));
+        var @string = new CodeFieldReferenceExpression(
+            new CodeArgumentReferenceExpression(paramName), Base.InternalValueVariableName);
+        var printingStatement = new CodeMethodInvokeExpression(systemConsole, "WriteLine", @string);
+
+        writeLineMethod.Statements.Add(printingStatement);
+        writeLineMethod.Statements.Add(Base.ReturnVoid());
 
         ioType.Members.Add(writeLineMethod);
     }
 
     private static void AddReadLineMethod(this CodeTypeDeclaration ioType)
     {
-        var readLineMethod = new CodeMemberMethod()
-        {
-            Name = "ReadLine",
-            ReturnType = new CodeTypeReference(DomString.FullTypeName),
-            Attributes = MemberAttributes.Public
-        };
+        var readLineMethod = Base.EmptyPublicMethod(DomString.FullTypeName, "ReadLine");
 
         const string resultVar = "result";
 

@@ -1,5 +1,6 @@
 using System;
 using System.CodeDom;
+using System.Collections.Generic;
 using OCompiler.Analyze.Semantics;
 using OCompiler.Analyze.Semantics.Class;
 using DomClass  = OCompiler.StandardLibrary.CodeDom.Reference.Class;
@@ -59,8 +60,6 @@ internal partial class CompileUnit
             default:
                 throw new Exception($"Class `{classInfo.Name}` was not found in StdLib, nor in OLang file.");
         }
-        
-        _codeNamespace.Types.Add(_currentTypeDeclaration);
     }
     
     private void AddBaseClass(ClassInfo classInfo)
@@ -114,6 +113,8 @@ internal partial class CompileUnit
             AddParsedCallable(method);
         }
 
+        _codeNamespace.Types.Add(_currentTypeDeclaration);
+        
         _currentClassInfo = null;
     }
 }

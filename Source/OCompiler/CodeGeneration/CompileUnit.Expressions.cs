@@ -76,6 +76,11 @@ internal partial class CompileUnit
     
     private CodeExpression ParsedRvalueExpression(Expression expression)
     {
+        if (expression.Token is Base)
+        {
+            return new CodeMethodInvokeExpression(new CodeThisReferenceExpression(), "ToString");
+        }
+        
         var referredObject = FirstRvalueExpression(expression);
         var currentExpression = expression.Child;
         while (currentExpression != null)

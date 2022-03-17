@@ -1,5 +1,6 @@
 using System.CodeDom;
 using DomString = OCompiler.StandardLibrary.CodeDom.Reference.String;
+using DomVoid   = OCompiler.StandardLibrary.CodeDom.Value.Void;
 
 namespace OCompiler.StandardLibrary.CodeDom;
 
@@ -14,11 +15,8 @@ internal static class Base
     {
         var newType = NewPublicTypeDeclaration(newClassName);
 
-        var emptyToStringMethod = new CodeMemberMethod
-        {
-            Name = "ToString",
-            ReturnType = new CodeTypeReference(DomString.FullTypeName)
-        };
+        var emptyToStringMethod = Base.EmptyPublicMethod(DomString.FullTypeName, "ToString");
+
         emptyToStringMethod.Statements.Add(
             new CodeMethodReturnStatement(
                 new CodeObjectCreateExpression(DomString.FullTypeName)));
@@ -66,11 +64,17 @@ internal static class Base
 
     public static CodeMemberMethod EmptyPublicMethod(string returnType, string name)
     {
-        return new CodeMemberMethod()
+        return new CodeMemberMethod
         {
             Name = name,
             ReturnType = new CodeTypeReference(returnType),
-            Attributes = MemberAttributes.Public
+            Attributes = MemberAttributes.Public | MemberAttributes.Final
         };
+    }
+
+    public static CodeMethodReturnStatement ReturnVoid()
+    {
+        var voidTypeObject = new CodeObjectCreateExpression(DomVoid.FullTypeName); 
+        return new CodeMethodReturnStatement(voidTypeObject);
     }
 }

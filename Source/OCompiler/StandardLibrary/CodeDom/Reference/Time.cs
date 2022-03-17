@@ -62,15 +62,12 @@ internal static class Time
         
         var thread = new CodeTypeReferenceExpression(typeof(System.Threading.Thread));
         var sleepStatement = new CodeMethodInvokeExpression(thread, sleepMethodName, @double);
-        
-        var returnValue = new CodeObjectCreateExpression(DomVoid.FullTypeName);
-        var returnStatement = new CodeMethodReturnStatement(returnValue);
-        
+
         var sleepMethod = Base.EmptyPublicMethod(DomVoid.FullTypeName, sleepMethodName);
-        sleepMethod.Parameters.Add(new CodeParameterDeclarationExpression(DomReal.FullTypeName, paramName));
+        sleepMethod.Parameters.Add(new CodeParameterDeclarationExpression(DomInt.FullTypeName, paramName));
         
         sleepMethod.Statements.Add(sleepStatement);
-        sleepMethod.Statements.Add(returnStatement);
+        sleepMethod.Statements.Add(Base.ReturnVoid());
 
         timeType.Members.Add(sleepMethod);
     }

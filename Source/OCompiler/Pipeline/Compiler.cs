@@ -1,8 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 
 using OCompiler.Analyze.Lexical;
+using OCompiler.Analyze.Lexical.Tokens;
+using OCompiler.Analyze.Lexical.Tokens.BooleanLiterals;
 using OCompiler.Analyze.Semantics;
 using OCompiler.Analyze.Syntax;
 using OCompiler.Exceptions;
@@ -16,13 +20,17 @@ namespace OCompiler.Pipeline
     internal class Compiler
     {
         public string SourceFilePath { get; }
+        public string PathToExecutable { get; }
+        public string MainClass { get; }
 
-        public Compiler(string sourceFilePath)
+        public Compiler(string sourceFilePath, string exePath, string mainClass)
         {
             SourceFilePath = sourceFilePath;
+            PathToExecutable = exePath;
+            MainClass = mainClass;
         }
 
-        public Assembly Run()
+        public void Run()
         {
             var tokenizer = new Tokenizer(SourceFilePath);
             var tokens = tokenizer.GetTokens().ToList();
@@ -40,10 +48,21 @@ namespace OCompiler.Pipeline
 
             var validator = new TreeValidator(tokenTree);
 
-            var compileUnit = new CompileUnit(validator); 
+            var compileUnit = new CompileUnit(validator, MainClass);
+            var code = new Code(compileUnit);
             
-            var generator = new Emitter(validator.ValidatedClasses);
-            return generator.Assembly;
+            
+            using (var file = new StreamWriter(PathToExecutable.Replace("exe", "cs")))
+            {
+                file.Write(code.Text);
+                file.Flush();
+            }
+
+            var codeGenerator = new CodeGenerator(compileUnit);
+            codeGenerator.Build(PathToExecutable);
+
+            //var generator = new Emitter(validator.ValidatedClasses);
+            //return generator.Assembly;
         }
     }
 }

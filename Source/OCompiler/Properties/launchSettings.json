@@ -24,6 +24,14 @@
     "Sum of two numbers": {
       "commandName": "Project",
       "commandLineArgs": "$(SolutionDir)/Examples/sum-of-two.ol Main 42 90"
+    },
+    "Test magic": {
+      "commandName": "Project",
+      "commandLineArgs": "$(SolutionDir)/Examples/simple.ol $(SolutionDir)/Build/mogus/mogus.exe Main"
+    },
+    "Compilation v2 Tic-tac-toe": {
+      "commandName": "Project",
+      "commandLineArgs": "$(SolutionDir)/Examples/tic-tac-toe.ol $(SolutionDir)/Build/mogus/mogus.exe Main"
     }
   }
 }

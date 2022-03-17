@@ -22,6 +22,7 @@ internal static class Real
 
         realType.AddInternalConstructor();
         realType.AddDefaultConstructor();
+        realType.AddRealConstructor();
 
         realType.AddToStringMethod();
         realType.AddToIntegerMethod();
@@ -32,16 +33,17 @@ internal static class Real
         realType.AddMinMethod();
         realType.AddEpsilonMethod();
 
-        realType.AddRealOperatorMethod(CodeBinaryOperatorType.Add, "Plus");
-        realType.AddRealOperatorMethod(CodeBinaryOperatorType.Subtract, "Minus");
-        realType.AddRealOperatorMethod(CodeBinaryOperatorType.Multiply, "Mult");
-        realType.AddRealOperatorMethod(CodeBinaryOperatorType.Divide, "Div");
-        realType.AddRealOperatorMethod(CodeBinaryOperatorType.Modulus, "Mod");
-        realType.AddRealOperatorMethod(CodeBinaryOperatorType.LessThan, "Less");
-        realType.AddRealOperatorMethod(CodeBinaryOperatorType.LessThanOrEqual, "LessEqual");
-        realType.AddRealOperatorMethod(CodeBinaryOperatorType.GreaterThan, "Greater");
-        realType.AddRealOperatorMethod(CodeBinaryOperatorType.GreaterThanOrEqual, "GreaterEqual");
-        realType.AddRealOperatorMethod(CodeBinaryOperatorType.ValueEquality, "Equal");
+        realType.AddBinaryOperatorMethod(CodeBinaryOperatorType.Add, "Plus");
+        realType.AddBinaryOperatorMethod(CodeBinaryOperatorType.Subtract, "Minus");
+        realType.AddBinaryOperatorMethod(CodeBinaryOperatorType.Multiply, "Mult");
+        realType.AddBinaryOperatorMethod(CodeBinaryOperatorType.Divide, "Div");
+        realType.AddBinaryOperatorMethod(CodeBinaryOperatorType.Modulus, "Mod");
+        
+        realType.AddBinaryOperatorMethod(CodeBinaryOperatorType.LessThan, "Less");
+        realType.AddBinaryOperatorMethod(CodeBinaryOperatorType.LessThanOrEqual, "LessEqual");
+        realType.AddBinaryOperatorMethod(CodeBinaryOperatorType.GreaterThan, "Greater");
+        realType.AddBinaryOperatorMethod(CodeBinaryOperatorType.GreaterThanOrEqual, "GreaterEqual");
+        realType.AddBinaryOperatorMethod(CodeBinaryOperatorType.ValueEquality, "Equal");
 
         return realType;
     }
@@ -67,27 +69,52 @@ internal static class Real
 
         realType.Members.Add(ctor);
     }
+    
+    private static void AddRealConstructor(this CodeTypeDeclaration realType)
+    {
+        const string paramName = "number";
+        
+        var newValue = new CodeFieldReferenceExpression(
+            new CodeArgumentReferenceExpression(paramName), Base.InternalValueVariableName);
+        
+        var ctor = Base.EmptyPublicConstructor();
+        ctor.Parameters.Add(new CodeParameterDeclarationExpression(FullTypeName, paramName));
+        
+        ctor.Statements.Add(Base.WriteToInternalValue(newValue));
 
-    private static void AddRealOperatorMethod(
-        this CodeTypeDeclaration realType,
+        realType.Members.Add(ctor);
+    }
+
+    private static void AddBinaryOperatorMethod(
+        this CodeTypeDeclaration integerType,
         CodeBinaryOperatorType op,
         string methodName)
     {
         const string rhsOperandName = "number";
+
+        var returnType = op switch
+        {
+            CodeBinaryOperatorType.Add => FullTypeName,
+            CodeBinaryOperatorType.Subtract => FullTypeName,
+            CodeBinaryOperatorType.Multiply => FullTypeName,
+            CodeBinaryOperatorType.Divide => FullTypeName,
+            CodeBinaryOperatorType.Modulus => FullTypeName,
+            _ => DomBool.FullTypeName
+        };
 
         var lhs = Base.ReferenceInternalValue();
         var rhs = new CodeFieldReferenceExpression(
             new CodeArgumentReferenceExpression(rhsOperandName), Base.InternalValueVariableName);
         var newValue = new CodeBinaryOperatorExpression(lhs, op, rhs);
 
-        var returnValue = new CodeObjectCreateExpression(FullTypeName, newValue);
+        var returnValue = new CodeObjectCreateExpression(returnType, newValue);
         var returnStatement = new CodeMethodReturnStatement(returnValue);
 
-        var operatorMethod = Base.EmptyPublicMethod(FullTypeName, methodName);
+        var operatorMethod = Base.EmptyPublicMethod(returnType, methodName);
         operatorMethod.Parameters.Add(new CodeParameterDeclarationExpression(FullTypeName, rhsOperandName));
         operatorMethod.Statements.Add(returnStatement);
 
-        realType.Members.Add(operatorMethod);
+        integerType.Members.Add(operatorMethod);
     }
 
     private static void AddToStringMethod(this CodeTypeDeclaration realType)

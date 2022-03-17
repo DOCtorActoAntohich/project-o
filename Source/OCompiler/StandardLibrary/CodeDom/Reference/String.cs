@@ -68,8 +68,9 @@ internal static class String
         const string paramName = "obj";
         ctor.Parameters.Add(new CodeParameterDeclarationExpression(DomAnyRef.FullTypeName, paramName));
 
-        var newValue = new CodeMethodInvokeExpression(
+        var call = new CodeMethodInvokeExpression(
             new CodeArgumentReferenceExpression(paramName), "ToString");
+        var newValue = new CodeFieldReferenceExpression(call, Base.InternalValueVariableName);
         ctor.Statements.Add(Base.WriteToInternalValue(newValue));
 
         
@@ -83,8 +84,9 @@ internal static class String
         const string paramName = "number";
         ctor.Parameters.Add(new CodeParameterDeclarationExpression(DomInt.FullTypeName, paramName));
         
-        var newValue = new CodeMethodInvokeExpression(
+        var call = new CodeMethodInvokeExpression(
             new CodeArgumentReferenceExpression(paramName), "ToString");
+        var newValue = new CodeFieldReferenceExpression(call, Base.InternalValueVariableName);
         ctor.Statements.Add(Base.WriteToInternalValue(newValue));
 
 
@@ -98,8 +100,9 @@ internal static class String
         const string paramName = "number";
         ctor.Parameters.Add(new CodeParameterDeclarationExpression(DomReal.FullTypeName, paramName));
         
-        var newValue = new CodeMethodInvokeExpression(
+        var call = new CodeMethodInvokeExpression(
             new CodeArgumentReferenceExpression(paramName), "ToString");
+        var newValue = new CodeFieldReferenceExpression(call, Base.InternalValueVariableName);
         ctor.Statements.Add(Base.WriteToInternalValue(newValue));
 
 
@@ -113,8 +116,9 @@ internal static class String
         const string paramName = "number";
         ctor.Parameters.Add(new CodeParameterDeclarationExpression(DomBool.FullTypeName, paramName));
         
-        var newValue = new CodeMethodInvokeExpression(
+        var call = new CodeMethodInvokeExpression(
             new CodeArgumentReferenceExpression(paramName), "ToString");
+        var newValue = new CodeFieldReferenceExpression(call, Base.InternalValueVariableName);
         ctor.Statements.Add(Base.WriteToInternalValue(newValue));
 
 

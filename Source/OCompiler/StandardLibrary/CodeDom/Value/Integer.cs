@@ -22,6 +22,7 @@ internal static class Integer
 
         integerType.AddInternalConstructor();
         integerType.AddDefaultConstructor();
+        integerType.AddIntegerConstructor();
 
         integerType.AddToStringMethod();
         integerType.AddToRealMethod();
@@ -31,16 +32,17 @@ internal static class Integer
         integerType.AddMaxMethod();
         integerType.AddMinMethod();
 
-        integerType.AddIntegerOperatorMethod(CodeBinaryOperatorType.Add, "Plus");
-        integerType.AddIntegerOperatorMethod(CodeBinaryOperatorType.Subtract, "Minus");
-        integerType.AddIntegerOperatorMethod(CodeBinaryOperatorType.Multiply, "Mult");
-        integerType.AddIntegerOperatorMethod(CodeBinaryOperatorType.Divide, "Div");
-        integerType.AddIntegerOperatorMethod(CodeBinaryOperatorType.Modulus, "Mod");
-        integerType.AddIntegerOperatorMethod(CodeBinaryOperatorType.LessThan, "Less");
-        integerType.AddIntegerOperatorMethod(CodeBinaryOperatorType.LessThanOrEqual, "LessEqual");
-        integerType.AddIntegerOperatorMethod(CodeBinaryOperatorType.GreaterThan, "Greater");
-        integerType.AddIntegerOperatorMethod(CodeBinaryOperatorType.GreaterThanOrEqual, "GreaterEqual");
-        integerType.AddIntegerOperatorMethod(CodeBinaryOperatorType.ValueEquality, "Equal");
+        integerType.AddBinaryOperatorMethod(CodeBinaryOperatorType.Add, "Plus");
+        integerType.AddBinaryOperatorMethod(CodeBinaryOperatorType.Subtract, "Minus");
+        integerType.AddBinaryOperatorMethod(CodeBinaryOperatorType.Multiply, "Mult");
+        integerType.AddBinaryOperatorMethod(CodeBinaryOperatorType.Divide, "Div");
+        integerType.AddBinaryOperatorMethod(CodeBinaryOperatorType.Modulus, "Mod");
+        
+        integerType.AddBinaryOperatorMethod(CodeBinaryOperatorType.LessThan, "Less");
+        integerType.AddBinaryOperatorMethod(CodeBinaryOperatorType.LessThanOrEqual, "LessEqual");
+        integerType.AddBinaryOperatorMethod(CodeBinaryOperatorType.GreaterThan, "Greater");
+        integerType.AddBinaryOperatorMethod(CodeBinaryOperatorType.GreaterThanOrEqual, "GreaterEqual");
+        integerType.AddBinaryOperatorMethod(CodeBinaryOperatorType.ValueEquality, "Equal");
 
         return integerType;
     }
@@ -66,23 +68,48 @@ internal static class Integer
 
         integerType.Members.Add(ctor);
     }
+    
+    private static void AddIntegerConstructor(this CodeTypeDeclaration integerType)
+    {
+        const string paramName = "number";
+        
+        var newValue = new CodeFieldReferenceExpression(
+            new CodeArgumentReferenceExpression(paramName), Base.InternalValueVariableName);
+        
+        var ctor = Base.EmptyPublicConstructor();
+        ctor.Parameters.Add(new CodeParameterDeclarationExpression(FullTypeName, paramName));
+        
+        ctor.Statements.Add(Base.WriteToInternalValue(newValue));
 
-    private static void AddIntegerOperatorMethod(
+        integerType.Members.Add(ctor);
+    }
+
+    private static void AddBinaryOperatorMethod(
         this CodeTypeDeclaration integerType,
         CodeBinaryOperatorType op,
         string methodName)
     {
         const string rhsOperandName = "number";
 
+        var returnType = op switch
+        {
+            CodeBinaryOperatorType.Add => FullTypeName,
+            CodeBinaryOperatorType.Subtract => FullTypeName,
+            CodeBinaryOperatorType.Multiply => FullTypeName,
+            CodeBinaryOperatorType.Divide => FullTypeName,
+            CodeBinaryOperatorType.Modulus => FullTypeName,
+            _ => DomBool.FullTypeName
+        };
+
         var lhs = Base.ReferenceInternalValue();
         var rhs = new CodeFieldReferenceExpression(
             new CodeArgumentReferenceExpression(rhsOperandName), Base.InternalValueVariableName);
         var newValue = new CodeBinaryOperatorExpression(lhs, op, rhs);
 
-        var returnValue = new CodeObjectCreateExpression(FullTypeName, newValue);
+        var returnValue = new CodeObjectCreateExpression(returnType, newValue);
         var returnStatement = new CodeMethodReturnStatement(returnValue);
 
-        var operatorMethod = Base.EmptyPublicMethod(FullTypeName, methodName);
+        var operatorMethod = Base.EmptyPublicMethod(returnType, methodName);
         operatorMethod.Parameters.Add(new CodeParameterDeclarationExpression(FullTypeName, rhsOperandName));
         operatorMethod.Statements.Add(returnStatement);
 

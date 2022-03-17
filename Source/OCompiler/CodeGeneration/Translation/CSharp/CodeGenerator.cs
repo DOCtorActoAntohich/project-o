@@ -131,7 +131,7 @@ internal class CodeGenerator
 
         foreach (var diagnostic in failures)
         {
-            Console.Error.WriteLine("\t{0}: {1}", diagnostic.Id, diagnostic.GetMessage());
+            Console.Error.WriteLine($"\t{diagnostic.Location}\t{diagnostic.Id}: {diagnostic.GetMessage()}");
         }
     }
 
