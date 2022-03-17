@@ -177,11 +177,47 @@ internal static class String
     
     private static void AddAtMethod(this CodeTypeDeclaration stringType)
     {
-        // TODO implement this method.
+        const string atMethodName = "At";
+        const string paramName = "index";
+
+        var index = new CodeFieldReferenceExpression(
+            new CodeArgumentReferenceExpression(paramName), Base.InternalValueVariableName);
+        var one = new CodePrimitiveExpression(1);
+        var nextIndex = new CodeBinaryOperatorExpression(index, CodeBinaryOperatorType.Add, one);
+
+        var @string = Base.ReferenceInternalValue();
+        var substr = new CodeMethodInvokeExpression(
+            @string, "Substring", index, nextIndex);
+        
+        var returnValue = new CodeObjectCreateExpression(FullTypeName, substr);
+        var returnStatement = new CodeMethodReturnStatement(returnValue);
+
+        var atMethod = Base.EmptyPublicMethod(FullTypeName, atMethodName);
+        atMethod.Parameters.Add(new CodeParameterDeclarationExpression(DomInt.FullTypeName, paramName));
+
+        atMethod.Statements.Add(returnStatement);
+
+        stringType.Members.Add(atMethod);
     }
     
     private static void AddConcatenateMethod(this CodeTypeDeclaration stringType)
     {
-        // TODO implement this method.
+        const string concatenateMethodName = "Concatenate";
+        const string paramName = "other";
+
+        var lhs = Base.ReferenceInternalValue();
+        var rhs = new CodeFieldReferenceExpression(
+            new CodeArgumentReferenceExpression(paramName), Base.InternalValueVariableName);
+        var concatenatedStrings = new CodeBinaryOperatorExpression(lhs, CodeBinaryOperatorType.Add, rhs);
+
+        var returnValue = new CodeObjectCreateExpression(FullTypeName, concatenatedStrings);
+        var returnStatement = new CodeMethodReturnStatement(returnValue);
+        
+        var concatenateMethod = Base.EmptyPublicMethod(FullTypeName, concatenateMethodName);
+        concatenateMethod.Parameters.Add(new CodeParameterDeclarationExpression(FullTypeName, paramName));
+
+        concatenateMethod.Statements.Add(returnStatement);
+
+        stringType.Members.Add(concatenateMethod);
     }
 }
