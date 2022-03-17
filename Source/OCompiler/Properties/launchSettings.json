@@ -20,6 +20,10 @@
     "Chain calls": {
       "commandName": "Project",
       "commandLineArgs": "$(SolutionDir)/Examples/chain-calls.ol Main 7"
+    },
+    "Inheritance": {
+      "commandName": "Project",
+      "commandLineArgs": "$(SolutionDir)/Examples/inheritance.ol Main"
     }
   }
 }
