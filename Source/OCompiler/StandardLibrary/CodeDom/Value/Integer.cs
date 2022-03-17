@@ -68,9 +68,9 @@ public static class Integer
     }
 
     private static void AddIntegerOperatorMethod(
-    this CodeTypeDeclaration integerType,
-    CodeBinaryOperatorType op,
-    string methodName)
+        this CodeTypeDeclaration integerType,
+        CodeBinaryOperatorType op,
+        string methodName)
     {
         const string rhsOperandName = "number";
 
@@ -91,9 +91,9 @@ public static class Integer
 
     private static void AddToStringMethod(this CodeTypeDeclaration integerType)
     {
-        var creationParam = new CodeMethodInvokeExpression(
+        var intToStr = new CodeMethodInvokeExpression(
             Base.ReferenceInternalValue(), "ToString");
-        var returnValue = new CodeObjectCreateExpression(DomString.FullTypeName, creationParam);
+        var returnValue = new CodeObjectCreateExpression(DomString.FullTypeName, intToStr);
         var returnStatement = new CodeMethodReturnStatement(returnValue);
 
         var toStringMethod = Base.EmptyPublicMethod(DomString.FullTypeName, "ToString");
@@ -120,10 +120,10 @@ public static class Integer
     private static void AddToBooleanMethod(this CodeTypeDeclaration integerType)
     {
         var convertType = new CodeTypeReferenceExpression(typeof(System.Convert));
-        var @boolean = new CodeMethodInvokeExpression(
+        var @bool = new CodeMethodInvokeExpression(
             convertType, "ToBoolean", Base.ReferenceInternalValue());
 
-        var returnValue = new CodeObjectCreateExpression(DomBool.FullTypeName, @boolean);
+        var returnValue = new CodeObjectCreateExpression(DomBool.FullTypeName, @bool);
         var returnStatement = new CodeMethodReturnStatement(returnValue);
 
         var toBoolMethod = Base.EmptyPublicMethod(DomBool.FullTypeName, "ToBoolean");
@@ -134,8 +134,6 @@ public static class Integer
 
     private static void AddNegationMethod(this CodeTypeDeclaration integerType)
     {
-        const string rhsOperandName = "number";
-
         var lhs = Base.ReferenceInternalValue();
         var rhs = new CodePrimitiveExpression(-1);
         var newValue = new CodeBinaryOperatorExpression(lhs, CodeBinaryOperatorType.Multiply, rhs);
@@ -143,8 +141,7 @@ public static class Integer
         var returnValue = new CodeObjectCreateExpression(FullTypeName, newValue);
         var returnStatement = new CodeMethodReturnStatement(returnValue);
 
-        var negativeMethod = Base.EmptyPublicMethod(FullTypeName, "UnaryMinus");
-        negativeMethod.Parameters.Add(new CodeParameterDeclarationExpression(FullTypeName, rhsOperandName));
+        var negativeMethod = Base.EmptyPublicMethod(FullTypeName, "Negative");
         negativeMethod.Statements.Add(returnStatement);
 
         integerType.Members.Add(negativeMethod);
@@ -152,12 +149,13 @@ public static class Integer
 
     private static void AddMaxMethod(this CodeTypeDeclaration integerType)
     {
-        var creationParam = new CodeMethodInvokeExpression(
-            Base.ReferenceInternalValue(), "MaxValue");
-        var returnValue = new CodeObjectCreateExpression(DomInt.FullTypeName, creationParam);
+        const string maxValueFieldName = "MaxValue";
+        var @int = new CodeTypeReferenceExpression(typeof(int));
+        var intMax = new CodeFieldReferenceExpression(@int, maxValueFieldName);
+        var returnValue = new CodeObjectCreateExpression(FullTypeName, intMax);
         var returnStatement = new CodeMethodReturnStatement(returnValue);
 
-        var maxMethod = Base.EmptyPublicMethod(DomInt.FullTypeName, "Max");
+        var maxMethod = Base.EmptyPublicMethod(FullTypeName, "Max");
         maxMethod.Statements.Add(returnStatement);
 
         integerType.Members.Add(maxMethod);
@@ -165,15 +163,15 @@ public static class Integer
 
     private static void AddMinMethod(this CodeTypeDeclaration integerType)
     {
-        var creationParam = new CodeMethodInvokeExpression(
-            Base.ReferenceInternalValue(), "MinValue");
-        var returnValue = new CodeObjectCreateExpression(DomInt.FullTypeName, creationParam);
+        const string minValueFieldName = "MinValue";
+        var @int = new CodeTypeReferenceExpression(typeof(int));
+        var intMin = new CodeFieldReferenceExpression(@int, minValueFieldName);
+        var returnValue = new CodeObjectCreateExpression(FullTypeName, intMin);
         var returnStatement = new CodeMethodReturnStatement(returnValue);
 
-        var minMethod = Base.EmptyPublicMethod(DomInt.FullTypeName, "Min");
+        var minMethod = Base.EmptyPublicMethod(FullTypeName, "Min");
         minMethod.Statements.Add(returnStatement);
 
         integerType.Members.Add(minMethod);
     }
-
 }
