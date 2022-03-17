@@ -9,7 +9,7 @@ class Random is
     end
     
     this (seed: Integer) is 
-        this.value := seed
+        this.value := seed.Mod(this.Mod)
     end
     
     method RandInt(from: Integer, to: Integer) : Integer is
@@ -112,8 +112,6 @@ class TicTacToe is
         end
     
         if this.random.RandInt(1, 5).GreaterEqual(this.level) then
-            IO.WriteLine("Random")
-            
             var row : this.random.RandInt(1, 3)
             var column : this.random.RandInt(1, 3)
             
@@ -128,7 +126,7 @@ class TicTacToe is
     
         var bestMove : 0
         // Cross player.
-        var bestScore : 1000
+        var bestScore : Integer.Max
         // Zero player.
         if player.Equal(this.Zero) then
             bestScore := Integer.Min
@@ -151,7 +149,7 @@ class TicTacToe is
                         var score : this.MinMax(this.Zero, 0)
                         
                         // Minimize.
-                        if score.LessEqual(bestScore) then
+                        if score.Less(bestScore) then
                             bestMove := move
                             bestScore := score
                         end
@@ -162,7 +160,7 @@ class TicTacToe is
                         var score : this.MinMax(this.Cross, 0)
                         
                         // Maximize.
-                        if score.GreaterEqual(bestScore) then
+                        if score.Greater(bestScore) then
                             bestMove := move
                             bestScore := score
                         end
@@ -204,7 +202,7 @@ class TicTacToe is
         end
         
         // Cross player.
-        var bestScore : 1000
+        var bestScore : Integer.Max
         // Zero player.
         if player.Equal(this.Zero) then
             bestScore := Integer.Min
@@ -227,7 +225,7 @@ class TicTacToe is
                         var score : this.MinMax(this.Zero, depth.Plus(1))
                         
                         // Minimize.
-                        if score.LessEqual(bestScore) then
+                        if score.Less(bestScore) then
                             bestScore := score
                         end
                         
@@ -237,7 +235,7 @@ class TicTacToe is
                         var score : this.MinMax(this.Cross, depth.Plus(1))
                         
                         // Maximize.
-                        if score.GreaterEqual(bestScore) then
+                        if score.Greater(bestScore) then
                             bestScore := score
                         end
                     end
@@ -253,7 +251,7 @@ class TicTacToe is
         end
         
         // No moves available.
-        if bestScore.Equal(1000).Or(bestScore.Equal(Integer.Min)) then 
+        if bestScore.Equal(Integer.Max).Or(bestScore.Equal(Integer.Min)) then 
             return 0
         end
         
@@ -358,7 +356,7 @@ class TicTacToe is
         
         // Error.
         IO.WriteLine("Invalid cell!")
-        return 3
+        return -1
     end
     
     method SetCellValue(cell: Integer, value: Integer) : Void is
