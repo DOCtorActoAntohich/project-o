@@ -23,6 +23,10 @@
     },
     "Inheritance": {
       "commandName": "Project",
+      "commandLineArgs": "$(SolutionDir)/Examples/inheritance-simple.ol Main"
+    },
+    "Inheritance with new fields": {
+      "commandName": "Project",
       "commandLineArgs": "$(SolutionDir)/Examples/inheritance.ol Main"
     }
   }
