@@ -26,4 +26,4 @@ jobs:
       uses: actions/upload-artifact@v3.0.0
       with:
         name: OCompiler-${{ matrix.platform }}
-        path: ./Build/bin/Release/*
+        path: ./Build/bin/Release/net60/*
