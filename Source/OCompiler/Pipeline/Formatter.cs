@@ -20,6 +20,7 @@ namespace OCompiler.Pipeline
                 Console.Write(tokenOutput);
             }
             Console.WriteLine();
+            Console.ResetColor();
         }
 
         public static void ShowTokens(IEnumerable<Token> tokens)
@@ -30,7 +31,7 @@ namespace OCompiler.Pipeline
                 Console.ForegroundColor = GetConsoleColor(token);
                 var tokenOutput = token is Whitespace or EndOfFile ? "" : $" '{token.Literal}'";
                 Console.Write(tokenOutput.PadRight(15));
-                Console.ForegroundColor = ConsoleColor.Gray;
+                Console.ResetColor();
                 Console.WriteLine(token.GetType().Name.PadRight(15));
             }
         }
