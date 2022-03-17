@@ -152,16 +152,21 @@ internal class Emitter
 
     private FieldInfo? GetField(string @class, string name)
     {
-        if (_standardTypes.ContainsKey(@class))
-        {
-            return _standardTypes[@class].GetField(name);
-        }
-        
         if (_fieldBuilders.ContainsKey(@class) && _fieldBuilders[@class].ContainsKey(name))
         {
             return _fieldBuilders[@class][name];
         }
-
+        
+        if (_standardTypes.ContainsKey(@class))
+        {
+            var field = _standardTypes[@class].GetField(name);
+            
+            if (field is not null)
+            {
+                return field;
+            }
+        }
+        
         if (GetType(@class) is {BaseType: { } baseType})
         {
             return GetField(baseType.Name, name);
@@ -172,14 +177,6 @@ internal class Emitter
     
     private MethodInfo? GetMethod(string @class, string name, Type[] parameters)
     {
-        if (_standardTypes.ContainsKey(@class))
-        {
-            return _standardTypes[@class].GetMethod(
-                name, 
-                BindingFlags.Instance | BindingFlags.Public, parameters
-            );
-        }
-        
         if (
             _methodBuilders.ContainsKey(@class) && 
             _methodBuilders[@class].ContainsKey(name) && 
@@ -189,6 +186,19 @@ internal class Emitter
             return _methodBuilders[@class][name][parameters];
         }
         
+        if (_standardTypes.ContainsKey(@class))
+        {
+            var method = _standardTypes[@class].GetMethod(
+                name, 
+                BindingFlags.Instance | BindingFlags.Public, parameters
+            );
+
+            if (method is not null)
+            {
+                return method;
+            }
+        }
+
         if (GetType(@class) is {BaseType: {} baseType})
         {
             return GetMethod(baseType.Name, name, parameters);
@@ -199,11 +209,6 @@ internal class Emitter
 
     private ConstructorInfo? GetConstructor(string @class, Type[] parameters)
     {
-        if (_standardTypes.ContainsKey(@class))
-        {
-            return _standardTypes[@class].GetConstructor(parameters);
-        }
-        
         if (
             _constructorBuilders.ContainsKey(@class) &&
             _constructorBuilders[@class].ContainsKey(parameters)
@@ -212,6 +217,16 @@ internal class Emitter
             return _constructorBuilders[@class][parameters];
         }
         
+        if (_standardTypes.ContainsKey(@class))
+        {
+            var constructor = _standardTypes[@class].GetConstructor(parameters);
+            
+            if (constructor is not null)
+            {
+                return constructor;
+            }
+        }
+
         if (GetType(@class) is {BaseType: {} baseType})
         {
             return GetConstructor(baseType.Name, parameters);

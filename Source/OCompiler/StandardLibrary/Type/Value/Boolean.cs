@@ -5,7 +5,12 @@ namespace OCompiler.StandardLibrary.Type.Value;
 public class Boolean : AnyValue
 {
     public bool _value;
-
+    
+    public Boolean()
+    {
+        _value = false;
+    }
+    
     public Boolean(bool p)
     {
         _value = p;
