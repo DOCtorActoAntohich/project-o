@@ -1,11 +1,7 @@
 using System;
 using System.CodeDom;
-using System.Linq;
 using OCompiler.Analyze.Semantics;
-using OCompiler.Analyze.Semantics.Callable;
 using OCompiler.Analyze.Semantics.Class;
-using OCompiler.Analyze.Semantics.Expression;
-using OCompiler.Analyze.Syntax.Declaration.Expression;
 using DomClass  = OCompiler.StandardLibrary.CodeDom.Reference.Class;
 using DomAnyRef = OCompiler.StandardLibrary.CodeDom.Reference.AnyRef;
 using DomIO     = OCompiler.StandardLibrary.CodeDom.Reference.IO;
@@ -21,31 +17,6 @@ namespace OCompiler.CodeGeneration;
 
 internal partial class CompileUnit
 {
-    private CodeTypeDeclaration _currentTypeDeclaration = null!;
-    private CodeMemberMethod? _currentCallable;
-    private ParsedClassInfo? _currentClassInfo;
-    private CallableInfo? _currentCallableInfo;
-
-    private Context CurrentContext()
-    {
-        return new Context(_currentClassInfo!, _currentCallableInfo);
-    }
-
-    private ExpressionInfo ExpressionInfoInCurrentContext(Expression expression)
-    {
-        return new ExpressionInfo(expression, CurrentContext());
-    }
-
-    private bool CurrentCallableHasParameter(string parameterName)
-    {
-        if (_currentCallableInfo == null)
-        {
-            return false;
-        }
-        return _currentCallableInfo.Parameters.Any(parameterInfo => parameterInfo.Name == parameterName);
-    }
-    
-    
     private void AddAllClasses(TreeValidator ast)
     {
         foreach (var classInfo in ast.ValidatedClasses)
@@ -118,7 +89,7 @@ internal partial class CompileUnit
             DomInt.TypeName    => DomInt.Generate(),
             DomReal.TypeName   => DomReal.Generate(),
             
-            DomVoid.TypeName   => DomVoid.Generate(), // bad.
+            DomVoid.TypeName   => DomVoid.Generate(),
             
             _ => throw new Exception($"SUS! This class is not found among Built-Ins: {builtClassInfo.Name}")
         };
