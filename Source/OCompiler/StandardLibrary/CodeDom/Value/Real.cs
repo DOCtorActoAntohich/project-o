@@ -6,7 +6,7 @@ using DomBool = OCompiler.StandardLibrary.CodeDom.Value.Boolean;
 
 namespace OCompiler.StandardLibrary.CodeDom.Value;
 
-public static class Real
+internal static class Real
 {
     public const string TypeName = "Real";
     public const string FullTypeName = $"{Base.Namespace}.{TypeName}";

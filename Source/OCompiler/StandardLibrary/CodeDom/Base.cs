@@ -3,7 +3,7 @@ using DomString = OCompiler.StandardLibrary.CodeDom.Reference.String;
 
 namespace OCompiler.StandardLibrary.CodeDom;
 
-public static class Base
+internal static class Base
 {
     public const string Namespace = "OLang";
     

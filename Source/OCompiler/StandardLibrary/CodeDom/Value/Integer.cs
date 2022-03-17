@@ -6,7 +6,7 @@ using DomBool = OCompiler.StandardLibrary.CodeDom.Value.Boolean;
 
 namespace OCompiler.StandardLibrary.CodeDom.Value;
 
-public static class Integer
+internal static class Integer
 {
     public const string TypeName = "Integer";
     public const string FullTypeName = $"{Base.Namespace}.{TypeName}";

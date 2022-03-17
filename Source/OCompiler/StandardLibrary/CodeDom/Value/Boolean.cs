@@ -3,7 +3,7 @@ using DomString = OCompiler.StandardLibrary.CodeDom.Reference.String;
 
 namespace OCompiler.StandardLibrary.CodeDom.Value;
 
-public static class Boolean
+internal static class Boolean
 {
     public const string TypeName = "Boolean";
     public const string FullTypeName = $"{Base.Namespace}.{TypeName}";

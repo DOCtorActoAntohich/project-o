@@ -1,9 +1,12 @@
 using System.CodeDom;
 using DomAnyRef = OCompiler.StandardLibrary.CodeDom.Reference.AnyRef;
+using DomInt    = OCompiler.StandardLibrary.CodeDom.Value.Integer;
+using DomReal   = OCompiler.StandardLibrary.CodeDom.Value.Real;
+using DomVoid   = OCompiler.StandardLibrary.CodeDom.Value.Void;
 
 namespace OCompiler.StandardLibrary.CodeDom.Reference;
 
-public static class Time
+internal static class Time
 {
     public const string TypeName = "Time";
     public const string FullTypeName = $"{Base.Namespace}.{TypeName}";
@@ -12,7 +15,63 @@ public static class Time
     {
         var timeType = Base.GenerateWithDefaultToString(TypeName);
         timeType.BaseTypes.Add(new CodeTypeReference(DomAnyRef.FullTypeName));
+        
+        timeType.AddCurrentTimeMethod();
+        timeType.AddSleepMethod();
 
         return timeType;
+    }
+
+    private static void AddCurrentTimeMethod(this CodeTypeDeclaration timeType)
+    {
+        const string currentTimeMethodName = "Current";
+
+        var time = new CodeTypeReference(typeof(System.DateTime));
+        var timeExpression = new CodeTypeReferenceExpression(time);
+
+        var theParametersForTheBeginning = new CodeExpression[]
+        {
+            new CodePrimitiveExpression(1970),
+            new CodePrimitiveExpression(1),
+            new CodePrimitiveExpression(1)
+        };
+        var whenTheUniverseStartedExisting =
+            new CodeObjectCreateExpression(time, theParametersForTheBeginning);
+
+        var now = new CodePropertyReferenceExpression(timeExpression, "Now");
+        var timeDifference = new CodeMethodInvokeExpression(
+            now, "Subtract", whenTheUniverseStartedExisting);
+
+        var @double = new CodePropertyReferenceExpression(timeDifference, "TotalSeconds");
+        var returnValue = new CodeObjectCreateExpression(DomReal.FullTypeName, @double);
+        var returnStatement = new CodeMethodReturnStatement(returnValue);
+
+        var currentTimeMethod = Base.EmptyPublicMethod(DomReal.FullTypeName, currentTimeMethodName);
+        currentTimeMethod.Statements.Add(returnStatement);
+
+        timeType.Members.Add(currentTimeMethod);
+    }
+    
+    private static void AddSleepMethod(this CodeTypeDeclaration timeType)
+    {
+        const string sleepMethodName = "Sleep";
+        const string paramName = "ms";
+
+        var ms = new CodeArgumentReferenceExpression(paramName);
+        var @double = new CodeFieldReferenceExpression(ms, Base.InternalValueVariableName);
+        
+        var thread = new CodeTypeReferenceExpression(typeof(System.Threading.Thread));
+        var sleepStatement = new CodeMethodInvokeExpression(thread, sleepMethodName, @double);
+        
+        var returnValue = new CodeObjectCreateExpression(DomVoid.FullTypeName);
+        var returnStatement = new CodeMethodReturnStatement(returnValue);
+        
+        var sleepMethod = Base.EmptyPublicMethod(DomVoid.FullTypeName, sleepMethodName);
+        sleepMethod.Parameters.Add(new CodeParameterDeclarationExpression(DomReal.FullTypeName, paramName));
+        
+        sleepMethod.Statements.Add(sleepStatement);
+        sleepMethod.Statements.Add(returnStatement);
+
+        timeType.Members.Add(sleepMethod);
     }
 }

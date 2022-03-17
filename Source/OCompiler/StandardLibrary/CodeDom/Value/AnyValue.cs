@@ -3,7 +3,7 @@ using DomClass = OCompiler.StandardLibrary.CodeDom.Reference.Class;
 
 namespace OCompiler.StandardLibrary.CodeDom.Value;
 
-public static class AnyValue
+internal static class AnyValue
 {
     public const string TypeName = "AnyValue";
     public const string FullTypeName = $"{Base.Namespace}.{TypeName}";

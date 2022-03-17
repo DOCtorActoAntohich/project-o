@@ -4,7 +4,7 @@ using DomAnyRef = OCompiler.StandardLibrary.CodeDom.Reference.AnyRef;
 
 namespace OCompiler.StandardLibrary.CodeDom.Reference;
 
-public static class IO
+internal static class IO
 {
     public const string TypeName = "IO";
     public const string FullTypeName = $"{Base.Namespace}.{TypeName}";

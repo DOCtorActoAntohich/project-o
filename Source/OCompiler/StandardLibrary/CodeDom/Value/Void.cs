@@ -3,7 +3,7 @@ using DomClass = OCompiler.StandardLibrary.CodeDom.Reference.Class;
 
 namespace OCompiler.StandardLibrary.CodeDom.Value;
 
-public class Void
+internal static class Void
 {
     public const string TypeName = "Void";
     public const string FullTypeName = $"{Base.Namespace}.{TypeName}";
