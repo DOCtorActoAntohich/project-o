@@ -119,15 +119,17 @@ public static class Integer
 
     private static void AddToBooleanMethod(this CodeTypeDeclaration integerType)
     {
-        var creationParam = new CodeMethodInvokeExpression(
-            Base.ReferenceInternalValue(), "ToBoolean");
-        var returnValue = new CodeObjectCreateExpression(DomBool.FullTypeName, creationParam);
+        var convertType = new CodeTypeReferenceExpression(typeof(System.Convert));
+        var @boolean = new CodeMethodInvokeExpression(
+            convertType, "ToBoolean", Base.ReferenceInternalValue());
+
+        var returnValue = new CodeObjectCreateExpression(DomBool.FullTypeName, @boolean);
         var returnStatement = new CodeMethodReturnStatement(returnValue);
 
-        var toBooleanMethod = Base.EmptyPublicMethod(DomBool.FullTypeName, "ToBoolean");
-        toBooleanMethod.Statements.Add(returnStatement);
+        var toBoolMethod = Base.EmptyPublicMethod(DomBool.FullTypeName, "ToBoolean");
+        toBoolMethod.Statements.Add(returnStatement);
 
-        integerType.Members.Add(toBooleanMethod);
+        integerType.Members.Add(toBoolMethod);
     }
 
     private static void AddNegationMethod(this CodeTypeDeclaration integerType)
@@ -151,11 +153,11 @@ public static class Integer
     private static void AddMaxMethod(this CodeTypeDeclaration integerType)
     {
         var creationParam = new CodeMethodInvokeExpression(
-            Base.ReferenceInternalValue(), "Max");
-        var returnValue = new CodeObjectCreateExpression(DomBool.FullTypeName, creationParam);
+            Base.ReferenceInternalValue(), "MaxValue");
+        var returnValue = new CodeObjectCreateExpression(DomInt.FullTypeName, creationParam);
         var returnStatement = new CodeMethodReturnStatement(returnValue);
 
-        var maxMethod = Base.EmptyPublicMethod(DomInt.FullTypeName, "MaxValue");
+        var maxMethod = Base.EmptyPublicMethod(DomInt.FullTypeName, "Max");
         maxMethod.Statements.Add(returnStatement);
 
         integerType.Members.Add(maxMethod);
@@ -164,11 +166,11 @@ public static class Integer
     private static void AddMinMethod(this CodeTypeDeclaration integerType)
     {
         var creationParam = new CodeMethodInvokeExpression(
-            Base.ReferenceInternalValue(), "Min");
-        var returnValue = new CodeObjectCreateExpression(DomBool.FullTypeName, creationParam);
+            Base.ReferenceInternalValue(), "MinValue");
+        var returnValue = new CodeObjectCreateExpression(DomInt.FullTypeName, creationParam);
         var returnStatement = new CodeMethodReturnStatement(returnValue);
 
-        var minMethod = Base.EmptyPublicMethod(DomInt.FullTypeName, "MinValue");
+        var minMethod = Base.EmptyPublicMethod(DomInt.FullTypeName, "Min");
         minMethod.Statements.Add(returnStatement);
 
         integerType.Members.Add(minMethod);
