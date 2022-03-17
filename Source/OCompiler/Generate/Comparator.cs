@@ -8,7 +8,7 @@ internal class Comparator : IEqualityComparer<Type[]>
 {
     public bool Equals(Type[]? x, Type[]? y)
     {
-        if (x.Length != y.Length)
+        if (x!.Length != y!.Length)
         {
             return false;
         }

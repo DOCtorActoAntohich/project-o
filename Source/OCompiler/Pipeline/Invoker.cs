@@ -34,7 +34,19 @@ internal class Invoker
 
     public void Run()
     {
-        Activator.CreateInstance(TargetClass, args: Arguments);
+        try
+        {
+            Activator.CreateInstance(TargetClass, args: Arguments);
+        }
+        catch (Exception exception)
+        {
+            if (exception.InnerException is not null)
+            {
+                exception = exception.InnerException!;
+            }
+            
+            Console.WriteLine($"Error: {exception.GetType().Name}(\"{exception.Message})\"");
+        }
     }
 
     public static ParsedConstructorInfo GetEntryPoint(List<ClassInfo> allClasses, string className, string[] args)
