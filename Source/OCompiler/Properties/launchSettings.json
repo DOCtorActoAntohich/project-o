@@ -1,6 +1,10 @@
 {
   "$schema": "http://json.schemastore.org/launchsettings.json",
   "profiles": {
+    "Inheritance": {
+      "commandName": "Project",
+      "commandLineArgs": "$(SolutionDir)/Examples/inheritance.ol Main"
+    },
     "TicTacToe": {
       "commandName": "Project",
       "commandLineArgs": "$(SolutionDir)/Examples/tic-tac-toe.ol TicTacToe"
