@@ -34,10 +34,18 @@ internal partial class CompileUnit
         FillParsedCallable(callableInfo);
         
         _currentTypeDeclaration.Members.Add(_currentCallable);
+
+        _currentCallable = null;
+        _currentCallableInfo = null;
     }
 
     private void FillParsedCallable(CallableInfo callableInfo)
     {
+        if (_currentCallable == null)
+        {
+            throw new Exception("Somehow the current callable to fill is null...");
+        }
+        
         foreach (var parameter in callableInfo.Parameters)
         {
             var p = new CodeParameterDeclarationExpression(parameter.Type, parameter.Name);

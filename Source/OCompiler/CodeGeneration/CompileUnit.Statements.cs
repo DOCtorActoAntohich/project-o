@@ -88,7 +88,7 @@ internal partial class CompileUnit
 
     private CodeStatement ParsedVariableDeclarationStatement(Variable variable)
     {
-        var variableExpressionInfo = new ExpressionInfo(variable.Expression, CurrentContext());
+        var variableExpressionInfo = ExpressionInfoInCurrentContext(variable.Expression);
 
         return new CodeVariableDeclarationStatement
         {

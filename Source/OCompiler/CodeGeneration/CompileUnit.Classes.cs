@@ -4,6 +4,8 @@ using System.Linq;
 using OCompiler.Analyze.Semantics;
 using OCompiler.Analyze.Semantics.Callable;
 using OCompiler.Analyze.Semantics.Class;
+using OCompiler.Analyze.Semantics.Expression;
+using OCompiler.Analyze.Syntax.Declaration.Expression;
 using DomClass  = OCompiler.StandardLibrary.CodeDom.Reference.Class;
 using DomAnyRef = OCompiler.StandardLibrary.CodeDom.Reference.AnyRef;
 using DomIO     = OCompiler.StandardLibrary.CodeDom.Reference.IO;
@@ -20,17 +22,26 @@ namespace OCompiler.CodeGeneration;
 internal partial class CompileUnit
 {
     private CodeTypeDeclaration _currentTypeDeclaration = null!;
-    private CodeMemberMethod _currentCallable = null!;
-    private ParsedClassInfo _currentClassInfo = null!;
-    private CallableInfo _currentCallableInfo = null!;
+    private CodeMemberMethod? _currentCallable;
+    private ParsedClassInfo? _currentClassInfo;
+    private CallableInfo? _currentCallableInfo;
 
     private Context CurrentContext()
     {
-        return new Context(_currentClassInfo, _currentCallableInfo);
+        return new Context(_currentClassInfo!, _currentCallableInfo);
+    }
+
+    private ExpressionInfo ExpressionInfoInCurrentContext(Expression expression)
+    {
+        return new ExpressionInfo(expression, CurrentContext());
     }
 
     private bool CurrentCallableHasParameter(string parameterName)
     {
+        if (_currentCallableInfo == null)
+        {
+            return false;
+        }
         return _currentCallableInfo.Parameters.Any(parameterInfo => parameterInfo.Name == parameterName);
     }
     
@@ -131,5 +142,7 @@ internal partial class CompileUnit
         {
             AddParsedCallable(method);
         }
+
+        _currentClassInfo = null;
     }
 }
