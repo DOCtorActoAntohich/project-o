@@ -7,7 +7,7 @@ on:
     branches: [ master ]
 
 jobs:
-  linux:
+  build:
     strategy:
       matrix:
         platform: [ubuntu-latest, macos-latest, windows-latest]
@@ -22,7 +22,7 @@ jobs:
       run: dotnet restore
     - name: Build
       run: dotnet build --no-restore --configuration Release
-    - name: Upload a Build Artifact
+    - name: Upload
       uses: actions/upload-artifact@v3.0.0
       with:
         name: OCompiler-${{ matrix.platform }}
