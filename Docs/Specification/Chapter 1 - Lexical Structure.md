@@ -167,9 +167,29 @@ true false
 
 ## Literals
 
+Literal is a source code representation of a value of a primitive type.
+
+Each literal belongs to one and only one of the built-in types.
+
 ### Integer
 
+Integer literal is a sequence of digits that represents integer value.
+
+Since the `Integer` type is a standard **.NET 32-bit signed integer**, the values of integer literal should comply with the following rule:
+
+![signed_integer_limit](https://user-images.githubusercontent.com/49134679/163717203-b5308489-ae24-4a85-99f7-7b9a66c4d6e7.png)
+
 ### Real (floating point)
+
+Real literal represents floating point values.
+
+It is represented with a sequence of two or more digits separated by the dot `.`, for example: `0.0` or `59009.1707`.
+
+For the clarity sake, C-style shortcuts such as `.5` and `5.` are unallowed.
+
+Since the `Real` type is a standard **.NET 32-bit single precision floating-point number**, positive values it can represent should comply with the following rule:
+
+![positive_real_limit](https://user-images.githubusercontent.com/49134679/163717837-9164826e-7dad-4595-88ef-c1139b606ceb.png)
 
 ### Boolean
 
