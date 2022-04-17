@@ -110,6 +110,40 @@ Code style recommendations (not mandatory):
 
 ## Identifiers
 
+Identifier is an unlimited-length character sequence that represents a name for a variable, class, method, or parameter.
+
+It can consist of **Latin ASCII letters** (uppercase `A-Z` and lowercase `a-z`), **digits** (`0-9`), or **underscores** (`_`).
+
+An identifier can only **start with a letter or underscore**, and it **cannot start with a digit**.
+
+An identifier **cannot** have the same name as a **keyword** or a **built-in literal**.
+
+Identifiers are **case-sensitive**.
+
+Examples:
+
+```c
+// Valid identifiers:
+first_name
+ClassName1_magic
+_good_Enough_name_for_parameter_1
+_1_PLUS_1_EQUALS_10
+_   // Often used to discard a value.
+
+
+// Invalid identifiers:
+1st_name
+separate identifiers // Most likely a syntax error because there are two of them.
+
+
+// The following identifiers are all different,
+// Because identifiers are case-sensitive:
+name
+Name
+nAmE
+NAME
+```
+
 ## Keywords
 
 ## Literals
