@@ -47,8 +47,7 @@ class Main is    // Everything before slashes remains, the rest is discarded.
     this is
     end
 
-    // The declaration will be ignored
-    // because it was commented out:
+    // The declaration will be ignored because it is commented out:
     // var number : 0
 end
 ```
@@ -87,7 +86,7 @@ end
 ```c
 /* This is commented out
   /* This might look like a nested comment,
-     But it's actual header is on the first line
+     But it's actual header is on the first line.
   */
   * The footer on the previous line has closed the comment already, so there is a syntax error.
   * The footer on the next line will not save from it.
@@ -97,9 +96,9 @@ end
 Multi-line comments can be used as single line comments too:
 
 ```c
-/* This is a single line comment*/
+/* This is a single line comment. */
 class Main is
-    var value : /* Bad practice but works */ 5
+    var value : /* Bad practice but works. */ 5
 end
 ```
 
@@ -193,10 +192,11 @@ Since the `Real` type is a standard **.NET 32-bit single precision floating-poin
 
 ### Boolean
 
-A `Boolean` type has only two values: `true` and `false`. Both of them consist of Latin ASCII letters.
+A `Boolean` type has only two values: `true` and `false`. Both of them consist of **Latin ASCII letters**.
 
-These two literals are reserved, and cannot be used as identifiers.
-However, the following identifiers are valid (although it is not recommended to name variables this way):
+These two literals are **reserved**, and **cannot be used as identifiers**.
+
+However, the following identifiers are valid (although it is **NOT recommended** to name variables this way):
 
 ```c
 True
