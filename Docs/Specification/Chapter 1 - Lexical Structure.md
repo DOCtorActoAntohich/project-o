@@ -207,6 +207,14 @@ _false
 
 ### String literals
 
+A string literal consists of zero or more characters enclosed in double quotes:
+
+```
+""   // Empty string.
+"The quick brown fox jumps over the lazy dog!"
+"The cost is 5$, but with a 50% discount it's 2.5$."
+```
+
 ### Separators
 
 ### Operators
