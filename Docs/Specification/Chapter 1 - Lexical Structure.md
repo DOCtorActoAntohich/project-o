@@ -146,6 +146,25 @@ NAME
 
 ## Keywords
 
+Keyword is a reserved identifier that has a special meaning and function in the language.
+
+The following keywords are **reserved**, and **cannot be used as identifiers**:
+
+```
+class extends this method is base
+if then else
+while loop
+end
+var
+return
+```
+
+Note that `true` and `false` might appear to be keywords, but they are technically boolean literals
+
+```
+true false
+```
+
 ## Literals
 
 ### Integer
