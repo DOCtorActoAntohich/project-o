@@ -193,6 +193,18 @@ Since the `Real` type is a standard **.NET 32-bit single precision floating-poin
 
 ### Boolean
 
+A `Boolean` type has only two values: `true` and `false`. Both of them consist of Latin ASCII letters.
+
+These two literals are reserved, and cannot be used as identifiers.
+However, the following identifiers are valid (although it is not recommended to name variables this way):
+
+```c
+True
+true_
+fALSE
+_false
+```
+
 ### String literals
 
 ### Separators
