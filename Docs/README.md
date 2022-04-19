@@ -8,6 +8,8 @@
 - [Chapter 1 - Lexical Structure](Specification/Chapter%201%20-%20Lexical%20Structure.md)
 - [Chapter 2 - Types](Specification/Chapter%202%20-%20Types.md)
 - [Chapter 3 - Syntactic Structure](Specification/Chapter%203%20-%20Syntactic%20Structure.md)
+- [Chapter 4 - Object-Oriented Programming](Specification/Chapter%204%20-%20Object-Oriented%20Programming.md)
+- [Chapter 5 - Generics](Specification/Chapter%205%20-%20Generics.md)
 
 #### Credits
 
