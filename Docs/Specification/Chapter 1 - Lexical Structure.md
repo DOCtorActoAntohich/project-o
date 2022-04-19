@@ -206,3 +206,15 @@ A string literal consists of zero or more characters enclosed in double quotes:
 ### Separators
 
 ### Operators
+
+By the language design, almost all regular symbolic unary and binary operators, often found in other languages, have been replaced with methods with descriptive names.
+
+If they appear in the source code, these operators will cause a compilation error:
+  - Unary operators:
+    - `!`, `-`.
+  - Binary operators:
+    - `+`, `-`, `*`, `/`, `%`, `^`, `&`, `&&`, `|`, `||`.
+
+However, the following operators are supported:
+  - Operator `=` is used to initialize a new variable or field with a value, or to assign a new value to an existing variable or field.
+  - Operator `,` is primarily used to separate the arguments in method declaration, or to separate the parameters in method call.
