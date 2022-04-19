@@ -2,24 +2,9 @@
 
 ## Character set
 
-The O Language on the syntax level supports only the following ASCII characters:
+The O Language on the syntax level supports the whole Unicode range, to the extent of .NET Core 6.0 support of Unicode.
 
-```
-A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
-a b c d e f g h i j k l m n o p q r s t u v w x y z
-0 1 2 3 4 5 6 7 8 9
-( ) { } [ ] < > _ - . , : ; = " #
-```
-
-If the parser meets a symbol that is not listed above, the compilation should fail with the unexpected symbol error.
-
-Additionally, string literals may contain the following characters within themselves:
-
-```
-! @ # $ % ^ & ? * - + = / \ | ` ~ '
-```
-
-In other words, the parser will accept the code if these characters are inside string literals. If the parser finds these symbols outside string literals, or if there are any other symbols that were not listed, the compilation will fail with unexpected symbol error.
+However, characters of reserved language words lie in the range of printable ASCII characters.
 
 ## Input Elements
 
@@ -28,6 +13,9 @@ In other words, the parser will accept the code if these characters are inside s
 The recommended maximum line length is `120` symbols.
 
 The recommended tab size is `4` symbols. However, it is recommended to use **spaces instead of tabs**.
+
+Whitespace characters are matched using [Char.IsWhiteSpace](https://docs.microsoft.com/en-us/dotnet/api/system.char.iswhitespace?view=net-6.0)
+method, so whitespaces are not restricted only to usual spaces and line feed characters.
 
 ## Comments
 
