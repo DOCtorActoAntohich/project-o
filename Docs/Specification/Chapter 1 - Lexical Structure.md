@@ -72,7 +72,7 @@ end
 **Multi-line comments do not support nesting**:
 
 ```c
-/* This is commented out
+/* This is commented out.
   /* This might look like a nested comment,
      But it's actual header is on the first line.
   */
@@ -203,7 +203,7 @@ A string literal consists of zero or more characters enclosed in double quotes:
 "The cost is 5$, but with a 50% discount it's 2.5$."
 ```
 
-### Separators
+String literals are always of a `String` type.
 
 ### Operators
 
