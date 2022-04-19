@@ -1,20 +1,14 @@
 # Types
 
-Project-O is a statically typed language, 
-which means that it must know the types 
-of all variables at compile time.
+Project O is a **statically typed** language, which means that the types of all variables must be known at compile time.
 
 ```java
 class Main is
     this is
-        // Vairable `my_var` has 
-        // type String and value "hi there".
-        // It can not change its type 
-        // unless you declare it again using `var` 
+        // Variable `my_var` has type String and value "hi there".
+        // It can not change its type after being declared.
         var my_var = "hi there"
-
-        var my_var = 3.1415  // Ok, new variable `my_var`
-        my_var = "hi again"  // <-- Compile time error: Cannot assign type String to type Real
+        my_var = 3.1415  // <-- Compile time error: Cannot assign type Real to type String
     end
 end
 ```
