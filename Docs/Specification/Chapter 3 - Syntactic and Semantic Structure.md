@@ -97,9 +97,9 @@ Variables cannot be referenced outside the block they are defined in.
 ```java
 method IsGreater(a: Integer, b: Integer) is
 if a.Greater(b) then
-  var greater = true             // This variable is accessible only within "then" block
+    var greater = true             // This variable is accessible only within "then" block
 else
-  var less = true
+    var less = true
 end
 var result = greater.ToString()  // Error: variable "greater" is not defined
 end
