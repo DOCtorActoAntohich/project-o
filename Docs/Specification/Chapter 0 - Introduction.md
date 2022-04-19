@@ -18,6 +18,29 @@ This section contains the definitions used across the language specification.
 - **Strongly typed language**: a language that does not allow implicit type conversions, so the values of one type cannot be interpreted as the values of another type without explicit programmer's interference.
 - **Weakly typed language**: a language that can implicitly convert types by interpreting values of one type as values of another type.
 
+### Naming conventions
+
+- **Snake case**:
+  - Lower case letters only.
+  - Words separated by underscores.
+  - All abbreviations are written in lower case too.
+  - Example: `advanced_http_server`
+- **Pascal case**:
+  - Each word starts with an upper case letter, but all other letters are in lower case.
+  - No spaces between words, no underscores.
+  - All abbreviations are written in upper case.
+  - Example: `AdvancedHTTPServer`
+- **Camel case**:
+  - Same as Pascal case, but the first word or abbreviation in the name is written in lowercase.
+  - Example: `advancedHTTPServer` or `httpClientQueue`
+- **Constant case**, or **Screaming case**:
+  - Same as Snake case, but all the letters are in the upper case.
+  - Example: `MAX_PLAYER_HEALTH`
+
+### Other
+
+- **Module** - a building unit of a program, usually represents a single file.
+
 ## Memory model
 
 ## Program compilation and execution
