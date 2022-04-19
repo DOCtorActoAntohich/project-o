@@ -99,7 +99,7 @@ Code style recommendations (not mandatory):
 
 Identifier is an unlimited-length character sequence that represents a name for a variable, class, method, or parameter.
 
-It can consist of **Latin ASCII letters** (uppercase `A-Z` and lowercase `a-z`), **digits** (`0-9`), or **underscores** (`_`).
+It can consist of Unicode **letters** and **digits**, as well as **underscores** (`_`).
 
 An identifier can only **start with a letter or underscore**, and it **cannot start with a digit**.
 
@@ -112,6 +112,8 @@ Examples:
 ```c
 // Valid identifiers:
 first_name
+変数
+имя
 ClassName1_magic
 _good_Enough_name_for_parameter_1
 _1_PLUS_1_EQUALS_10
@@ -186,7 +188,7 @@ These two literals are **reserved**, and **cannot be used as identifiers**.
 
 However, the following identifiers are valid (although it is **NOT recommended** to name variables this way):
 
-```c
+```typescript
 True
 true_
 fALSE
@@ -197,24 +199,77 @@ _false
 
 A string literal consists of zero or more characters enclosed in double quotes:
 
-```
+```typescript
 ""   // Empty string.
 "The quick brown fox jumps over the lazy dog!"
 "The cost is 5$, but with a 50% discount it's 2.5$."
 ```
 
+Note that line feed in the string is completely valid: 
+```typescript
+"This is an example of a string that
+spans across multiple lines"
+```
+
 String literals are always of a `String` type.
+
+### Separators
+
+#### Statement separators
+
+There is no separators for statements.
+
+
+#### Block separators
+
+Blocks like methods and classes are separated by keywords `begin` and `end`.
+
+For loops and conditionals there are also special keywords defined, see section [Keywords](#Keywords).
+
+
+#### Other delimiters
+
+Dot `.` is used to access methods and fields of the object in the form `<Object>.<Member>`:
+
+```typescript
+var a: Integer = 5
+a.Plus(1)  // call method Plus of the object a, which is of type Integer
+```
+
+Equals sign `=` is used to give a variable or field initial value,
+as well as to assign the new value to existing variable or field:
+```typescript
+var a: Integer = 1  // set initial value of a to 1
+a = 2               // store 2 in variable a
+```
+
+Parentheses `(` `)` and commas `,` are used to define methods parameters and to pass parameters on method calls.
+
+If a method **is called** without arguments, parentheses are still necessary:
+
+```typescript
+Integer(1).Plus(1)    // returns 2
+Integer(1).ToString() // returns "1"
+Integer(1).ToString   // is just a method reference — method is not called
+```
+
+Angle brackets `<` `>` are used to denote generic types:
+
+```typescript
+var a: List<Integer> = []
+```
+
 
 ### Operators
 
-By the language design, almost all regular symbolic unary and binary operators, often found in other languages, have been replaced with methods with descriptive names.
+By the language design, all regular symbolic unary and binary operators, often found in other languages
+have been replaced with methods with descriptive names.
 
-If they appear in the source code, these operators will cause a compilation error:
-  - Unary operators:
-    - `!`, `-`.
-  - Binary operators:
-    - `+`, `-`, `*`, `/`, `%`, `^`, `&`, `&&`, `|`, `||`.
-
-However, the following operators are supported:
-  - Operator `=` is used to initialize a new variable or field with a value, or to assign a new value to an existing variable or field.
-  - Operator `,` is primarily used to separate the arguments in method declaration, or to separate the parameters in method call.
+So, instead of
+```typescript
+a = a * 7 + 9
+```
+One should write
+```typescript
+a = a.Mult(7).Plus(9)
+```
