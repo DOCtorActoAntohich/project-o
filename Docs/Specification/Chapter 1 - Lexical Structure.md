@@ -265,11 +265,11 @@ var a: List<Integer> = []
 By the language design, all regular symbolic unary and binary operators, often found in other languages
 have been replaced with methods with descriptive names.
 
-So, instead of
+So, instead of the following:
 ```typescript
 a = a * 7 + 9
 ```
-One should write
+One should write:
 ```typescript
 a = a.Mult(7).Plus(9)
 ```
