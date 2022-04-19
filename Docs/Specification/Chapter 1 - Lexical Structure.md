@@ -48,7 +48,7 @@ Code style recommendations (not mandatory):
 
 ### Multi-line comments
 
-Multi-line comments are wrapped between the header `/*` and the footer `*/`. Everything between the header and the footer is considered a whitespace (i.e. fully discared).
+Multi-line comments are wrapped between the header `/*` and the footer `*/`. Everything between the header and the footer is considered a whitespace (i.e. fully discarded).
 
 ```c
 /*
@@ -148,7 +148,7 @@ var
 return
 ```
 
-Note that `true` and `false` might appear to be keywords, but they are technically boolean literals
+Note that `true` and `false` might appear to be keywords, but they are technically Boolean literals:
 
 ```
 true false
@@ -174,7 +174,7 @@ Real literal represents floating point values.
 
 It is represented with a sequence of two or more digits separated by the dot `.`, for example: `0.0` or `59009.1707`.
 
-For the clarity sake, C-style shortcuts such as `.5` and `5.` are unallowed.
+For the clarity sake, C-style shortcuts such as `.5` and `5.` are not permitted.
 
 Since the `Real` type is a standard **.NET 32-bit single precision floating-point number**, positive values it can represent should comply with the following rule:
 
@@ -205,7 +205,7 @@ A string literal consists of zero or more characters enclosed in double quotes:
 "The cost is 5$, but with a 50% discount it's 2.5$."
 ```
 
-Note that line feed in the string is completely valid: 
+Note that line feed in the string is completely valid:
 ```typescript
 "This is an example of a string that
 spans across multiple lines"

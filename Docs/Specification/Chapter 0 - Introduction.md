@@ -1,7 +1,7 @@
 # Introduction
 
 `The O Language`, or `The Project O` is a general-purpose class-based Object-Oriented language.
-The initial language design was influended by other languages such as Pascal and C#.
+The initial language design was influenced by other languages such as Pascal and C#.
 The target platform for the O Language programs is `.NET 6` (and all systems that can run it), which defines `C#10` as the initial implementation language.
 
 The key design idea of The Project O is to avoid **runtime errors** caused by **implicit type casts**. This implies that The O Language is **statically and strongly typed**.
