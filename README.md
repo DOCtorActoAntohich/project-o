@@ -13,7 +13,17 @@ The target platform of the project is `.NET 6`. It is required to have it instal
 1. Open the `.sln` file in Visual Studio or Rider.
 2. Click `Build Solution` or `Build Project`.
 
-### How to run programs in The O language
+### How to run programs from Visual Studio / Rider
+
+You can do either of the following:
+- Create a new launch setting based on existing ones.
+- Edit any program in `Examples` folder.
+
+After that, select the desired launch configuration and press `Launch`. Your IDE should automagically build a compiler for you, and then run the program.
+
+Also, be sure to read through the next section.
+
+### How to run programs from the command line
 
 *Note: currently The O language programs can only be interpreted because `.NET 6` does not allow to save binary files. We will be working on this issue soon.*
 
