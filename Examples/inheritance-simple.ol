@@ -1,6 +1,6 @@
 class Main is
 	this is
-		var somePhone = NotMyPhone
+		var somePhone = NotMyPhone()
 		somePhone.Turn_on()
 	end
 end
@@ -9,11 +9,11 @@ class Phone is
 	var serial = 0
 
 	method Turn_on() : Void is
-		if this.serial.Equal(0).Not then 
-			IO.Write("Turn on the phone with number ")
-			IO.WriteLine(this.serial.ToString())
+		if this.serial.Equal(0).Not() then 
+			IO().Write("Turn on the phone with number ")
+			IO().WriteLine(this.serial.ToString())
 		else
-			IO.WriteLine("It's the basic phone, cannot turn it on")
+			IO().WriteLine("It's the basic phone, cannot turn it on")
 		end
 	end
 end
