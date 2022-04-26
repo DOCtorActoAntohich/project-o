@@ -27,7 +27,7 @@ Also, be sure to read through the next section.
 
 *Note: currently The O language programs can only be interpreted because `.NET 6` does not allow to save binary files. We will be working on this issue soon.*
 
-> To get familiar with the language, read more about the language documentation (links are in the bottom).
+> To get familiar with the language, read more about the language documentation (see [Additional information](#additional-information)).
 
 To run the O language program, you should save it to a file with `.ol` format.
 Then, run the compiler with the following command:
