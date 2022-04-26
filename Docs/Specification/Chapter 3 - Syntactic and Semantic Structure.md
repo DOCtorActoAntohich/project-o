@@ -107,7 +107,7 @@ end
 ### Variable assignments 
 Assignment is stated using `(name) = (value)` syntax.
 ```java
-var a : 6
+var a = 6
 a = a.Plus(8)
 ```
 Value **must be of the same type** the variable is defined with.
