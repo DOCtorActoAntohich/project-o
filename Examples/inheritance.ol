@@ -1,16 +1,16 @@
 class Main is
     this is
-        var cat : SuperCat("James", "LaserEyes")
+        var cat = SuperCat("James", "LaserEyes")
         
-        IO.WriteLine(cat.Fight())
+        IO().WriteLine(cat.Fight())
     end
 end
 
 class Animal is
-    var name : String
+    var name = String()
     
     this (name: String) is
-        this.name := name
+        this.name = name
     end
     
     method Sound() : String is
@@ -31,11 +31,11 @@ end
 
 
 class SuperCat extends Cat is
-    var ability : String
+    var ability = String()
 
     this (name: String, ability: String) is
         base(name)
-        this.ability := ability
+        this.ability = ability
     end
 
     method Fight() : String is

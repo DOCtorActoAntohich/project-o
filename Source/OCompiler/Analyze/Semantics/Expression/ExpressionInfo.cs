@@ -42,7 +42,7 @@ internal class ExpressionInfo
     {
         var type = Expression.Token switch
         {
-            Identifier identifier => ResolveType(identifier),
+            Identifier => ResolveType(),
             Lexical.Tokens.Keywords.This => Context.Class.Name,
             Lexical.Tokens.Keywords.Base => ResolveBaseReference(),
             IntegerLiteral => "Integer",
@@ -80,12 +80,6 @@ internal class ExpressionInfo
                     primaryClass = ClassTree.TraversedClasses[type];
                     break;
                 case Syntax.Declaration.Expression.Expression childExpression:
-                    // Check if there is a method with this name and no parameters
-                    if (primaryClass.GetMethodReturnType(childExpression.Token.Literal, new()) != null)
-                    {
-                        childInfo.Expression = childExpression.ReplaceWithCall();
-                        continue;
-                    }
                     var fieldName = childExpression.Token.Literal;
                     if (!primaryClass.HasField(fieldName))
                     {
@@ -132,16 +126,21 @@ internal class ExpressionInfo
         }
         return type;
     }
-    private string ResolveType(Identifier identifier)
+    private string ResolveType()
     {
-        var classOrVariable = identifier.Literal;
+        var classOrVariable = Expression.Token.Literal;
         if (ClassTree.ClassExists(classOrVariable))
         {
-            return classOrVariable;
+            if (Expression is Call)
+            {
+                return classOrVariable;
+            }
+            throw new SyntaxError(Expression.Token.Position, "Constructors must be explicitly called");
         }
+
         if (Context.Callable == null)
         {
-            throw new UnknownNameError(identifier.Position, $"Unknown class {classOrVariable}");
+            throw new UnknownNameError(Expression.Token.Position, $"Unknown class {classOrVariable}");
         }
 
         var methodParameterType = Context.Callable.GetParameterType(classOrVariable);
@@ -152,7 +151,7 @@ internal class ExpressionInfo
 
         if (!Context.Callable.LocalVariables.ContainsKey(classOrVariable))
         {
-            throw new UnknownNameError(identifier.Position, $"Use of unassigned variable {classOrVariable}");
+            throw new UnknownNameError(Expression.Token.Position, $"Use of unassigned variable {classOrVariable}");
         }
 
         var localVarInfo = Context.Callable.LocalVariables[classOrVariable];
