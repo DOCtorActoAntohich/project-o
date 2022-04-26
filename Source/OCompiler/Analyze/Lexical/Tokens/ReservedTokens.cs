@@ -22,7 +22,7 @@ namespace OCompiler.Analyze.Lexical.Tokens
             RegisterToken<Delimiters.Dot>();
             RegisterToken<Delimiters.Colon>();
             RegisterToken<Delimiters.Comma>();
-            RegisterToken<Delimiters.Assign>();
+            RegisterToken<Delimiters.Equals>();
             RegisterToken<Delimiters.StringQuote>();
             RegisterToken<Delimiters.StringQuoteEscape>();
             RegisterToken<Delimiters.LeftParenthesis>();

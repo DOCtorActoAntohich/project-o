@@ -27,9 +27,9 @@ internal class Variable : IBodyStatement
         }
         
         // Assign delimiter.
-        if (tokens.Next() is not Lexical.Tokens.Delimiters.Colon)
+        if (tokens.Next() is not Lexical.Tokens.Delimiters.Equals)
         {
-            throw new SyntaxError(tokens.Current().Position, "Expected expression");
+            throw new SyntaxError(tokens.Current().Position, "Expected assignment");
         }
 
         // Get next token.

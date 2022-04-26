@@ -23,7 +23,7 @@ internal class Assignment : IStatement
         }
         
         // Assign delimiter.
-        if (tokens.Current() is not Assign)
+        if (tokens.Current() is not Lexical.Tokens.Delimiters.Equals)
         {
             tokens.RestoreIndex(index);
             assignment = null;
