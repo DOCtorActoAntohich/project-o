@@ -6,7 +6,29 @@ A compiler for the O language is made for educational purposes.
 
 ## How to build and run programs
 
-Soon:tm:
+The target platform of the project is `.NET 6`. It is required to have it installed.
+
+### How to compile a compiler
+
+1. Open the `.sln` file in Visual Studio or Rider.
+2. Click `Build Solution` or `Build Project`.
+
+### How to run programs in The O language
+
+*Note: currently The O language programs can only be interpreted because `.NET 6` does not allow to save binary files. We will be working on this issue soon.*
+
+> To get familiar with the language, read more about the language documentation (links are in the bottom).
+
+To run the O language program, you should save it to a file with `.ol` format.
+Then, run the compiler with the following command:
+
+```
+dotnet OCompiler <module_name> <class_name> [parameters]
+```
+
+1. `module_name` is a path to your `.ol` file.
+2. `class_name` is a name of class whose constructor will be an entry point of the program.
+3. `parameters` is a space-separated list of parameters for the class constructor (they can only be of a primitive built-in type).
 
 ## Additional information
 
