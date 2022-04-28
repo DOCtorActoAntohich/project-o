@@ -67,7 +67,8 @@ List is compound type, meaning it stores multiple values **of the same type** to
 
 ```java
 var lst: List<Integer> = []              // empty list of integers
-lst = [1, 2, 3]                          // list with 3 integers 
+lst = [1, 2, 3]                          // list with 3 integers
+lst.Append(1337)
 var last = lst[lst.Length().Minus(1)]    // access to last item
 ```
 
