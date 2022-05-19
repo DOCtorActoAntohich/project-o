@@ -18,7 +18,7 @@ internal class ParsedClassInfo : ClassInfo
     public List<ParsedConstructorInfo> Constructors { get; } = new();
     public Context Context { get; }
 
-    private readonly static Dictionary<string, ParsedClassInfo> parsedClasses = new();
+    private static readonly Dictionary<string, ParsedClassInfo> ParsedClasses = new();
 
     private ParsedClassInfo(Syntax.Declaration.Class.Class parsedClass)
     {
@@ -95,27 +95,27 @@ internal class ParsedClassInfo : ClassInfo
     public static ParsedClassInfo GetByClass(Syntax.Declaration.Class.Class parsedClass)
     {
         var name = parsedClass.Name.Literal;
-        if (parsedClasses.TryGetValue(name, out var classInfo) && classInfo is not EmptyParsedClassInfo)
+        if (ParsedClasses.TryGetValue(name, out var classInfo) && classInfo is not EmptyParsedClassInfo)
         {
             return classInfo;
         }
 
         var newInfo = new ParsedClassInfo(parsedClass);
-        foreach (var derivedClass in parsedClasses.Values.Where(
+        foreach (var derivedClass in ParsedClasses.Values.Where(
             c => c.BaseClass != null && c.BaseClass.Name == name
         ))
         {
             derivedClass.BaseClass = newInfo;
         }
-        parsedClasses[name] = newInfo;
+        ParsedClasses[name] = newInfo;
         return newInfo;
     }
 
     public static ClassInfo GetByName(string name)
     {
-        if (parsedClasses.ContainsKey(name))
+        if (ParsedClasses.ContainsKey(name))
         {
-            return parsedClasses[name];
+            return ParsedClasses[name];
         }
         if (BuiltClassInfo.StandardClasses.ContainsKey(name))
         {
@@ -123,16 +123,15 @@ internal class ParsedClassInfo : ClassInfo
         }
 
         var newClassInfo = new EmptyParsedClassInfo(name);
-        parsedClasses.Add(name, newClassInfo);
+        ParsedClasses.Add(name, newClassInfo);
         return newClassInfo;
     }
 
     public override string? GetMethodReturnType(string name, List<string> argumentTypes)
     {
-        var type = Methods.Where(
+        var type = Methods.FirstOrDefault(
             m => m.Name == name &&
-            m.Parameters.Select(p => p.Type).SequenceEqual(argumentTypes)
-        ).FirstOrDefault()?.ReturnType;
+                 m.Parameters.Select(p => p.Type).SequenceEqual(argumentTypes))?.ReturnType;
 
         if (type == null && BaseClass != null)
         {
@@ -144,9 +143,9 @@ internal class ParsedClassInfo : ClassInfo
 
     public override ParsedConstructorInfo? GetConstructor(List<string> argumentTypes)
     {
-        var constructor = Constructors.Where(
-            c => c.Parameters.Select(p => p.Type).SequenceEqual(argumentTypes)
-        ).FirstOrDefault();
+        var constructor = Constructors.FirstOrDefault(
+            c => c.Parameters.Select(
+                p => p.Type).SequenceEqual(argumentTypes));
 
         return constructor;
     }
@@ -159,7 +158,7 @@ internal class ParsedClassInfo : ClassInfo
 
     public ParsedFieldInfo? GetFieldInfo(string name)
     {
-        var field = Fields.Where(f => f.Name == name).FirstOrDefault();
+        var field = Fields.FirstOrDefault(f => f.Name == name);
         if (field == null && BaseClass is ParsedClassInfo parsedBaseClass) {
             field = parsedBaseClass.GetFieldInfo(name);
         }
@@ -183,7 +182,7 @@ internal class ParsedClassInfo : ClassInfo
 
     public void AddFieldType(string name, string type)
     {
-        var field = Fields.Where(f => f.Name == name).FirstOrDefault();
+        var field = Fields.FirstOrDefault(f => f.Name == name);
         if (field != null && field.Type == null)
         {
             field.Expression.ValidateExpression();
