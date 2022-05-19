@@ -47,7 +47,7 @@ internal class AnnotatedSyntaxTree
         return @string.ToString();
     }
 
-    public void ValidateConstructors(ParsedClassInfo classInfo)
+    private void ValidateConstructors(ParsedClassInfo classInfo)
     {
         foreach (var constructor in classInfo.Constructors)
         {
@@ -55,7 +55,7 @@ internal class AnnotatedSyntaxTree
         }
     }
 
-    public void ValidateMethods(ParsedClassInfo classInfo)
+    private void ValidateMethods(ParsedClassInfo classInfo)
     {
         foreach (var method in classInfo.Methods)
         {
@@ -63,7 +63,7 @@ internal class AnnotatedSyntaxTree
         }
     }
 
-    public void ValidateFields(ParsedClassInfo classInfo)
+    private void ValidateFields(ParsedClassInfo classInfo)
     {
         foreach (var field in classInfo.Fields)
         {
@@ -76,7 +76,7 @@ internal class AnnotatedSyntaxTree
         }
     }
 
-    public void ValidateConstructor(ParsedConstructorInfo constructor, ParsedClassInfo classInfo)
+    private void ValidateConstructor(ParsedConstructorInfo constructor, ParsedClassInfo classInfo)
     {
         foreach (var statement in constructor.Body)
         {
@@ -84,7 +84,7 @@ internal class AnnotatedSyntaxTree
         }
     }
 
-    public void ValidateMethod(ParsedMethodInfo method, ParsedClassInfo classInfo)
+    private void ValidateMethod(ParsedMethodInfo method, ParsedClassInfo classInfo)
     {
         foreach (var statement in method.Body)
         {
@@ -92,7 +92,7 @@ internal class AnnotatedSyntaxTree
         }
     }
 
-    public void ValidateStatement(IBodyStatement statement, ParsedClassInfo classInfo, CallableInfo callable)
+    private void ValidateStatement(IBodyStatement statement, ParsedClassInfo classInfo, CallableInfo callable)
     {
         switch (statement)
         {
@@ -119,7 +119,7 @@ internal class AnnotatedSyntaxTree
         }
     }
 
-    public void ValidateVariable(Variable variable, ParsedClassInfo classInfo, CallableInfo callable)
+    private void ValidateVariable(Variable variable, ParsedClassInfo classInfo, CallableInfo callable)
     {
         var variableName = variable.Identifier.Literal;
         if (InheritanceTree.ClassExists(variableName))
@@ -144,7 +144,7 @@ internal class AnnotatedSyntaxTree
         varInfo.ValidateExpression();
     }
 
-    public void ValidateAssignment(Assignment assignment, ParsedClassInfo classInfo, CallableInfo callable)
+    private void ValidateAssignment(Assignment assignment, ParsedClassInfo classInfo, CallableInfo callable)
     {
         var variableOrField = assignment.Variable;
         if (variableOrField.Child == null)
@@ -161,7 +161,7 @@ internal class AnnotatedSyntaxTree
         ValidateFieldAssignment(variableOrField.Child.Token.Literal, assignment.Value, classInfo, callable);
     }
 
-    public void ValidateLocalAssignment(
+    private void ValidateLocalAssignment(
         string variableName,
         Syntax.Declaration.Expression.Expression value,
         ParsedClassInfo classInfo,
@@ -184,7 +184,7 @@ internal class AnnotatedSyntaxTree
         }
     }
 
-    public void ValidateFieldAssignment(
+    private void ValidateFieldAssignment(
         string fieldName,
         Syntax.Declaration.Expression.Expression value,
         ParsedClassInfo classInfo,
@@ -204,7 +204,7 @@ internal class AnnotatedSyntaxTree
         }
     }
 
-    public void ValidateIf(If conditional, ParsedClassInfo classInfo, CallableInfo callable)
+    private void ValidateIf(If conditional, ParsedClassInfo classInfo, CallableInfo callable)
     {
         ValidateCondition(conditional.Condition, classInfo, callable);
         foreach (var statement in conditional.Body)
@@ -217,7 +217,7 @@ internal class AnnotatedSyntaxTree
         }
     }
 
-    public void ValidateLoop(While loop, ParsedClassInfo classInfo, CallableInfo callable)
+    private void ValidateLoop(While loop, ParsedClassInfo classInfo, CallableInfo callable)
     {
         ValidateCondition(loop.Condition, classInfo, callable);
         foreach (var statement in loop.Body)
@@ -226,7 +226,7 @@ internal class AnnotatedSyntaxTree
         }
     }
 
-    public void ValidateReturn(Return @return, ParsedClassInfo classInfo, CallableInfo callable)
+    private void ValidateReturn(Return @return, ParsedClassInfo classInfo, CallableInfo callable)
     {
         string methodReturnType = callable switch
         {
@@ -253,7 +253,7 @@ internal class AnnotatedSyntaxTree
         }
     }
 
-    public void ValidateCondition(Syntax.Declaration.Expression.Expression condition, ParsedClassInfo classInfo, CallableInfo callable)
+    private void ValidateCondition(Syntax.Declaration.Expression.Expression condition, ParsedClassInfo classInfo, CallableInfo callable)
     {
         var conditionInfo = new ExpressionInfo(condition, new Context(classInfo, callable));
         conditionInfo.ValidateExpression();
