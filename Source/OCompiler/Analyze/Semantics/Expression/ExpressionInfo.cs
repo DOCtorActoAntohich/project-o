@@ -4,8 +4,6 @@ using OCompiler.Analyze.Semantics.Class;
 using OCompiler.Analyze.Syntax.Declaration.Expression;
 using OCompiler.Exceptions;
 using OCompiler.Exceptions.Semantic;
-
-using System;
 using System.Collections.Generic;
 
 namespace OCompiler.Analyze.Semantics.Expression;
@@ -129,7 +127,7 @@ internal class ExpressionInfo
     private string ResolveType()
     {
         var classOrVariable = Expression.Token.Literal;
-        if (InheritanceTree.ClassExists(classOrVariable))
+        if (InheritanceTree.HasClass(classOrVariable))
         {
             if (Expression is Call)
             {

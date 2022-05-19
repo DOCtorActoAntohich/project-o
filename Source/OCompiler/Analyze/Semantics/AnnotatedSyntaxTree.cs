@@ -122,13 +122,14 @@ internal class AnnotatedSyntaxTree
     private void ValidateVariable(Variable variable, ParsedClassInfo classInfo, CallableInfo callable)
     {
         var variableName = variable.Identifier.Literal;
-        if (InheritanceTree.ClassExists(variableName))
+        if (InheritanceTree.HasClass(variableName))
         {
             throw new NameCollisionError(
                 variable.Identifier.Position,
                 $"Cannot create variable, name {variableName} is already used by a class"
             );
         }
+        
         if (callable.HasParameter(variableName))
         {
             throw new NameCollisionError(
@@ -136,6 +137,7 @@ internal class AnnotatedSyntaxTree
                 $"Cannot create variable, name {variable.Identifier.Literal} is already used by a class"
             );
         }
+        
         if (!callable.LocalVariables.TryGetValue(variableName, out var varInfo))
         {
             varInfo = new ExpressionInfo(variable.Expression, new Context(classInfo, callable));

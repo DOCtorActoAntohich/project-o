@@ -13,7 +13,7 @@ namespace OCompiler.Analyze.Semantics
 
         
         public ClassInfo? this[string name] => TraversedClasses.GetValueOrDefault(name);
-        public static bool ClassExists(string name) => TraversedClasses.ContainsKey(name);
+        public static bool HasClass(string name) => TraversedClasses.ContainsKey(name);
         
         
         public InheritanceTree(Syntax.Tree syntaxTree)
