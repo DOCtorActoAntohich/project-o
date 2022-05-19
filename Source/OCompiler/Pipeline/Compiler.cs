@@ -36,7 +36,7 @@ namespace OCompiler.Pipeline
             Formatter.ShowAST(tokenTree);
             Console.WriteLine();
 
-            var validator = new TreeValidator(tokenTree);
+            var validator = new AnnotatedSyntaxTree(tokenTree);
 
             var generator = new Emitter(validator.ValidatedClasses);
             return generator.Assembly;

@@ -52,7 +52,7 @@ internal class ExpressionInfo
             _ => throw new CompilerInternalError($"Unexpected Primary expression: {Expression}")
         };
 
-        var primaryClass = ClassTree.TraversedClasses[type];
+        var primaryClass = InheritanceTree.TraversedClasses[type];
 
         if (Expression is Call constructorCall)
         {
@@ -77,7 +77,7 @@ internal class ExpressionInfo
             {
                 case Call call:
                     type = GetCallResultType(primaryClass, call);
-                    primaryClass = ClassTree.TraversedClasses[type];
+                    primaryClass = InheritanceTree.TraversedClasses[type];
                     break;
                 case Syntax.Declaration.Expression.Expression childExpression:
                     var fieldName = childExpression.Token.Literal;
@@ -99,7 +99,7 @@ internal class ExpressionInfo
                         default:
                             throw new CompilerInternalError($"Unknown ClassInfo object: {primaryClass}");
                     }
-                    primaryClass = ClassTree.TraversedClasses[type];
+                    primaryClass = InheritanceTree.TraversedClasses[type];
                     break;
                 default:
                     throw new CompilerInternalError($"Unknown Expression type: {childInfo.Expression}");
@@ -129,7 +129,7 @@ internal class ExpressionInfo
     private string ResolveType()
     {
         var classOrVariable = Expression.Token.Literal;
-        if (ClassTree.ClassExists(classOrVariable))
+        if (InheritanceTree.ClassExists(classOrVariable))
         {
             if (Expression is Call)
             {

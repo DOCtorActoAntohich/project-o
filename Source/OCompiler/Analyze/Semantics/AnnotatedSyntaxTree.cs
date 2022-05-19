@@ -13,15 +13,15 @@ using OCompiler.Exceptions.Semantic;
 
 namespace OCompiler.Analyze.Semantics;
 
-internal class TreeValidator
+internal class AnnotatedSyntaxTree
 {
-    private readonly ClassTree _knownClasses;
-    public List<ClassInfo> ValidatedClasses => new(_knownClasses);
+    private readonly InheritanceTree _inheritanceTree;
+    public List<ClassInfo> ValidatedClasses => new(_inheritanceTree);
 
-    public TreeValidator(Tree syntaxTree)
+    public AnnotatedSyntaxTree(Tree syntaxTree)
     {
-        _knownClasses = new ClassTree(syntaxTree);
-        foreach (var @class in _knownClasses)
+        _inheritanceTree = new InheritanceTree(syntaxTree);
+        foreach (var @class in _inheritanceTree)
         {
             if (@class is not ParsedClassInfo parsedClass)
             {
@@ -37,7 +37,7 @@ internal class TreeValidator
     {
         StringBuilder @string = new();
         @string.AppendLine("Known classes:");
-        foreach (var classInfo in _knownClasses)
+        foreach (var classInfo in _inheritanceTree)
         {
             @string.Append(classInfo.Name);
             @string.Append(" (");
@@ -122,7 +122,7 @@ internal class TreeValidator
     public void ValidateVariable(Variable variable, ParsedClassInfo classInfo, CallableInfo callable)
     {
         var variableName = variable.Identifier.Literal;
-        if (ClassTree.ClassExists(variableName))
+        if (InheritanceTree.ClassExists(variableName))
         {
             throw new NameCollisionError(
                 variable.Identifier.Position,
