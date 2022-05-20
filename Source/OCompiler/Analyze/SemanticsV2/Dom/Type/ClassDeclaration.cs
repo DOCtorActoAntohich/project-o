@@ -3,7 +3,7 @@ using OCompiler.Analyze.SemanticsV2.Dom.Type.Member;
 
 namespace OCompiler.Analyze.SemanticsV2.Dom.Type;
 
-internal class TypeDeclaration : TypeMember, ICanHaveGenericTypes
+internal class ClassDeclaration : TypeMember, ICanHaveGenericTypes
 {
     public List<TypeReference> GenericTypes { get; } = new();
     public bool HasGenerics => GenericTypes.Count > 0;
@@ -19,7 +19,7 @@ internal class TypeDeclaration : TypeMember, ICanHaveGenericTypes
     public List<TypeMember> OtherMembers { get; } = new();
     
     
-    public TypeDeclaration(string name) : base(name)
+    public ClassDeclaration(string name) : base(name)
     {
     }
 }

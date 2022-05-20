@@ -10,7 +10,7 @@ namespace OCompiler.Analyze.SemanticsV2;
 
 internal class AnnotatedSyntaxTreeV2
 {
-    public Dictionary<string, TypeDeclaration> BuiltinClasses { get; } = new();
+    public Dictionary<string, ClassDeclaration> BuiltinClasses { get; } = new();
 
 
     public AnnotatedSyntaxTreeV2(Syntax.Tree syntaxTree)
@@ -34,7 +34,7 @@ internal class AnnotatedSyntaxTreeV2
             CreateBuiltinClass(type.BaseType);
         }
 
-        var declaration = new TypeDeclaration(type.Name);
+        var declaration = new ClassDeclaration(type.Name);
         AddClassDeclaration(declaration);
         
         if (type.BaseType != null)
@@ -47,7 +47,7 @@ internal class AnnotatedSyntaxTreeV2
         AddConstructorsForBuiltin(type);
     }
 
-    private void AddClassDeclaration(TypeDeclaration declaration)
+    private void AddClassDeclaration(ClassDeclaration declaration)
     {
         BuiltinClasses.Add(declaration.Name, declaration);
     }
