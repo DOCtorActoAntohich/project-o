@@ -40,6 +40,10 @@
     "Type annotations": {
       "commandName": "Project",
       "commandLineArgs": "$(SolutionDir)/Examples/type_annotations.ol Main"
+    },
+    "Generic generics": {
+      "commandName": "Project",
+      "commandLineArgs": "$(SolutionDir)/Examples/generics.ol Main"
     }
   }
 }
