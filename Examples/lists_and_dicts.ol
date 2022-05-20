@@ -4,7 +4,7 @@ class Main is
       return []
     else
       var first_element = lst.Get(0)
-      var reversed_rest = reverse_list(lst.Slice(1, lst.Length().Minus(1))
+      var reversed_rest = reverse_list(lst.Slice(1, lst.Length().Minus(1)))
       reversed_rest.Append(first_element)
       return reversed_rest
     end
@@ -45,7 +45,7 @@ class Main is
     var keyBase = "sus"
     var dict: Dict<String, Integer> = {}
     var i = 0
-    while i < lst.Length() loop
+    while i.Less(keys.Length()) loop
       dict.Set(
         keyBase.Concatenate(i.ToString()),
         lst.Get(i)
