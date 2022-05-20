@@ -15,4 +15,9 @@ internal class MemberConstructor : TypeMember, ICanHaveParameters, ICanHaveState
     public MemberConstructor() : base("")
     {
     }
+
+    public MemberConstructor(IEnumerable<ParameterDeclarationExpression> parameters) : this()
+    {
+        Parameters.AddRange(parameters);
+    }
 }
