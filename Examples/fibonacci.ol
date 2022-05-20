@@ -21,6 +21,9 @@ class Main is
         )
     end
     this is
-        IO.Write(this.fib(20).ToString())
+        IO.Write("You need to pass an Integer as an argument")
+    end
+    this(N: Integer) is
+        IO.Write(this.fib(N).ToString())
     end
 end
