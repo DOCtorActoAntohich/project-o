@@ -11,29 +11,29 @@ class Main is
   end
 
   method PrintList(lst: List<Integer>) is
-    IO.Write("[")
+    IO().Write("[")
     var i = 0
     while i.Less(lst.Length()) loop
-      IO.Write(lst.Get(i).ToString())
-      IO.Write(", ")
+      IO().Write(lst.Get(i).ToString())
+      IO().Write(", ")
       i = i.Plus(1)
     end
-    IO.Write("]")
+    IO().Write("]")
   end
 
   method PrintDict(lst: Dict<String, Integer>) is
-    IO.Write("{")
+    IO().Write("{")
     var keys = dict.Keys()
     var i = 0
     while i.Less(keys.Length()) loop
       var key = keys.Get(i)
-      IO.Write(key)
-      IO.Write(": ")
-      IO.Write(dict.Get(key).ToString())
-      IO.Write(", ")
+      IO().Write(key)
+      IO().Write(": ")
+      IO().Write(dict.Get(key).ToString())
+      IO().Write(", ")
       i = i.Plus(1)
     end
-    IO.Write("}")
+    IO().Write("}")
   end
 
   this is

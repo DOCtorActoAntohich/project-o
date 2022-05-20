@@ -21,9 +21,10 @@ class Main is
         )
     end
     this is
-        IO.Write("You need to pass an Integer as an argument")
+        IO().Write("You need to pass an Integer as an argument")
     end
     this(N: Integer) is
-        IO.Write(this.fib(N).ToString())
+        IO().Write("Fibonacci at index ".Concatenate(N.ToString()).Concatenate(": "))
+        IO().Write(this.fib(N).ToString())
     end
 end
