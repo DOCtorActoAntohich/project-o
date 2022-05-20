@@ -1,4 +1,4 @@
-﻿using OCompiler.Extensions;
+﻿using OCompiler.Utils;
 
 namespace OCompiler.Analyze.Lexical.Tokens
 {
