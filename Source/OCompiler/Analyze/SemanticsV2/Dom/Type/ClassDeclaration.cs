@@ -22,4 +22,22 @@ internal class ClassDeclaration : TypeMember, ICanHaveGenericTypes
     public ClassDeclaration(string name) : base(name)
     {
     }
+
+    public void AddField(MemberField field)
+    {
+        Fields.Add(field);
+        field.Owner = this;
+    }
+
+    public void AddMethod(MemberMethod method)
+    {
+        Methods.Add(method);
+        method.Owner = this;
+    }
+
+    public void AddConstructor(MemberConstructor constructor)
+    {
+        Constructors.Add(constructor);
+        constructor.Owner = this;
+    }
 }

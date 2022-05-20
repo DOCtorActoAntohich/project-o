@@ -58,7 +58,7 @@ internal class AnnotatedSyntaxTreeV2
         foreach (var field in builtinClass.GetRuntimeFields())
         {
             var memberField = new MemberField(field.Name, new TypeReference(field.FieldType.Name));
-            declaration.Fields.Add(memberField);
+            declaration.AddField(memberField);
         }
     }
 
@@ -71,7 +71,7 @@ internal class AnnotatedSyntaxTreeV2
             var returnType = new TypeReference(method.ReturnType.Name);
             var memberMethod = new MemberMethod(method.Name, parameters, returnType);
 
-            declaration.Methods.Add(memberMethod);
+            declaration.AddMethod(memberMethod);
         }
     }
 
@@ -83,7 +83,7 @@ internal class AnnotatedSyntaxTreeV2
             var parameters = ExtractParameters(constructor);
             var memberConstructor = new MemberConstructor(parameters);
             
-            declaration.Constructors.Add(memberConstructor);
+            declaration.AddConstructor(memberConstructor);
         }
     }
 
