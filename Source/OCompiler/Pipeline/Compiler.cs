@@ -23,6 +23,23 @@ namespace OCompiler.Pipeline
         public Assembly Run()
         {
             var tokenizer = new Tokenizer(SourceFilePath);
+            var tokens = tokenizer.GetTokens();
+
+            var tokenTree = new Tree(new TokenEnumerator(tokens));
+            if (tokenTree.IsEmpty)
+            {
+                throw new AnalyzeError("No classes.");
+            }
+
+            var validator = new TreeValidator(tokenTree);
+            var generator = new Emitter(validator.ValidatedClasses);
+
+            return generator.Assembly;
+        }
+
+        public Assembly RunVerbose()
+        {
+            var tokenizer = new Tokenizer(SourceFilePath);
             var tokens = tokenizer.GetTokens().ToList();
             Formatter.ShowHighlightedCode(tokens);
             Console.WriteLine();
