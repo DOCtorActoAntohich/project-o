@@ -10,14 +10,14 @@ namespace OCompiler.Analyze.Syntax.Declaration;
 internal class TypeAnnotation
 {
     public Identifier Name { get; }
-    public List<Identifier> GenericTypes { get; } = new();
+    public List<TypeAnnotation> GenericTypes { get; } = new();
 
     public TypeAnnotation(Identifier name)
     {
         Name = name;
     }
 
-    public TypeAnnotation(Identifier name, IEnumerable<Identifier> generics)
+    public TypeAnnotation(Identifier name, IEnumerable<TypeAnnotation> generics)
     {
         Name = name;
         GenericTypes = new(generics);
@@ -31,34 +31,54 @@ internal class TypeAnnotation
             return false;
         }
 
-        var genericTypes = new List<Identifier>();
+        var genericTypes = new List<TypeAnnotation>();
         if (tokens.Next() is LeftAngleBracket)
         {
-            ParseGenericsList(tokens);
+            genericTypes = ParseGenericsList(tokens);
         }
 
         type = new TypeAnnotation(name, genericTypes);
         return true;
     }
 
-    private static List<Identifier> ParseGenericsList(TokenEnumerator tokens)
+    private static List<TypeAnnotation> ParseGenericsList(TokenEnumerator tokens)
     {
-        var types = new List<Identifier>();
+        // Skip the left brace
+        tokens.Next();
+
+        var types = new List<TypeAnnotation>();
 
         while (tokens.Current() is not RightAngleBracket)
         {
-            if (tokens.Next() is not Identifier type)
+            if (!TryParse(tokens, out var type))
             {
                 throw new SyntaxError(tokens.Current().Position, "Expected a type in the generics list");
             }
-            types.Add(type);
+            types.Add(type!);
 
-            if (tokens.Next() is not (Comma or RightAngleBracket))
+            switch (tokens.Current())
             {
-                throw new SyntaxError(tokens.Current().Position, "Expected a comma or end of generics list");
+                case Comma:
+                    tokens.Next();
+                    break;
+                case not RightAngleBracket:
+                    throw new SyntaxError(tokens.Current().Position, "Expected a comma or end of generics list");
             }
         }
 
+        tokens.Next();
         return types;
+    }
+
+    public override string ToString()
+    {
+        string @string = Name.Literal;
+
+        if (GenericTypes.Count > 0)
+        {
+            @string += $"<{string.Join(", ", GenericTypes)}>";
+        }
+
+        return @string;
     }
 }

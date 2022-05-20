@@ -3,7 +3,7 @@ using OCompiler.Analyze.Lexical.Tokens;
 
 namespace OCompiler.Analyze.Syntax.Declaration.Expression;
 
-internal class Call : Expression
+internal class Call : SimpleExpression
 {
     public List<Expression> Arguments { get; }
 
@@ -21,9 +21,8 @@ internal class Call : Expression
         Arguments = new();
     }
 
-    public override string ToString()
+    protected override string SelfToString()
     {
-        string child = Child is null ? "" : $".{Child}";
-        return $"{Token.Literal}{Declaration.Expression.Arguments.ToString(Arguments)}{child}";
+        return Token.Literal + Declaration.Expression.Arguments.ToString(Arguments);
     }
 }

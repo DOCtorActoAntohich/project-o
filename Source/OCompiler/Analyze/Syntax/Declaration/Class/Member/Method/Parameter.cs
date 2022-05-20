@@ -8,7 +8,7 @@ namespace OCompiler.Analyze.Syntax.Declaration.Class.Member.Method;
 internal class Parameter
 {
     public Identifier Name { get; }
-    public Identifier Type { get; }
+    public TypeAnnotation Type { get; }
 
     public static bool TryParse(TokenEnumerator tokens, out Parameter? parameter)
     {
@@ -24,21 +24,19 @@ internal class Parameter
         {
             throw new SyntaxError(tokens.Current().Position, "Expected ':'");
         }
-        
+        tokens.Next();
+
         // Type.
-        if (tokens.Next() is not Identifier type)
+        if (!TypeAnnotation.TryParse(tokens, out var type))
         {
             throw new SyntaxError(tokens.Current().Position, "Expected class name");
         }
         
-        // Get next token.
-        tokens.Next();
-        
-        parameter = new Parameter(name, type);
+        parameter = new Parameter(name, type!);
         return true;
     }
 
-    private Parameter(Identifier name, Identifier type)
+    private Parameter(Identifier name, TypeAnnotation type)
     {
         Name = name;
         Type = type;
@@ -46,6 +44,6 @@ internal class Parameter
 
     public override string ToString()
     {
-        return $"{Name.Literal}: {Type.Literal}";
+        return $"{Name.Literal}: {Type}";
     }
 }

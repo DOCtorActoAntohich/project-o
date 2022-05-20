@@ -14,6 +14,6 @@ internal class ParsedMethodInfo : CallableInfo
     ) : base(parsedMethod, context)
     {
         Name = parsedMethod.Name.Literal;
-        ReturnType = parsedMethod.ReturnType == null ? "Void" : parsedMethod.ReturnType.Literal;
+        ReturnType = parsedMethod.ReturnType is null ? "Void" : parsedMethod.ReturnType.Name.Literal;
     }
 }
