@@ -18,6 +18,8 @@ This section contains the definitions used across the language specification.
 - **Strongly typed language**: a language that does not allow implicit type conversions, so the values of one type cannot be interpreted as the values of another type without explicit programmer's interference.
 - **Weakly typed language**: a language that can implicitly convert types by interpreting values of one type as values of another type.
 
+- **Function (method) parameters**: names listed in the function definitions, together with their types.
+- **Function (method) arguments**: actual values that are passed in the function call.
 ### Naming conventions
 
 - **Snake case**:
