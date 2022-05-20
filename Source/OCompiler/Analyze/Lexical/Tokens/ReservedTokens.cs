@@ -26,9 +26,13 @@ namespace OCompiler.Analyze.Lexical.Tokens
             RegisterToken<Delimiters.StringQuote>();
             RegisterToken<Delimiters.StringQuoteEscape>();
             RegisterToken<Delimiters.LeftParenthesis>();
+            RegisterToken<Delimiters.LeftAngleBracket>();
             RegisterToken<Delimiters.LeftSquareBracket>();
+            RegisterToken<Delimiters.LeftCurlyBracket>();
             RegisterToken<Delimiters.RightParenthesis>();
+            RegisterToken<Delimiters.RightAngleBracket>();
             RegisterToken<Delimiters.RightSquareBracket>();
+            RegisterToken<Delimiters.RightCurlyBracket>();
             RegisterToken<Keywords.Var>();
             RegisterToken<Keywords.If>();
             RegisterToken<Keywords.Then>();
