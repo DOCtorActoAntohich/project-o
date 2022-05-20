@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace OCompiler.Builtins.Compound;
 
-public class List<T>
+public class List<T> : Class
 {
     private readonly System.Collections.Generic.List<T> _list = new();
 

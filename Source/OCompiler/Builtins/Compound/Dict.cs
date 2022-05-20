@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace OCompiler.Builtins.Compound;
 
-public class Dict<K, V> where K : notnull
+public class Dict<K, V> : Class where K : notnull
 {
     private readonly Dictionary<K, V> _dictionary = new();
 
