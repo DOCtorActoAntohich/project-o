@@ -1,70 +1,62 @@
-using OCompiler.StandardLibrary.Type.Reference;
+using System.Globalization;
+using String = OCompiler.StandardLibrary.Type.Reference.String;
 
 namespace OCompiler.StandardLibrary.Type.Value;
 
-public class Integer : AnyValue
+// Get real lol.
+public class Real : Class
 {
-    // System.Int32 (hopefully).
-    internal int Value { get; }
-
-    public Integer(int p)
+    internal double Value { get; }
+    
+    public Real(double p)
     {
         Value = p;
     }
 
-    internal Integer(double p)
-    {
-        Value = (int) p;
-    }
-
     
-    public Integer()
+    public Real()
     {
-        Value = 0;
+        Value = 0.0;
     }
     
-    public Integer(Integer p)
+    public Real(Real p)
     {
         Value = p.Value;
     }
 
-    public Integer(Real p)
+    public Real(Integer p)
     {
-        Value = (int) p.Value;
+        Value = p.Value;
     }
-
-
-    public Integer Min() => new Integer(int.MinValue);
-    public Integer Max() => new Integer(int.MaxValue);
-
     
-    public Real ToReal()
-    {
-        return new Real(Value);
-    }
+    
+    public Real Min => new Real(double.MinValue);
+    public Real Max => new Real(double.MaxValue);
 
+    public Real Epsilon => new Real(double.Epsilon);
+
+
+    public Integer ToInteger()
+    {
+        return new Integer((int) Value);
+    }
+    
     public Boolean ToBoolean()
     {
-        return Value != 0 ?
+        return Value is < -double.Epsilon or > double.Epsilon ?
             new Boolean(true) :
             new Boolean(false);
     }
 
     public new String ToString()
     {
-        return new String(Value.ToString());
+        return new String(Value.ToString(CultureInfo.CurrentCulture));
     }
-
-
-    public Integer UnaryMinus()
+    
+    
+    public Real Plus(Integer p)
     {
-        return new Integer(-Value);
-    }
-
-
-    public Integer Plus(Integer p)
-    {
-        return new Integer(Value + p.Value);
+        return new Real(Value + p.Value);
     }
 
     public Real Plus(Real p)
@@ -73,9 +65,9 @@ public class Integer : AnyValue
     }
     
     
-    public Integer Minus(Integer p)
+    public Real Minus(Integer p)
     {
-        return new Integer(Value - p.Value);
+        return new Real(Value - p.Value);
     }
 
     public Real Minus(Real p)
@@ -84,9 +76,9 @@ public class Integer : AnyValue
     }
     
     
-    public Integer Mult(Integer p)
+    public Real Mult(Integer p)
     {
-        return new Integer(Value * p.Value);
+        return new Real(Value * p.Value);
     }
 
     public Real Mult(Real p)
@@ -95,9 +87,9 @@ public class Integer : AnyValue
     }
     
     
-    public Integer Div(Integer p)
+    public Real Div(Integer p)
     {
-        return new Integer(Value / p.Value);
+        return new Real(Value / p.Value);
     }
 
     public Real Div(Real p)
@@ -106,12 +98,12 @@ public class Integer : AnyValue
     }
     
     
-    public Integer Mod(Integer p)
+    public Real Mod(Integer p)
     {
-        return new Integer(Value % p.Value);
+        return new Real(Value % p.Value);
     }
-
-
+    
+    
     public Boolean Less(Integer p)
     {
         return new Boolean(Value < p.Value);
@@ -154,8 +146,8 @@ public class Integer : AnyValue
     {
         return new Boolean(Value >= p.Value);
     }
-
-
+    
+    
     public Boolean Equal(Integer p)
     {
         return new Boolean(Value.CompareTo(p.Value) == 0);

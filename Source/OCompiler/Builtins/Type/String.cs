@@ -3,7 +3,7 @@ using OCompiler.StandardLibrary.Type.Value;
 
 namespace OCompiler.StandardLibrary.Type.Reference;
 
-public class String : AnyRef
+public class String : Class
 {
     internal string Value { get; }
 
