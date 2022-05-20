@@ -1,6 +1,4 @@
-using OCompiler.StandardLibrary.Type.Reference;
-
-namespace OCompiler.StandardLibrary.Type.Value;
+namespace OCompiler.Builtins.Primitives;
 
 public class Integer : Class
 {

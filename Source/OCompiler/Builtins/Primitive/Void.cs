@@ -1,4 +1,4 @@
-﻿namespace OCompiler.StandardLibrary.Type.Value;
+﻿namespace OCompiler.Builtins.Primitives;
 
 public class Void : Class
 {

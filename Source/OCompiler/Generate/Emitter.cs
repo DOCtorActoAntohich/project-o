@@ -13,14 +13,14 @@ using OCompiler.Analyze.Syntax.Declaration;
 using OCompiler.Analyze.Syntax.Declaration.Expression;
 using OCompiler.Analyze.Syntax.Declaration.Statement;
 using OCompiler.Exceptions;
-using OCompiler.StandardLibrary.Type.Reference;
-using OCompiler.StandardLibrary.Type.Value;
-using Boolean = OCompiler.StandardLibrary.Type.Value.Boolean;
-using Class = OCompiler.StandardLibrary.Type.Class;
+using OCompiler.Builtins.Primitives;
+
+using Boolean = OCompiler.Builtins.Primitives.Boolean;
+using String = OCompiler.Builtins.Primitives.String;
+using Void = OCompiler.Builtins.Primitives.Void;
+
 using If = OCompiler.Analyze.Syntax.Declaration.Statement.If;
 using Return = OCompiler.Analyze.Syntax.Declaration.Statement.Return;
-using String = OCompiler.StandardLibrary.Type.Reference.String;
-using Void = OCompiler.StandardLibrary.Type.Value.Void;
 using While = OCompiler.Analyze.Syntax.Declaration.Statement.While;
 
 namespace OCompiler.Generate;

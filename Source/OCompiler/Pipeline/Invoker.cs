@@ -9,10 +9,10 @@ using OCompiler.Analyze.Semantics.Callable;
 using OCompiler.Analyze.Semantics.Class;
 using OCompiler.Exceptions;
 
-using Boolean = OCompiler.StandardLibrary.Type.Value.Boolean;
-using Integer = OCompiler.StandardLibrary.Type.Value.Integer;
-using Real    = OCompiler.StandardLibrary.Type.Value.Real;
-using String  = OCompiler.StandardLibrary.Type.Reference.String;
+using Boolean = OCompiler.Builtins.Primitives.Boolean;
+using Integer = OCompiler.Builtins.Primitives.Integer;
+using Real    = OCompiler.Builtins.Primitives.Real;
+using String  = OCompiler.Builtins.Primitives.String;
 
 namespace OCompiler.Pipeline;
 

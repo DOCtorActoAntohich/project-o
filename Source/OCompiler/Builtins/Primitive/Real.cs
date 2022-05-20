@@ -1,7 +1,6 @@
 using System.Globalization;
-using String = OCompiler.StandardLibrary.Type.Reference.String;
 
-namespace OCompiler.StandardLibrary.Type.Value;
+namespace OCompiler.Builtins.Primitives;
 
 // Get real lol.
 public class Real : Class

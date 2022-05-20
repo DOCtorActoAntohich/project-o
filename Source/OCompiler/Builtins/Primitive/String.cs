@@ -1,7 +1,6 @@
 using System.Globalization;
-using OCompiler.StandardLibrary.Type.Value;
 
-namespace OCompiler.StandardLibrary.Type.Reference;
+namespace OCompiler.Builtins.Primitives;
 
 public class String : Class
 {

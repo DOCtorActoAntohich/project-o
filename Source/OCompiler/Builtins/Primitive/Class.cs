@@ -1,6 +1,4 @@
-﻿using OCompiler.StandardLibrary.Type.Reference;
-
-namespace OCompiler.StandardLibrary.Type;
+﻿namespace OCompiler.Builtins.Primitives;
 
 public abstract class Class
 {
