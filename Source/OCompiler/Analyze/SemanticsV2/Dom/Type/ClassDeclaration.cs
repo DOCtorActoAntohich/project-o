@@ -15,10 +15,7 @@ internal class ClassDeclaration : TypeMember, ICanHaveGenericTypes
     public List<MemberMethod> Methods { get; } = new();
     public List<MemberConstructor> Constructors { get; } = new();
 
-    // For nested definitions.
-    public List<TypeMember> OtherMembers { get; } = new();
-    
-    
+
     public ClassDeclaration(string name) : base(name)
     {
     }

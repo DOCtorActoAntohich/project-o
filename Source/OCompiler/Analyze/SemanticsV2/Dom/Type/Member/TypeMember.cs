@@ -4,6 +4,8 @@ internal abstract class TypeMember : CodeObject
 {
     public ClassDeclaration? Owner { get; set; }
     
+    public object? UserData;
+    
     protected TypeMember(string name) : base(name)
     {
     }
