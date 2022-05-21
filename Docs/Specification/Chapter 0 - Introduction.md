@@ -45,4 +45,10 @@ This section contains the definitions used across the language specification.
 
 ## Memory model
 
+All the types in the language are [reference types](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/reference-types) and are handled by a garbage collector.
+
 ## Program compilation and execution
+
+A program written in O is compiled into **.NET Assembly** and is immediately executed just after the compilation finishes.
+
+This approach is used since `.NET 6` does not allow saving compiled assemblies on the disk (see [Microsoft Docs](https://docs.microsoft.com/en-us/dotnet/api/system.reflection.emit.assemblybuilder.save)).
