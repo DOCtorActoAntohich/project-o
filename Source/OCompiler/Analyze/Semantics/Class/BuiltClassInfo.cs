@@ -3,7 +3,6 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
-using OCompiler.Exceptions;
 
 namespace OCompiler.Analyze.Semantics.Class;
 
@@ -46,7 +45,7 @@ internal class BuiltClassInfo : ClassInfo
         StandardClasses = LoadStandardClasses();
     }
 
-    private static Dictionary<string, ClassInfo> LoadStandardClasses(string @namespace = "OCompiler.StandardLibrary")
+    private static Dictionary<string, ClassInfo> LoadStandardClasses(string @namespace = "OCompiler.Builtins")
     {
         var asm = Assembly.GetExecutingAssembly();
         return new Dictionary<string, ClassInfo>(

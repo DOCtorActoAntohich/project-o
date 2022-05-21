@@ -1,8 +1,6 @@
-using OCompiler.StandardLibrary.Type.Reference;
+namespace OCompiler.Builtins.Primitives;
 
-namespace OCompiler.StandardLibrary.Type.Value;
-
-public class Boolean : AnyValue
+public class Boolean : Class
 {
     public bool _value;
     

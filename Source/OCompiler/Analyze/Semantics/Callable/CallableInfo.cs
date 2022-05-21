@@ -37,7 +37,7 @@ internal abstract class CallableInfo
                 Body = method.Body;
                 AddParameters(method.Parameters);
                 AddLocalVariables();
-                if (method.ReturnType == null || method.ReturnType.Literal == "Void")
+                if (method.ReturnType is null || method.ReturnType.Name.Literal == "Void")
                 {
                     Body.AddTrailingReturn();
                 }

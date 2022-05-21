@@ -1,9 +1,8 @@
 using System.Globalization;
-using OCompiler.StandardLibrary.Type.Value;
 
-namespace OCompiler.StandardLibrary.Type.Reference;
+namespace OCompiler.Builtins.Primitives;
 
-public class String : AnyRef
+public class String : Class
 {
     internal string Value { get; }
 

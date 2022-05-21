@@ -10,8 +10,8 @@ namespace OCompiler.Analyze.Syntax.Declaration.Class;
 
 internal class Class
 {
-    public Identifier Name { get; }
-    public Identifier? Extends { get; }
+    public TypeAnnotation Name { get; }
+    public TypeAnnotation? Extends { get; }
     public List<Field> Fields { get; }
     public List<Method> Methods { get; }
     public List<Constructor> Constructors { get; }
@@ -23,27 +23,23 @@ internal class Class
         {
             throw new SyntaxError(tokens.Current().Position, $"Expected 'class' keyword");
         }
-    
-        // Class name.
-        if (tokens.Next() is not Identifier name)
+        tokens.Next();
+
+        // Class name (actually a type).
+        if (!TypeAnnotation.TryParse(tokens, out var type))
         {
-            throw new SyntaxError(tokens.Current().Position, $"Class identifier expected at line {tokens.Current().Position.Line}.");
+            throw new SyntaxError(tokens.Current().Position, $"Class name expected at line {tokens.Current().Position.Line}.");
         }
         
         // Extends.
-        Identifier? extends = null;
-        if (tokens.Next() is Lexical.Tokens.Keywords.Extends)
+        TypeAnnotation? extends = null;
+        if (tokens.Current() is Lexical.Tokens.Keywords.Extends)
         {
-            if (tokens.Next() is not Identifier)
-            {
-                throw new SyntaxError(tokens.Current().Position, $"Class identifier expected at line {tokens.Current().Position.Line}.");
-            }
-            
-            // Save.
-            extends = (Identifier)tokens.Current();
-            
-            // Move forward.
             tokens.Next();
+            if (!TypeAnnotation.TryParse(tokens, out extends))
+            {
+                throw new SyntaxError(tokens.Current().Position, $"Class name expected at line {tokens.Current().Position.Line}.");
+            }
         }
         
         // Is.
@@ -87,15 +83,15 @@ internal class Class
         // Get next token.
         tokens.Next();
 
-        return new Class(name, fields, methods, constructors, extends);
+        return new Class(type!, fields, methods, constructors, extends);
     }
 
     private Class(
-        Identifier name, 
+        TypeAnnotation name, 
         List<Field> fields, 
         List<Method> methods, 
-        List<Constructor> constructors, 
-        Identifier? extends = null
+        List<Constructor> constructors,
+        TypeAnnotation? extends = null
         )
     {
         Name = name;
@@ -113,9 +109,15 @@ internal class Class
         members.AddRange(Fields);
         members.AddRange(Constructors);
         members.AddRange(Methods);
-        
+
         // Name.
-        @string.AppendLine(Extends is null ? Name.Literal : $"{Name.Literal} extends {Extends.Literal}");
+        @string.Append(Name.ToString());
+        if (Extends is not null)
+        {
+            @string.Append(" extends ");
+            @string.Append(Extends.ToString());
+        }
+        @string.AppendLine();
 
         for (var i = 0; i < members.Count; ++i)
         {

@@ -28,6 +28,22 @@
     "Inheritance with new fields": {
       "commandName": "Project",
       "commandLineArgs": "$(SolutionDir)/Examples/inheritance.ol Main"
+    },
+    "Lists and dictionaries": {
+      "commandName": "Project",
+      "commandLineArgs": "$(SolutionDir)/Examples/lists_and_dicts.ol Main"
+    },
+    "Fibonacci": {
+      "commandName": "Project",
+      "commandLineArgs": "$(SolutionDir)/Examples/fibonacci.ol Main 20"
+    },
+    "Type annotations": {
+      "commandName": "Project",
+      "commandLineArgs": "$(SolutionDir)/Examples/type_annotations.ol Main"
+    },
+    "Generic generics": {
+      "commandName": "Project",
+      "commandLineArgs": "$(SolutionDir)/Examples/generics.ol Main"
     }
   }
 }

@@ -6,7 +6,7 @@ using OCompiler.Utils;
 
 namespace OCompiler.Analyze.Syntax.Declaration.Expression;
 
-internal class Expression: IBodyStatement
+internal abstract class Expression: IBodyStatement
 {
     public Expression? Parent { get; private set; }
     public Expression? Child { get; set; }
@@ -14,35 +14,24 @@ internal class Expression: IBodyStatement
     
     public static bool TryParse(TokenEnumerator tokens, out Expression? expression)
     {
-        if (tokens.Current() is not (
-            Identifier or 
-            StringLiteral or 
-            RealLiteral or 
-            IntegerLiteral or 
-            BooleanLiteral or 
-            Lexical.Tokens.Keywords.This or 
-            Lexical.Tokens.Keywords.Base
-        ))
+        if (SimpleExpression.TryParse(tokens, out var simpleExpression))
+        {
+            expression = simpleExpression;
+        }
+        else if (ListDefinition.TryParse(tokens, out var listDefinition))
+        {
+            expression = listDefinition;
+        }
+        else if (DictDefinition.TryParse(tokens, out var dictDefinition))
+        {
+            expression = dictDefinition;
+        }
+        else
         {
             expression = null;
             return false;
         }
-        
-        // Parse token
-        Token token = tokens.Current();
-        // Get next token.
-        tokens.Next();
-        
-        // Try parse arguments.
-        if (Arguments.TryParse(tokens, out List<Expression>? arguments))
-        {
-            expression = new Call(token, arguments!);
-        }
-        else
-        {
-            expression = new Expression(token);
-        }
-        
+
         // No dot. Only one expression.
         if (tokens.Current() is not Lexical.Tokens.Delimiters.Dot)
         {
@@ -58,7 +47,7 @@ internal class Expression: IBodyStatement
             throw new SyntaxError(tokens.Current().Position, "Expected expression");
         }
 
-        expression.Child = child;
+        expression!.Child = child;
         child!.Parent = expression;
 
         return true;
@@ -78,13 +67,14 @@ internal class Expression: IBodyStatement
 
     public override string ToString()
     {
-        string child = Child is null ? "" : $".{Child}";
-
-        if (Token is StringLiteral)
+        string @string = SelfToString();
+        if (Child is not null)
         {
-            return $"\"{Token.Literal}\"{child}";
+            @string += '.';
+            @string += Child.ToString();
         }
-        
-        return $"{Token.Literal}{child}";
+        return @string;
     }
+
+    protected abstract string SelfToString();
 }

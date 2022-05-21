@@ -6,7 +6,9 @@ internal class ParsedParameterInfo
 {
     public Parameter Parameter { get; }
     public string Name => Parameter.Name.Literal;
-    public string Type => Parameter.Type.Literal;
+
+    // Won't work for generics
+    public string Type => Parameter.Type.Name.Literal;
 
     public ParsedParameterInfo(Parameter parsedParameter)
     {

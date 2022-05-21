@@ -1,7 +1,10 @@
 using System;
-using Void = OCompiler.StandardLibrary.Type.Value.Void;
 
-namespace OCompiler.StandardLibrary.Type.Reference;
+using Void = OCompiler.Builtins.Primitives.Void;
+using String = OCompiler.Builtins.Primitives.String;
+using OCompiler.Builtins.Primitives;
+
+namespace OCompiler.Builtins.Utility;
 
 public class IO : Class
 {
