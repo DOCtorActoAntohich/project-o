@@ -2,11 +2,27 @@
 
 ## Character set
 
-The O Language on the syntax level supports the whole Unicode range, to the extent of .NET Core 6.0 support of Unicode.
+The O Language on the syntax level supports the whole Unicode range, to the extent of `.NET 6` support of Unicode.
 
-However, characters of reserved language words lie in the range of printable ASCII characters.
+However, characters of *reserved language words* lie in the range of printable ASCII characters.
 
 ## Input Elements
+
+The input text of the program is split on tokens.
+
+For now, the possible tokens are:
+
+- [Whitespaces](#whitespaces)
+- [Comment delimiters](#comments)
+- [Identifiers](#identifiers)
+- [Keywords](#keywords)
+- [Literals](#literals)
+  - [Boolean literals](#boolean)
+  - [Integer literals](#integer)
+  - [Real literals](#real-floating-point)
+  - [String literals](#string-literals)
+- [Separators](#separators)
+- [Delimiters](#delimiters)
 
 ## Whitespaces
 
@@ -36,15 +52,16 @@ class Main is    // Everything before slashes remains, the rest is discarded.
     end
 
     // The declaration will be ignored because it is commented out:
-    // var number : 0
+    // var number = 0
 end
 ```
 
-Code style recommendations (not mandatory):
-  - Every sentence in the comment should start with a capital letter.
-  - Every single line comment should end with `.` or `:`
-  - When the line is too long, it is recommended to break it - in this case, the line of comment may not end with `.` or `:`.
-  - There should be a space after the `//` (see the example).
+Code style recommendations:
+
+- Every sentence in the comment should start with a capital letter.
+- Every single line comment should end with a punctuation mark.
+- When the line is too long, it is recommended to break it — in this case, the line of comment may not end with a punctuation mark.
+- There should be a space after the `//` (see the example).
 
 ### Multi-line comments
 
@@ -69,7 +86,7 @@ class Magic is
 end
 ```
 
-**Multi-line comments do not support nesting**:
+Multi-line comments **do not support nesting**:
 
 ```c
 /* This is commented out.
@@ -90,10 +107,11 @@ class Main is
 end
 ```
 
-Code style recommendations (not mandatory):
-  - Sentence rules from single-line comments apply to multi-line comments.
-  - There should be a space after `/*` and before `*/`.
-  - Use star symbols to align each line of the comment. Align stars vertically. Note the spaces after each star (refer to the first example).
+Code style recommendations:
+
+- Sentence rules from single-line comments apply to multi-line comments.
+- There should be a space after `/*` and before `*/`.
+- Use star symbols to align each line of the comment. Align stars vertically. Note the spaces after each star (refer to the first example).
 
 ## Identifiers
 
@@ -126,7 +144,7 @@ separate identifiers // Most likely a syntax error because there are two of them
 
 
 // The following identifiers are all different,
-// Because identifiers are case-sensitive:
+// because identifiers are case-sensitive:
 name
 Name
 nAmE
@@ -139,7 +157,7 @@ Keyword is a reserved identifier that has a special meaning and function in the 
 
 The following keywords are **reserved**, and **cannot be used as identifiers**:
 
-```
+```c
 class extends this method is base
 if then else
 while loop
@@ -148,9 +166,11 @@ var
 return
 ```
 
-Note that `true` and `false` might appear to be keywords, but they are technically Boolean literals:
+### Built-in literals
 
-```
+Note that `true` and `false` might appear to be keywords, but they are technically **Boolean literals**:
+
+```c
 true false
 ```
 
@@ -165,8 +185,7 @@ Each literal belongs to one and only one of the built-in types.
 Integer literal is a sequence of digits that represents integer value.
 
 Since the `Integer` type is a standard **.NET 32-bit signed integer**, the values of integer literal should comply with the following rule:
-
-![signed_integer_limit](https://user-images.githubusercontent.com/49134679/163717203-b5308489-ae24-4a85-99f7-7b9a66c4d6e7.png)
+> $-2^{32} \leq n \leq 2^{32}$, where $n$ is the `Integer` value
 
 ### Real (floating point)
 
@@ -178,7 +197,7 @@ For the clarity sake, C-style shortcuts such as `.5` and `5.` are not permitted.
 
 Since the `Real` type is a standard **.NET 32-bit single precision floating-point number**, positive values it can represent should comply with the following rule:
 
-![positive_real_limit](https://user-images.githubusercontent.com/49134679/163717837-9164826e-7dad-4595-88ef-c1139b606ceb.png)
+> $1.175494351 \cdot 10^{-38} \leq p \leq 3.402823466 \cdot 10^{38}$, where $p$ is the `Real` value
 
 ### Boolean
 
@@ -205,7 +224,8 @@ A string literal consists of zero or more characters enclosed in double quotes:
 "The cost is 5$, but with a 50% discount it's 2.5$."
 ```
 
-Note that line feed in the string is completely valid:
+Note that line feed character in the string is completely valid:
+
 ```typescript
 "This is an example of a string that
 spans across multiple lines"
@@ -213,35 +233,99 @@ spans across multiple lines"
 
 String literals are always of a `String` type.
 
-### Separators
+## Separators
 
-#### Statement separators
+### Statement separators
 
 There is no separators for statements.
 
+### Block separators
 
-#### Block separators
+#### Classes and methods
 
-Blocks like methods and classes are separated by keywords `begin` and `end`.
+Bodies of methods and classes are separated by keywords `is` and `end`:
 
-For loops and conditionals there are also special keywords defined, see section [Keywords](#Keywords).
+```c
+class Example is
+    this() is 
+        IO().Write("I'm alive")
+    end
+end
+```
 
+#### Loops
 
-#### Other delimiters
+Body of `while` loops is separated by keywords `loop` and `end`:
+
+```c
+while i.Less(5) loop
+    IO().Write(i.ToString())
+    i = i.Minus(1)
+end
+
+#### Conditionals
+
+Body of `if` conditional is separated by keywords `then` and `end`:
+
+```c
+if a.Greater(5) then
+    a = 5
+end
+```
+
+If the conditional includes an `else` body, a triplet `then`/`else`/`end` is used:
+
+```c
+if a.Greater(0) then
+    message = "Number is positive"
+else
+    message = "Number is negative or 0"
+end
+```
+
+## Delimiters
+
+### Dot
 
 Dot `.` is used to access methods and fields of the object in the form `<Object>.<Member>`:
 
 ```typescript
 var a: Integer = 5
-a.Plus(1)  // call method Plus of the object a, which is of type Integer
+var b = a.Plus(1)  // call method Plus of the object a, which is of type Integer
 ```
+
+### Equals
 
 Equals sign `=` is used to give a variable or field initial value,
 as well as to assign the new value to existing variable or field:
+
 ```typescript
-var a: Integer = 1  // set initial value of a to 1
-a = 2               // store 2 in variable a
+var a = 1  // set initial value of a to 1
+a = 42     // store 42 in variable a
 ```
+
+### Colon
+
+Colon `:` is used to
+
+- denote the type of a function parameter,
+- denote the type of a variable,
+- denote the return type of a method,
+- split a key-value pair in [dictionary](Chapter%202%20-%20Types.md#Dict) definition.
+
+```typescript
+class Example is
+  var list: List<Integer> = []  // Type hint for a variable
+  var dict = {"amogus": 25565}  // Key-value pair in the dictionary
+
+  method Lookup(key: String)    // Function parameter type definition
+    : Integer is                // Function return type definition
+    return dict.Get(key)
+  end
+end
+```
+
+### Parentheses
 
 Parentheses `(` `)` and commas `,` are used to define methods parameters and to pass parameters on method calls.
 
@@ -253,23 +337,47 @@ Integer(1).ToString() // returns "1"
 Integer(1).ToString   // is just a method reference — method is not called
 ```
 
+### Angle brackets
+
 Angle brackets `<` `>` are used to denote generic types:
 
 ```typescript
-var a: List<Integer> = []
+class SomeGeneric<K> is
+  var listOfK: List<K> = []
+  var listOfIntegers: List<Integer> = []
+end
 ```
 
+### Square brackets
 
-### Operators
+Square brackets `[` `]` are used for defining [lists](Chapter%202%20-%20Types.md#List):
 
-By the language design, all regular symbolic unary and binary operators, often found in other languages
-have been replaced with methods with descriptive names.
+```typescript
+var emptyList = []
+var list = [13, 27, 39, 42]
+```
+
+### Curly brackets
+
+Curly brackets `{` `}` are used for defining [dictionaries](Chapter%202%20-%20Types.md#Dict):
+
+```typescript
+var emptyDict = {}
+var dict = {"1": 20, "sus": 42}
+```
+
+## Operators
+
+By the language design, all regular symbolic unary and binary operators, often found in other languages have been replaced with methods with descriptive names.
 
 So, instead of the following:
+
 ```typescript
 a = a * 7 + 9
 ```
+
 One should write:
+
 ```typescript
 a = a.Mult(7).Plus(9)
 ```
