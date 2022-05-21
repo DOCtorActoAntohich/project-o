@@ -49,7 +49,7 @@ internal class BuiltinClassTree
 
         if (type.BaseType != null)
         {
-            declaration.BaseTypes.Add(new TypeReference(TrimGrave(type.BaseType.Name)));
+            declaration.BaseType = new TypeReference(TrimGrave(type.BaseType.Name));
         }
         
         AddFieldsForBuiltin(declaration, type);

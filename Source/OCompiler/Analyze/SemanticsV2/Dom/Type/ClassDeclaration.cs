@@ -8,7 +8,7 @@ internal class ClassDeclaration : TypeMember, ICanHaveGenericTypes
     public List<TypeReference> GenericTypes { get; } = new();
     public bool HasGenerics => GenericTypes.Count > 0;
 
-    public List<TypeReference> BaseTypes { get; } = new();
+    public TypeReference? BaseType { get; set; }
 
 
     public List<MemberField> Fields { get; } = new();
