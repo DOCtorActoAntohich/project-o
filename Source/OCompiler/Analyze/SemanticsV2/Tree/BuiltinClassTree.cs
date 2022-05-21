@@ -43,7 +43,7 @@ internal class BuiltinClassTree
 
         var declaration = new ClassDeclaration(TrimGrave(type.Name))
         {
-            UserData = type
+            DotnetType = type
         };
         AddClassDeclaration(declaration);
 
@@ -70,7 +70,7 @@ internal class BuiltinClassTree
             var type = declaration.GetGenericType(field.FieldType.Name) ?? new TypeReference(field.FieldType.Name);
             var memberField = new MemberField(field.Name, type)
             {
-                UserData = field
+                DotnetType = field
             };
             declaration.AddField(memberField);
         }
@@ -86,7 +86,7 @@ internal class BuiltinClassTree
                              new TypeReference(method.ReturnType.Name);
             var memberMethod = new MemberMethod(method.Name, parameters, returnType)
             {
-                UserData = method
+                DotnetType = method
             };
 
             declaration.AddMethod(memberMethod);
@@ -100,7 +100,7 @@ internal class BuiltinClassTree
             var parameters = ExtractParameters(declaration, constructor);
             var memberConstructor = new MemberConstructor(parameters)
             {
-                UserData = constructor
+                DotnetType = constructor
             };
 
             declaration.AddConstructor(memberConstructor);

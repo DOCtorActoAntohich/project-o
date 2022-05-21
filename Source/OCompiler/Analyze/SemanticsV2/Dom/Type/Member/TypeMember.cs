@@ -4,7 +4,7 @@ internal abstract class TypeMember : CodeObject
 {
     public ClassDeclaration? Owner { get; set; }
     
-    public object? UserData;
+    public System.Reflection.MemberInfo? DotnetType;
     
     protected TypeMember(string name) : base(name)
     {
