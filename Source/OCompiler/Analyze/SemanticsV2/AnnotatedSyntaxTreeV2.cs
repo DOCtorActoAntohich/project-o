@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using OCompiler.Analyze.SemanticsV2.Dom.Type;
@@ -50,7 +51,8 @@ internal class AnnotatedSyntaxTreeV2
             var declaration = CreateEmptyDeclaration(parsedClass);
             AddClassDeclaration(declaration);
 
-            AddGenericTypeReferences(declaration, parsedClass);
+            CreateGenericTypeParametersReferences(declaration, parsedClass);
+            CreateBaseTypeReference(declaration, parsedClass.Extends);
         }
     }
 
@@ -70,12 +72,47 @@ internal class AnnotatedSyntaxTreeV2
         ParsedClasses.Add(declaration.Name, declaration);
     }
 
-    private static void AddGenericTypeReferences(ClassDeclaration declaration, ParsedClassData parsedClass)
+    private static void CreateGenericTypeParametersReferences(ClassDeclaration declaration, ParsedClassData parsedClass)
     {
         foreach (var genericType in parsedClass.Name.GenericTypes)
         {
             var genericTypeReference = new TypeReference(genericType.Name.Literal, isGeneric: true);
             declaration.GenericTypes.Add(genericTypeReference);
         }
+    }
+
+    private static void CreateBaseTypeReference(ClassDeclaration declaration, TypeAnnotation? baseType)
+    {
+        if (baseType == null)
+        {
+            return;
+        }
+
+        var baseTypeReference = new TypeReference(baseType.Name.Literal);
+        foreach (var parentGenericType in baseType.GenericTypes)
+        {
+            if (declaration.HasGenericType(parentGenericType.Name.Literal))
+            {
+                var genericType = declaration.GetGenericType(parentGenericType.Name.Literal);
+                baseTypeReference.GenericTypes.Add(genericType!);
+                continue;
+            }
+
+            var specializedGenericType = ParseSpecializedGenericType(parentGenericType);
+            baseTypeReference.GenericTypes.Add(specializedGenericType);
+        }
+
+        declaration.BaseType = baseTypeReference;
+    }
+
+    private static TypeReference ParseSpecializedGenericType(TypeAnnotation specializedType)
+    {
+        var reference = new TypeReference(specializedType.Name.Literal);
+        foreach (var specialization in specializedType.GenericTypes)
+        {
+            reference.GenericTypes.Add(ParseSpecializedGenericType(specialization));
+        }
+
+        return reference;
     }
 }

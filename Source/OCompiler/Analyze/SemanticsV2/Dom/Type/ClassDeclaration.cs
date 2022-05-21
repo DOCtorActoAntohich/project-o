@@ -50,4 +50,9 @@ internal class ClassDeclaration : TypeMember, ICanHaveGenericTypes
 
         return null;
     }
+
+    public bool HasGenericType(string name)
+    {
+        return GetGenericType(name) != null;
+    }
 }
