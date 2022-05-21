@@ -24,6 +24,8 @@ For now, the possible tokens are:
 - [Separators](#separators)
 - [Delimiters](#delimiters)
 
+Note that the O Language does not use any [operators](#operators), they are not treated as valid input elements.
+
 ## Whitespaces
 
 The recommended maximum line length is `120` symbols.
