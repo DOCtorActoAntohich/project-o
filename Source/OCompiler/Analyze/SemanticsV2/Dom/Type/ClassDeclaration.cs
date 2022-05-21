@@ -37,4 +37,17 @@ internal class ClassDeclaration : TypeMember, ICanHaveGenericTypes
         Constructors.Add(constructor);
         constructor.Owner = this;
     }
+
+    public TypeReference? GetGenericType(string name)
+    {
+        foreach (var genericType in GenericTypes)
+        {
+            if (genericType.Name == name)
+            {
+                return genericType;
+            }
+        }
+
+        return null;
+    }
 }

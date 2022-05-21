@@ -66,7 +66,9 @@ internal class BuiltinClassTree
     {
         foreach (var field in builtinClass.GetRuntimeFields())
         {
-            var memberField = new MemberField(field.Name, new TypeReference(field.FieldType.Name))
+            // Use generic type or create new type reference.
+            var type = declaration.GetGenericType(field.FieldType.Name) ?? new TypeReference(field.FieldType.Name);
+            var memberField = new MemberField(field.Name, type)
             {
                 UserData = field
             };
@@ -78,8 +80,10 @@ internal class BuiltinClassTree
     {
         foreach (var method in builtinClass.GetRuntimeMethods())
         {
-            var parameters = ExtractParameters(method);
-            var returnType = new TypeReference(method.ReturnType.Name);
+            var parameters = ExtractParameters(declaration, method);
+            // Use generic type or create new type reference.
+            var returnType = declaration.GetGenericType(method.ReturnType.Name) ??
+                             new TypeReference(method.ReturnType.Name);
             var memberMethod = new MemberMethod(method.Name, parameters, returnType)
             {
                 UserData = method
@@ -93,7 +97,7 @@ internal class BuiltinClassTree
     {
         foreach (var constructor in builtinClass.GetConstructors())
         {
-            var parameters = ExtractParameters(constructor);
+            var parameters = ExtractParameters(declaration, constructor);
             var memberConstructor = new MemberConstructor(parameters)
             {
                 UserData = constructor
@@ -103,12 +107,15 @@ internal class BuiltinClassTree
         }
     }
 
-    private IEnumerable<ParameterDeclarationExpression> ExtractParameters(MethodBase callable)
+    private IEnumerable<ParameterDeclarationExpression> ExtractParameters(ClassDeclaration declaration,
+        MethodBase callable)
     {
         var parameters = new List<ParameterDeclarationExpression>();
         foreach (var parameter in callable.GetParameters())
         {
-            var type = new TypeReference(parameter.ParameterType.Name);
+            // Use generic type or create new type reference.
+            var type = declaration.GetGenericType(parameter.ParameterType.Name) ?? 
+                       new TypeReference(parameter.ParameterType.Name);
             var name = parameter.Name ?? "";
             parameters.Add(new ParameterDeclarationExpression(name, type));
         }
