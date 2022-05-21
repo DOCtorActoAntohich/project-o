@@ -2,7 +2,7 @@
 
 Project O is a **statically typed** language, which means that the types of all variables must be known at compile time.
 
-```java
+```ts
 class Main is
     this is
         // Variable `my_var` has type String and value "hi there".
@@ -13,74 +13,451 @@ class Main is
 end
 ```
 
-Language has several builtin types. There are:
+## Built-in types
 
-+ `String`
-+ `Integer`
-+ `Real`
-+ `Boolean`
-+ `List<T>`
-+ `Dict<K, V>`
+Language has several builtin types:
 
-Let us briefly consider each type: 
+- Primitive types:
+  - [`String`](#string)
+  - [`Integer`](#integer)
+  - [`Real`](#real)
+  - [`Boolean`](#boolean)
+  - [Special primitives](#special-types)
+    - [Class](#class)
+    - [Void](#void)
+- Compound types:
+  - [`List<T>`](#list)
+  - [`Dict<K, V>`](#dict)
+- Utility types:
+  - [`IO`](#io)
+  - [`Time`](#time)
 
 ### String
 
-Immutable string type. You **cannot** change it, but you can concatenate with another string, convert it to real or integers 
-
-```java
+```ts
 var hello = "hello"
-hello = hello.Concatenate(", world")
+var fromInt  = String(123)  // or Integer(123).ToString()
+var fromReal = String(1.5)  // or Real(1.5).ToString()
+var fromBool = String(true) // or Boolean(true).ToString()
 ```
+
+Immutable string type. You **cannot** change it, but you can:
+
+- Compare it to another string:
+
+  ```ts
+  var obviouslyFalse: Boolean = hello.Compare("not hello")
+  // the variable is a Boolean false, since "hello" != "not hello"
+  ```
+
+- Concatenate it with another string:
+
+  ```ts
+  hello = hello.Concatenate(", world")
+  // Now the variable stores "hello, world"
+  ```
+
+- Take a symbol at a position inside the string
+
+  ```ts
+  // first character has index 0
+  var w: String = hello.At(7) // .At() returns a 1-symbol String
+  var e = hello.At(1)
+  var l = hello.At(2)
+  var well: String = w.Concatenate(e).Concatenate(l).Concatenate(l)
+  ```
+
+- Convert it to other primitives:
+
+  ```ts
+  var truth: Boolean   = "true".ToBoolean()
+  var number: Integer  = "42".ToInteger()
+  var realNumber: Real = "13.25".ToReal()
+  ```
+
+  If the conversion can't be done, an error at runtime happens.
+  
+  ```ts
+  var errorCause = "not a number".ToReal() // Execution would stop here
+  ```
 
 ### Integer
 
-Numerical type, represents integer number
+Numerical type, represents an integer number.
 
-```java
-var number = 31415
-number = "1231".ToInteger()
+```ts
+var number = 125
+var fromReal = Integer(1.5)  // or Real(1.5).ToInteger()
 ```
 
-### Real 
+Has 2 methods to retrieve the maximum and minimum possible values:
 
-Floating-point numbers, which are numbers with decimal points.
+```ts
+var big = Integer().Max() // any Integer variable also has this method
 
-```java
-var real_number = 3.1415
-real_number = "3.1415".ToReal()
+var bigButNegative = Integer().Min()
+```
+
+Supports a set of operations:
+
+- Arithmetics
+  
+  - May take both `Real` and `Integer` as an argument
+
+    ```ts
+    var a = number.Plus(1)   // will store 126
+    var b = number.Minus(1)  // will store 123
+    var c = number.Mult(2)   // will store 250
+    var d = number.Div(5)    // will store 25
+
+    // Comparison
+    var v = number.Less(125)         // false
+    var w = number.LessEqual(125)    // true
+    var x = number.Greater(125)      // false
+    var y = number.GreaterEqual(125) // true
+    var z = number.Equal(125.0)      // true
+    ```
+  
+  - May take only `Integer` as an argument
+  
+    ```ts
+    var mod = number.Mod(3)    // will store 2
+    ```
+
+  - No parameters
+  
+    ```ts
+    var negative = number.UnaryMinus()   // will store -125
+    ```
+
+- Conversion to other primitives
+  
+  ```ts
+  // false, any other value would give true
+  var falsity: Boolean = Integer(0).ToBoolean()
+  
+  var strValue: String = number.ToString()
+  var realNumber: Real = number.ToReal()
+  ```
+
+### Real
+
+Floating-point number, that is, a number with a decimal point.
+
+```ts
+var realNumber = 3.1415
+var fromInt = Real(123)
+```
+
+Has the same methods as `Integer`, but also has an `Epsilon()` method, which returns the smallest possible `Real` number.
+
+```ts
+var smallest = Real().Epsilon()
+```
+
+*Epsilon* value is also used to determine if the `Real` is approximately equal to zero, when converting the value to `Boolean`.
+
+```ts
+// realNumber has a value of 3.1415
+var truth = realNumber.ToBoolean() // true
+
+// If realNumber was close to zero, the variable would have stored Boolean false.
 ```
 
 ### Boolean
 
-Represents a logical value. As in most other programming languages, a `Boolean` type has two possible values: `true` and `false`.
+Represents a logical value. Has two possible values: `true` and `false`.
 
-
-```java
-var is_kek = true
-var is_lol = "false".ToBoolean()
+```ts
+var isKek = true
+var isLol = "false".ToBoolean()
 ```
+
+Supported operations:
+
+- Logic operations
+  All the logic operations return a new `Boolean` value.
+
+  ```ts
+  var and = isKek.And(isLol) // false
+  var or  = isKek.Or(isLol)  // true
+  var xor = isKek.Xor(isLol) // true
+  var not = isKek.Not()      // false
+  ```
+
+- Conversion to `Integer` and `String`
+
+  Conversion to `Integer` results in 1, if the value is `true`, 0 otherwise.
+  
+  ```ts
+  var one = isKek.ToInteger()
+  var zero = isLol.ToInteger()
+  ```
+
+  Conversion to `String` results in `"True"` for `true` value and `"False"` otherwise.
+  
+  ```ts
+  var truth:   String = isKek.ToString()
+  var falsity: String = isLol.ToString()
+  ```
 
 ### List
 
-List is compound type, meaning it stores multiple values **of the same type** together.
+`List<T>` is a compound type, meaning that it stores multiple values **of the same type** together.
 
-```java
-var lst: List<Integer> = []               // empty list of integers
-lst = [1, 2, 3]                           // list with 3 integers 
-var last = lst.Get(lst.Length().Minus(1)) // access to last item
+```ts
+var list: List<Integer> = []       // An empty list of integers
+list = [1, 2, 3]                   // A list with 3 integers
+
+var anotherList = List<Integer>()  // Also an empty list of integers
 ```
 
+Note that you need to specify the type explicitly when the list is initialized with an empty list literal `[]`.
+
+#### Methods of `List<T>`
+
+- `Length() : Integer`
+
+  Returns the current amount of items stored in the list.
+
+  ```ts
+  var len1: Integer = list.Length()  // 3, since list is [1, 2, 3]
+  var len2 = anotherList.Length()    // 0
+  ```
+
+- `Get(index: Integer) : T`
+
+  Get the item from the list by its index. Items are numbered from 0.
+
+  Causes an error if the list has less items than the target index.
+
+  ```ts
+  var two: Integer = list.Get(1)           // 2
+
+  var error = anotherList.Get(0)  // error, since anotherList is empty
+  ```
+
+- `Search(item: T) : Integer`
+
+  Returns the index of the first occurence of the item.
+
+  If the item is not found, returns `-1`.
+
+  ```ts
+  var s1 = list.Search(3)         // 2
+  var s2 = anotherList.Search(2)  // -1
+  ```
+
+- `Set(index: Integer, item: T) : Void`
+
+  Replaces the item at specified index with `item`.
+
+  Causes an error if the list has less items than the target index.
+
+  ```ts
+  list.Set(0, 15) // list is now [15, 2, 3]
+  ```
+
+- `Append(item: T) : Void`
+
+  Appends the item to the end of the list, that is, creates a new index and assigns a value associated with it.
+
+  ```ts
+  list.Append(42)            // list is now [15, 2, 3, 42]
+  var newLen = list.Length() // 4
+  ```
+
+- `RemoveAt(index: Integer) : Void`
+
+  Removes the item at specified index.
+
+  Causes an error if the list has less items than the target index.
+
+  ```ts
+  // list is [15, 3, 42]
+  var two = list.Get(1)      // 2
+  list.RemoveAt(1)           // list is now [15, 3, 42]
+  var three = list.Get(1)    // 3
+  ```
+
+- `Pop() : T`
+
+  Removes the last item in the list and returns it.
+
+  Causes an error if the list is empty.
+
+  ```ts
+  // list is [15, 3, 42]
+  var sixByNine = list.Pop() // 42
+  var len = list.Length()    // 2
+  ```
+
+P.S. [Why six by nine?](https://en.wikipedia.org/wiki/Phrases_from_The_Hitchhiker%27s_Guide_to_the_Galaxy#The_Answer_to_the_Ultimate_Question_of_Life,_the_Universe,_and_Everything_is_42)
 
 ### Dict
 
-Represents a mapping between values. As in most other programming languages, type `Dict<K, V>` stores a mapping of keys of type `K` to values of type `V`.
+`Dict<K, V>` represents a mapping between values (*keys* of type `K` and *values* of type `V`)
 
+```ts
+var dict: Dict<String, Integer> = {}     // empty dict
+dict = {"42": 42, "sus": -1}             // dict with 2 key-value pais
 
-```java
-var dct: Dict<String, Integer> = {}     // empty dict
-dct = {"42": 42}                        // dict with 1 key-value pair
-dct.Set("aboba", 1)                     // set value to key
-dct.Get("aboba")                        // get value from key
-dct.Keys()                              // return List[K]
+var anotherDict = Dict<String, Integer>()
 ```
+
+Note that, similarly to lists, you need to specify the type explicitly when the dict is initialized with an empty dict literal `{}`.
+
+#### Methods of `Dict<K, V>`
+
+- `Length() : Integer`
+
+  Returns the current amount of keys in the dict.
+
+  ```ts
+  var len1: Integer = dict.Length()  // 2
+  var len2 = anotherDict.Length()    // 0
+  ```
+
+- `Get(key: K) : V`
+
+  Get the item from the dict by its key.
+
+  Causes an error if the key is not in the dict.
+
+  ```ts
+  var minusOne: Integer = dict.Get("sus") // -1
+  ```
+
+- `Search(value: V) : K`
+
+  Returns the key of the first occurence of the value.
+
+  If the item is not found, throws an error.
+
+  ```ts
+  var s1: String = dict.Search(42) // "42"
+  ```
+
+- `Set(key: K, value: V) : Void`
+
+  Replaces the item under specified key with `value`.
+  If the key does not exist, creates it first.
+
+  ```ts
+  dict.Set("why", 13) // dict is now {"42": 42, "sus": -1, "why": 13}
+  ```
+
+- `Remove(key: K) : Void`
+
+  Removes key-pair value with the specified key.
+
+  Causes an error if there is no such key in the dict.
+
+  ```ts
+  dict.Remove("42") // dict is now {"sus": -1, "why": 13}
+  ```
+
+- `Keys() : List<K>`
+
+  Returns a `List<K>`, which contains all the keys stored in the dict.
+
+  ```ts
+  var keys = dict.Keys() // ["sus", "why"]
+  ```
+
+### IO
+
+This *utility* type allows to interact with the user's console.
+
+Possible interactions:
+
+- Write out a string
+  
+  `Write(s: String) : Void` allows to print a string in the console.
+
+  `WriteLine(s: String) : Void` does the same, but adds a line feed character to the output.
+
+  `WriteLine() : Void` simply adds a line feed character to the output.
+
+  ```ts
+  // Print 10 dots and move the cursor to the next line
+  var i = 0
+  while i.Less(10) loop
+      IO().Write(".")
+      i = i.Plus(1)  
+  end
+
+  IO.WriteLine()
+  ```
+
+- Read a line from the input
+  
+  `ReadLine() : String` blocks the program execution and reads a line from the input, returns it and continues the execution.
+
+  ```ts
+  IO().Write("Please enter a number: ")
+
+  // Waits for user input
+  var num = IO().ReadLine("Please enter a number: ").ToInteger()
+  
+  IO().WriteLine("Your number mod 8 is: ".Concatenate(
+      num.Mod(8).ToString()
+  ))
+  ```
+
+### Time
+
+This *utility* type allows to:
+
+- Get the current local time:
+  
+  `Current() : Integer` returns the current time as a [Unix Timestamp](https://en.wikipedia.org/wiki/Unix_time).
+
+  ```ts
+  var secSinceMidnight = Time.Current().Mod(86400)
+  var hours = secSinceMidnight.Div(3600)
+  var minutes = secSinceMidnight.Div(60).Mod(60)
+  var seconds = secSinceMidnight.Mod(60)
+  var time =
+      hours.ToString()
+  .Concatenate(
+      minutes.ToString()
+  ).Concatenate(
+      seconds.ToString()
+  )
+  
+  IO().WriteLine("Current time is ".Concatenate(time))
+  ```
+
+- Pause the program execution for a fixed time:
+
+  Calling `Sleep(seconds: Integer) : Void` would make the delay before proceeding the execution.
+
+  ```ts
+  // Print 3 dots and move the cursor to the next line,
+  // but wait for 1 second before printing each dot 
+  var i = 0
+  while i.Less(3) loop
+      Time.Sleep(1)
+      IO().Write(".")
+      i = i.Plus(1)  
+  end
+
+  IO.WriteLine()
+  ```
+
+### Special types
+
+These types do not have any meaningful logic, but are important to make the O Language work.
+
+#### `Class`
+
+This type is a base for all other types. It defines a single method `ToString() : String`, which returns an empty string.
+
+All the built-in classes inherit from this class, or from its descendants.
+
+All the classes in the program in O Language inherit `Class` directly, unless this behavior is changed with the `extends` syntax.
+
+#### `Void`
+
+This type has no logic at all, and represents an absence of the return value of a function.
