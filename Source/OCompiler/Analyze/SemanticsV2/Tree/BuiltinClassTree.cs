@@ -41,9 +41,12 @@ internal class BuiltinClassTree
             CreateBuiltinClass(type.BaseType);
         }
 
-        var declaration = new ClassDeclaration(TrimGrave(type.Name));
+        var declaration = new ClassDeclaration(TrimGrave(type.Name))
+        {
+            UserData = type
+        };
         AddClassDeclaration(declaration);
-        
+
         if (type.BaseType != null)
         {
             declaration.BaseTypes.Add(new TypeReference(TrimGrave(type.BaseType.Name)));
@@ -63,7 +66,10 @@ internal class BuiltinClassTree
     {
         foreach (var field in builtinClass.GetRuntimeFields())
         {
-            var memberField = new MemberField(field.Name, new TypeReference(field.FieldType.Name));
+            var memberField = new MemberField(field.Name, new TypeReference(field.FieldType.Name))
+            {
+                UserData = field
+            };
             declaration.AddField(memberField);
         }
     }
@@ -74,7 +80,10 @@ internal class BuiltinClassTree
         {
             var parameters = ExtractParameters(method);
             var returnType = new TypeReference(method.ReturnType.Name);
-            var memberMethod = new MemberMethod(method.Name, parameters, returnType);
+            var memberMethod = new MemberMethod(method.Name, parameters, returnType)
+            {
+                UserData = method
+            };
 
             declaration.AddMethod(memberMethod);
         }
@@ -85,8 +94,11 @@ internal class BuiltinClassTree
         foreach (var constructor in builtinClass.GetConstructors())
         {
             var parameters = ExtractParameters(constructor);
-            var memberConstructor = new MemberConstructor(parameters);
-            
+            var memberConstructor = new MemberConstructor(parameters)
+            {
+                UserData = constructor
+            };
+
             declaration.AddConstructor(memberConstructor);
         }
     }
