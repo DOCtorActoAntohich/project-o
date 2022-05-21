@@ -9,6 +9,7 @@ internal class TypeReference : CodeObject, ICanHaveGenericTypes
     
     public List<TypeReference> GenericTypes { get; } = new();
 
+    public System.Reflection.MemberInfo? DotnetType;
     
     public TypeReference(string name, bool isGeneric = false) : base(name)
     {
