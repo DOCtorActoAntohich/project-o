@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using OCompiler.Analyze.SemanticsV2.Dom.Expression;
 using OCompiler.Analyze.SemanticsV2.Dom.Type;
@@ -48,13 +49,14 @@ internal class BuiltinClassTree
             DotnetType = type
         };
         AddClassDeclaration(declaration);
-
+        
+        declaration.GenericTypes.AddRange(
+            type.GetGenericArguments().Select(
+                genericType => new TypeReference(genericType.Name, dotnetType: genericType)));
+        
         if (type.BaseType != null)
         {
-            declaration.BaseType = new TypeReference(TrimGrave(type.BaseType.Name))
-            {
-                DotnetType = type.BaseType
-            };
+            declaration.BaseType = new TypeReference(TrimGrave(type.BaseType.Name), dotnetType: type.BaseType);
         }
         
         AddFieldsForBuiltin(declaration, type);
@@ -71,10 +73,8 @@ internal class BuiltinClassTree
     {
         foreach (var field in builtinClass.GetRuntimeFields())
         {
-            var type = new TypeReference(field.FieldType.Name)
-            {
-                DotnetType = field.FieldType
-            };
+            var type = declaration.GetGenericType(field.FieldType.Name) ?? 
+                       new TypeReference(field.FieldType.Name, dotnetType: field.FieldType);
             var memberField = new MemberField(field.Name, type)
             {
                 DotnetType = field
@@ -87,11 +87,9 @@ internal class BuiltinClassTree
     {
         foreach (var method in builtinClass.GetRuntimeMethods())
         {
-            var parameters = ExtractParameters(method);
-            var returnType = new TypeReference(method.ReturnType.Name)
-            {
-                DotnetType = method.ReturnType
-            };
+            var parameters = ExtractParameters(declaration, method);
+            var returnType = declaration.GetGenericType(method.ReturnType.Name) ??
+                             new TypeReference(method.ReturnType.Name, dotnetType: method.ReturnType);
             var memberMethod = new MemberMethod(method.Name, parameters, returnType)
             {
                 DotnetType = method
@@ -105,7 +103,7 @@ internal class BuiltinClassTree
     {
         foreach (var constructor in builtinClass.GetConstructors())
         {
-            var parameters = ExtractParameters(constructor);
+            var parameters = ExtractParameters(declaration, constructor);
             var memberConstructor = new MemberConstructor(parameters)
             {
                 DotnetType = constructor
@@ -115,15 +113,14 @@ internal class BuiltinClassTree
         }
     }
 
-    private IEnumerable<ParameterDeclarationExpression> ExtractParameters(MethodBase callable)
+    private IEnumerable<ParameterDeclarationExpression> ExtractParameters(ClassDeclaration declaration,  
+        MethodBase callable)
     {
         var parameters = new List<ParameterDeclarationExpression>();
         foreach (var parameter in callable.GetParameters())
         {
-            var type = new TypeReference(parameter.ParameterType.Name)
-            {
-                DotnetType = parameter.ParameterType
-            };
+            var type = declaration.GetGenericType(parameter.ParameterType.Name) ??
+                       new TypeReference(parameter.ParameterType.Name, dotnetType: parameter.ParameterType);
             var name = parameter.Name ?? "";
             parameters.Add(new ParameterDeclarationExpression(name, type));
         }

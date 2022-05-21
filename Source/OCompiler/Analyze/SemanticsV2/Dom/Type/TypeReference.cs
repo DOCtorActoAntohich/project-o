@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace OCompiler.Analyze.SemanticsV2.Dom.Type;
 
@@ -9,10 +10,11 @@ internal class TypeReference : CodeObject, ICanHaveGenericTypes
     
     public List<TypeReference> GenericTypes { get; } = new();
 
-    public System.Reflection.MemberInfo? DotnetType;
+    public MemberInfo? DotnetType;
     
-    public TypeReference(string name, bool isGeneric = false) : base(name)
+    public TypeReference(string name, bool isGeneric = false, MemberInfo? dotnetType = null) : base(name)
     {
         IsGeneric = isGeneric;
+        DotnetType = dotnetType;
     }
 }
