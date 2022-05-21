@@ -1,8 +1,9 @@
 using System;
-using OCompiler.StandardLibrary.Type.Value;
-using Void = OCompiler.StandardLibrary.Type.Value.Void;
 
-namespace OCompiler.StandardLibrary.Type;
+using Void = OCompiler.Builtins.Primitives.Void;
+using OCompiler.Builtins.Primitives;
+
+namespace OCompiler.Builtins.Utility;
 
 public class Time : Class
 {

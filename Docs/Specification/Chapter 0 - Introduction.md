@@ -40,6 +40,8 @@ This section contains the definitions used across the language specification.
 ### Other
 
 - **Module** - a building unit of a program, usually represents a single file.
+- **Function (method) parameters**: names listed in the function definitions, together with their types.
+- **Function (method) arguments**: actual values that are passed in the function call.
 
 ## Memory model
 

@@ -17,7 +17,7 @@ internal class Field: Variable, IClassMember
         return true;
     }
 
-    protected Field(Identifier name, Expression.Expression expression) : base(name, expression) { }
+    protected Field(Identifier name, TypeAnnotation type, Expression.Expression expression) : base(name, type, expression) { }
 
-    protected Field(Variable variable) : base(variable.Identifier, variable.Expression) { }
+    protected Field(Variable variable) : base(variable.Identifier, variable.Type, variable.Expression) { }
 }

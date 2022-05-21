@@ -11,7 +11,7 @@ internal class Method: IClassMember
 {
     public Identifier Name { get; }
     public List<Parameter> Parameters { get; }
-    public Identifier? ReturnType { get; }
+    public TypeAnnotation? ReturnType { get; }
     public Body Body { get; }
     
     public static bool TryParse(TokenEnumerator tokens, out Method? method)
@@ -35,19 +35,17 @@ internal class Method: IClassMember
         var parameters = Member.Method.Parameters.Parse(tokens);
 
         // Try to parse return type.
-        Identifier? returnType = null;
+        TypeAnnotation? returnType = null;
         // Colon.
         if (tokens.Current() is Lexical.Tokens.Delimiters.Colon)
         {
-            // Return type.
-            if (tokens.Next() is not Identifier)
-            {
-                throw new SyntaxError(tokens.Current().Position, "Expected class name");
-            }
-            
-            returnType = (Identifier)tokens.Current();
-            // Get next token.
             tokens.Next();
+
+            // Return type.
+            if (!TypeAnnotation.TryParse(tokens, out returnType))
+            {
+                throw new SyntaxError(tokens.Current().Position, "Expected return type");
+            }
         }
         
         // Is.
@@ -74,7 +72,7 @@ internal class Method: IClassMember
         return true;
     }
 
-    private Method(Identifier name, List<Parameter> parameters, Identifier? returnType, Body body)
+    private Method(Identifier name, List<Parameter> parameters, TypeAnnotation? returnType, Body body)
     {
         Name = name;
         Parameters = parameters;
@@ -86,7 +84,7 @@ internal class Method: IClassMember
     {
         var @string = new StringBuilder();
 
-        string returnType = ReturnType is null ? "None" : ReturnType.Literal;
+        string returnType = ReturnType is null ? "Void" : ReturnType.ToString();
         @string.AppendLine($"{Name.Literal}({Member.Method.Parameters.ToString(Parameters)}) -> {returnType}");
         @string.Append(Body.ToString(prefix));
         

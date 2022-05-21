@@ -45,7 +45,7 @@ internal class BuiltClassInfo : ClassInfo
         StandardClasses = LoadStandardClasses();
     }
 
-    private static Dictionary<string, ClassInfo> LoadStandardClasses(string @namespace = "OCompiler.StandardLibrary")
+    private static Dictionary<string, ClassInfo> LoadStandardClasses(string @namespace = "OCompiler.Builtins")
     {
         var asm = Assembly.GetExecutingAssembly();
         return new Dictionary<string, ClassInfo>(

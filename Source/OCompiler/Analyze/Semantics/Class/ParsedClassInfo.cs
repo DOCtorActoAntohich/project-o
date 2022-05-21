@@ -28,9 +28,9 @@ internal class ParsedClassInfo : ClassInfo
         AddConstructors(parsedClass.Constructors);
         AddDefaultConstructor();
 
-        Name = parsedClass.Name.Literal;
+        Name = parsedClass.Name.Name.Literal;
         Class = parsedClass;
-        BaseClass = parsedClass.Extends == null ? GetByName("Class") : GetByName(parsedClass.Extends.Literal);
+        BaseClass = parsedClass.Extends == null ? GetByName("Class") : GetByName(parsedClass.Extends.Name.Literal);
     }
 
     protected ParsedClassInfo()
@@ -94,7 +94,7 @@ internal class ParsedClassInfo : ClassInfo
 
     public static ParsedClassInfo GetByClass(Syntax.Declaration.Class.Class parsedClass)
     {
-        var name = parsedClass.Name.Literal;
+        var name = parsedClass.Name.Name.Literal;
         if (ParsedClasses.TryGetValue(name, out var classInfo) && classInfo is not EmptyParsedClassInfo)
         {
             return classInfo;
