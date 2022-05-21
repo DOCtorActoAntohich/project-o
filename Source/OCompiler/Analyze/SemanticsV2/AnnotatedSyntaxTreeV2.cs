@@ -11,6 +11,7 @@ namespace OCompiler.Analyze.SemanticsV2;
 internal class AnnotatedSyntaxTreeV2
 {
     public Dictionary<string, ClassDeclaration> BuiltinClasses { get; } = new();
+    public Dictionary<string, ClassDeclaration> ParsedClasses { get; } = new();
 
 
     public AnnotatedSyntaxTreeV2(Syntax.Tree syntaxTree)
@@ -23,28 +24,43 @@ internal class AnnotatedSyntaxTreeV2
     {
         foreach (var @class in BuiltinClassesFromAssembly())
         {
+            if (HasBuiltinClass(@class))
+            {
+                continue;
+            }
             CreateBuiltinClass(@class);
         }
     }
 
+    private static string TrimGrave(string typeName)
+    {
+        var graveIndex = typeName.IndexOf('`');
+        return graveIndex >= 0 ? typeName[..graveIndex] : typeName;
+    }
+
+    private bool HasBuiltinClass(Type type)
+    {
+        return BuiltinClasses.ContainsKey(TrimGrave(type.Name));
+    }
+    
     private void CreateBuiltinClass(Type type)
     {
-        if (type.BaseType != null && type.BaseType != typeof(object))
+        if (type.BaseType != null && type.BaseType != typeof(object) && !HasBuiltinClass(type.BaseType))
         {
             CreateBuiltinClass(type.BaseType);
         }
 
-        var declaration = new ClassDeclaration(type.Name);
+        var declaration = new ClassDeclaration(TrimGrave(type.Name));
         AddClassDeclaration(declaration);
         
         if (type.BaseType != null)
         {
-            declaration.BaseTypes.Add(new TypeReference(type.BaseType.Name));
+            declaration.BaseTypes.Add(new TypeReference(TrimGrave(type.BaseType.Name)));
         }
         
-        AddFieldsForBuiltin(type);
-        AddMethodsForBuiltin(type);
-        AddConstructorsForBuiltin(type);
+        AddFieldsForBuiltin(declaration, type);
+        AddMethodsForBuiltin(declaration, type);
+        AddConstructorsForBuiltin(declaration, type);
     }
 
     private void AddClassDeclaration(ClassDeclaration declaration)
@@ -52,9 +68,8 @@ internal class AnnotatedSyntaxTreeV2
         BuiltinClasses.Add(declaration.Name, declaration);
     }
 
-    private void AddFieldsForBuiltin(Type builtinClass)
+    private void AddFieldsForBuiltin(ClassDeclaration declaration, Type builtinClass)
     {
-        var declaration = BuiltinClasses[builtinClass.Name];
         foreach (var field in builtinClass.GetRuntimeFields())
         {
             var memberField = new MemberField(field.Name, new TypeReference(field.FieldType.Name));
@@ -62,9 +77,8 @@ internal class AnnotatedSyntaxTreeV2
         }
     }
 
-    private void AddMethodsForBuiltin(Type builtinClass)
+    private void AddMethodsForBuiltin(ClassDeclaration declaration, Type builtinClass)
     {
-        var declaration = BuiltinClasses[builtinClass.Name];
         foreach (var method in builtinClass.GetRuntimeMethods())
         {
             var parameters = ExtractParameters(method);
@@ -75,9 +89,8 @@ internal class AnnotatedSyntaxTreeV2
         }
     }
 
-    private void AddConstructorsForBuiltin(Type builtinClass)
+    private void AddConstructorsForBuiltin(ClassDeclaration declaration, Type builtinClass)
     {
-        var declaration = BuiltinClasses[builtinClass.Name];
         foreach (var constructor in builtinClass.GetConstructors())
         {
             var parameters = ExtractParameters(constructor);
@@ -100,7 +113,7 @@ internal class AnnotatedSyntaxTreeV2
         return parameters;
     }
     
-    private static List<Type> BuiltinClassesFromAssembly(string @namespace = "OCompiler.StandardLibrary")
+    private static List<Type> BuiltinClassesFromAssembly(string @namespace = "OCompiler.Builtins")
     {
         var standardClasses = new List<Type>();
         foreach (var type in Assembly.GetExecutingAssembly().GetTypes())
