@@ -32,8 +32,8 @@ namespace OCompiler.Pipeline
                 throw new AnalyzeError("No classes.");
             }
 
-            var validator = new AnnotatedSyntaxTree(tokenTree);
             var annotatedSyntaxTree = new AnnotatedSyntaxTreeV2(tokenTree);
+            var validator = new AnnotatedSyntaxTree(tokenTree);
             
             var generator = new Emitter(validator.ValidatedClasses);
 

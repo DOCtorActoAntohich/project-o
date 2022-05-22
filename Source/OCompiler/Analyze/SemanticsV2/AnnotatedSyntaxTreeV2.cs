@@ -11,8 +11,6 @@ namespace OCompiler.Analyze.SemanticsV2;
 
 internal class AnnotatedSyntaxTreeV2
 {
-    private static readonly string RootClassName = "Class";
-    
     public Dictionary<string, ClassDeclaration> BuiltinClasses { get; }
     public Dictionary<string, ClassDeclaration> ParsedClasses { get; } = new();
 
@@ -22,6 +20,8 @@ internal class AnnotatedSyntaxTreeV2
         BuiltinClasses = new BuiltinClassTree().Classes;
         
         CreateDeclarationsFrom(syntaxTree);
+
+        var inheritanceTree = new InheritanceTree(BuiltinClasses, ParsedClasses);
     }
 
     public ClassDeclaration GetClass(string name)
@@ -85,26 +85,30 @@ internal class AnnotatedSyntaxTreeV2
     {
         if (baseType == null)
         {
+            declaration.BaseType = new TypeReference(InheritanceTree.RootClassName);
             return;
         }
 
         var baseTypeReference = new TypeReference(baseType.Name.Literal);
         foreach (var parentGenericType in baseType.GenericTypes)
         {
-            if (declaration.HasGenericType(parentGenericType.Name.Literal))
-            {
-                var genericType = declaration.GetGenericType(parentGenericType.Name.Literal);
-                baseTypeReference.GenericTypes.Add(genericType!);
-                continue;
-            }
-
-            var specializedGenericType = ParseSpecializedGenericType(parentGenericType);
-            baseTypeReference.GenericTypes.Add(specializedGenericType);
+            var typeReference = TypeReferenceFromTypeAnnotation(declaration, parentGenericType);
+            baseTypeReference.GenericTypes.Add(typeReference);
         }
 
         declaration.BaseType = baseTypeReference;
     }
 
+    private static TypeReference TypeReferenceFromTypeAnnotation(ClassDeclaration declaration, TypeAnnotation type)
+    {
+        if (declaration.HasGenericType(type.Name.Literal))
+        {
+            return declaration.GetGenericType(type.Name.Literal)!;
+        }
+        
+        return ParseSpecializedGenericType(type);
+    }
+    
     private static TypeReference ParseSpecializedGenericType(TypeAnnotation specializedType)
     {
         var reference = new TypeReference(specializedType.Name.Literal);
@@ -114,5 +118,10 @@ internal class AnnotatedSyntaxTreeV2
         }
 
         return reference;
+    }
+
+    private static void CreateAllMembers(ClassDeclaration declaration, ParsedClassData parsedClass)
+    {
+
     }
 }
