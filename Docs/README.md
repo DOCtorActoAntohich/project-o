@@ -4,12 +4,12 @@
 
 ### Table of contents
 
-- [Chapter 0 - Introduction](Specification/Chapter%200%20-%20Introduction.md)
-- [Chapter 1 - Lexical Structure](Specification/Chapter%201%20-%20Lexical%20Structure.md)
-- [Chapter 2 - Types](Specification/Chapter%202%20-%20Types.md)
-- [Chapter 3 - Syntactic Structure](Specification/Chapter%203%20-%20Syntactic%20Structure.md)
-- [Chapter 4 - Object-Oriented Programming](Specification/Chapter%204%20-%20Object-Oriented%20Programming.md)
-- [Chapter 5 - Generics](Specification/Chapter%205%20-%20Generics.md)
+- [Chapter 0 - Introduction](Specification/0_Introduction.md)
+- [Chapter 1 - Lexical Structure](Specification/1_Lexical_structure.md)
+- [Chapter 2 - Syntactic Structure](Specification/2_Syntax_and_semantics.md)
+- [Chapter 3 - Types](Specification/3_Types.md)
+- [Chapter 4 - Object-Oriented Programming](Specification/4_OOP.md)
+- [Chapter 5 - Generics](Specification/5_Generics.md)
 
 #### Credits
 

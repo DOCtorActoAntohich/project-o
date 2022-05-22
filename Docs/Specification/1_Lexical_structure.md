@@ -170,7 +170,7 @@ return
 
 ### Built-in literals
 
-Note that `true` and `false` might appear to be keywords, but they are technically **Boolean literals**:
+Note that `true` and `false` might appear to be keywords, but technically they are **Boolean literals**:
 
 ```c
 true false
@@ -313,7 +313,7 @@ Colon `:` is used to
 - denote the type of a function parameter,
 - denote the type of a variable,
 - denote the return type of a method,
-- split a key-value pair in [dictionary](Chapter%202%20-%20Types.md#Dict) definition.
+- split a key-value pair in a [dict](3_types.md#dict) definition.
 
 ```typescript
 class Example is
@@ -352,7 +352,7 @@ end
 
 ### Square brackets
 
-Square brackets `[` `]` are used for defining [lists](Chapter%202%20-%20Types.md#List):
+Square brackets `[` `]` are used for defining [lists](3_Types.md#list):
 
 ```typescript
 var emptyList = []
@@ -361,7 +361,7 @@ var list = [13, 27, 39, 42]
 
 ### Curly brackets
 
-Curly brackets `{` `}` are used for defining [dictionaries](Chapter%202%20-%20Types.md#Dict):
+Curly brackets `{` `}` are used for defining [dicts](3_types.md#dict):
 
 ```typescript
 var emptyDict = {}
