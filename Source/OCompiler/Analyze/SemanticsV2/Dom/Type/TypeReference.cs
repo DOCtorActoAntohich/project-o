@@ -29,11 +29,10 @@ internal class TypeReference : CodeObject, ICanHaveGenericTypes
             return stringBuilder.ToString();
         }
         
-        stringBuilder
+        return stringBuilder
             .Append('<')
-            .Append(string.Join(", ", GenericTypes.Select(type => type.ToString()).ToArray()))
-            .Append('>');
-
-        return stringBuilder.ToString();
+            .Append(string.Join(", ", GenericTypes))
+            .Append('>')
+            .ToString();
     }
 }
