@@ -1,5 +1,7 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
+using System.Text;
 
 namespace OCompiler.Analyze.SemanticsV2.Dom.Type;
 
@@ -16,5 +18,22 @@ internal class TypeReference : CodeObject, ICanHaveGenericTypes
     {
         IsGeneric = isGeneric;
         DotnetType = dotnetType;
+    }
+
+    public override string ToString()
+    {
+        var stringBuilder = new StringBuilder(Name);
+
+        if (GenericTypes.Count == 0)
+        {
+            return stringBuilder.ToString();
+        }
+        
+        stringBuilder
+            .Append('<')
+            .Append(string.Join(", ", GenericTypes.Select(type => type.ToString()).ToArray()))
+            .Append('>');
+
+        return stringBuilder.ToString();
     }
 }

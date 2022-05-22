@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using OCompiler.Analyze.SemanticsV2.Dom.Type;
@@ -21,7 +20,35 @@ internal class AnnotatedSyntaxTreeV2
         
         CreateDeclarationsFrom(syntaxTree);
 
-        var inheritanceTree = new InheritanceTree(BuiltinClasses, ParsedClasses);
+        var inheritanceTree = new InheritanceTree(this);
+    }
+
+    public int ClassesCount => BuiltinClasses.Count + ParsedClasses.Count;
+
+    public IEnumerable<string> AllNames()
+    {
+        foreach (var name in BuiltinClasses.Keys)
+        {
+            yield return name;
+        }
+
+        foreach (var name in ParsedClasses.Keys)
+        {
+            yield return name;
+        }
+    }
+    
+    public IEnumerable<ClassDeclaration> AllClasses()
+    {
+        foreach (var @class in BuiltinClasses.Values)
+        {
+            yield return @class;
+        }
+
+        foreach (var @class in ParsedClasses.Values)
+        {
+            yield return @class;
+        }
     }
 
     public ClassDeclaration GetClass(string name)
@@ -42,6 +69,16 @@ internal class AnnotatedSyntaxTreeV2
     public bool HasClass(string name)
     {
         return BuiltinClasses.ContainsKey(name) || ParsedClasses.ContainsKey(name);
+    }
+
+    public bool IsValid(TypeReference typeReference)
+    {
+        if (typeReference.IsGeneric)
+        {
+            return true;
+        }
+        
+        return HasClass(typeReference.Name) && typeReference.GenericTypes.All(IsValid);
     }
 
     private void CreateDeclarationsFrom(Syntax.Tree syntaxTree)

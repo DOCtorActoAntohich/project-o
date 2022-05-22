@@ -12,20 +12,18 @@ using ClassDict = Dictionary<string, ClassDeclaration>;
 internal class InheritanceTree
 {
     public static readonly string RootClassName = "Class";
+    private static readonly string DotnetRootType = "Object";
 
     public bool IsValid { get; private set; }
-    
-    
-    private readonly ClassDict _classes;
+
+
+    private readonly AnnotatedSyntaxTreeV2 _ast;
     private readonly Dictionary<string, int> _inheritanceDepth = new();
 
     
-    public InheritanceTree(ClassDict builtins, ClassDict parsedClasses)
+    public InheritanceTree(AnnotatedSyntaxTreeV2 ast)
     {
-        var allClasses =
-            builtins.GetEnumerator().MakeEnumerable().Concat(parsedClasses.GetEnumerator().MakeEnumerable());
-
-        _classes = new ClassDict(allClasses);
+        _ast = ast;
 
         ValidateTree();
     }
@@ -47,13 +45,23 @@ internal class InheritanceTree
 
         var newParents = new List<string>();
         
-        foreach (var potentialChild in _classes.Values)
+        foreach (var potentialChild in _ast.AllClasses())
         {
-            if (potentialChild.BaseType == null || potentialChild.BaseType.Name != @class)
+            if (potentialChild.BaseType == null || potentialChild.BaseType.Name == DotnetRootType)
             {
                 continue;
             }
             
+            if (!_ast.IsValid(potentialChild.BaseType))
+            {
+                throw new AnalyzeError($"Invalid type reference: {potentialChild.BaseType}");
+            }
+            
+            if (potentialChild.BaseType.Name != @class)
+            {
+                continue;
+            }
+
             _inheritanceDepth.Add(potentialChild.Name, currentDepth);
             newParents.Add(potentialChild.Name);
         }
@@ -66,12 +74,12 @@ internal class InheritanceTree
 
     private void CheckForUntouchedClasses()
     {
-        if (_classes.Count == _inheritanceDepth.Count)
+        if (_ast.ClassesCount == _inheritanceDepth.Count)
         {
             return;
         }
 
-        var untouchedClasses = _classes.Keys.Where(name => !_inheritanceDepth.ContainsKey(name));
+        var untouchedClasses = _ast.AllNames().Where(name => !_inheritanceDepth.ContainsKey(name));
         var errorMessage = new StringBuilder("All or some of the following classes form a cycle in inheritance tree: ");
         errorMessage.Append(string.Join(", ", untouchedClasses.ToArray()));
 
