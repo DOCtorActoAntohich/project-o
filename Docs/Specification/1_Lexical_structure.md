@@ -172,7 +172,7 @@ return
 
 Note that `true` and `false` might appear to be keywords, but technically they are **Boolean literals**:
 
-```c
+```ts
 true false
 ```
 
@@ -209,7 +209,7 @@ These two literals are **reserved**, and **cannot be used as identifiers**.
 
 However, the following identifiers are valid (although it is **NOT recommended** to name variables this way):
 
-```typescript
+```ts
 True
 true_
 fALSE
@@ -220,7 +220,7 @@ _false
 
 A string literal consists of zero or more characters enclosed in double quotes:
 
-```typescript
+```ts
 ""   // Empty string.
 "The quick brown fox jumps over the lazy dog!"
 "The cost is 5$, but with a 50% discount it's 2.5$."
@@ -228,7 +228,7 @@ A string literal consists of zero or more characters enclosed in double quotes:
 
 Note that line feed character in the string is completely valid:
 
-```typescript
+```ts
 "This is an example of a string that
 spans across multiple lines"
 ```
@@ -247,7 +247,7 @@ There is no separators for statements.
 
 Bodies of methods and classes are separated by keywords `is` and `end`:
 
-```c
+```ts
 class Example is
     this() is 
         IO().Write("I'm alive")
@@ -259,17 +259,18 @@ end
 
 Body of `while` loops is separated by keywords `loop` and `end`:
 
-```c
+```ts
 while i.Less(5) loop
     IO().Write(i.ToString())
     i = i.Minus(1)
 end
+```
 
 #### Conditionals
 
 Body of `if` conditional is separated by keywords `then` and `end`:
 
-```c
+```ts
 if a.Greater(5) then
     a = 5
 end
@@ -277,7 +278,7 @@ end
 
 If the conditional includes an `else` body, a triplet `then`/`else`/`end` is used:
 
-```c
+```ts
 if a.Greater(0) then
     message = "Number is positive"
 else
@@ -310,9 +311,9 @@ a = 42     // store 42 in variable a
 
 Colon `:` is used to
 
-- denote the type of a function parameter,
-- denote the type of a variable,
-- denote the return type of a method,
+- denote the type of a [function parameter](2_Syntax_and_semantics.md#method-parameters),
+- denote the type of a [variable](2_Syntax_and_semantics.md#variable-definition),
+- denote the return type of a [method](2_Syntax_and_semantics.md#methods),
 - split a key-value pair in a [dict](3_types.md#dict) definition.
 
 ```typescript
@@ -329,11 +330,9 @@ end
 
 ### Parentheses
 
-Parentheses `(` `)` and commas `,` are used to define methods parameters and to pass parameters on method calls.
+Parentheses `(` `)` and commas `,` are used to define [methods parameters](2_Syntax_and_semantics.md#method-parameters) and to pass parameters on [method calls](2_Syntax_and_semantics.md#method-calls).
 
-If a method **is called** without arguments, parentheses are still necessary:
-
-```typescript
+```ts
 Integer(1).Plus(1)    // returns 2
 Integer(1).ToString() // returns "1"
 Integer(1).ToString   // is just a method reference — method is not called
@@ -343,7 +342,7 @@ Integer(1).ToString   // is just a method reference — method is not called
 
 Angle brackets `<` `>` are used to denote generic types:
 
-```typescript
+```ts
 class SomeGeneric<K> is
   var listOfK: List<K> = []
   var listOfIntegers: List<Integer> = []
@@ -354,7 +353,7 @@ end
 
 Square brackets `[` `]` are used for defining [lists](3_Types.md#list):
 
-```typescript
+```ts
 var emptyList = []
 var list = [13, 27, 39, 42]
 ```
@@ -374,12 +373,12 @@ By the language design, all regular symbolic unary and binary operators, often f
 
 So, instead of the following:
 
-```typescript
+```ts
 a = a * 7 + 9
 ```
 
 One should write:
 
-```typescript
+```ts
 a = a.Mult(7).Plus(9)
 ```

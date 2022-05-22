@@ -58,7 +58,7 @@ end
 
 ### Methods
 
-Methods are defined using `method` keyword, with arguments passed in parentheses after the method name. If there is no parameters, the parentheses are still required.
+Methods are defined using `method` keyword, followed with the method name and the method [parameters](#method-parameters) afterwards.
 
 If the method has a return type, it must be stated using `:` after the argument list.
 
@@ -71,6 +71,18 @@ The body of a method can contain [statements](#statements):
 - [Conditional block](#conditional-statements)
 - [Loop](#loops)
 - [Return](#return)
+
+#### Method parameters
+
+Each parameter must be defined as a name, followed by a colon `:`, and a type for this parameter.
+
+These definitions should be listed using comma `,`, and whole this list should be enclosed in parentheses `(` `)` and put after the method name.
+
+For example: `method SomeMethod(param1: Integer, param2: String)`
+
+**Note:** If there is no parameters, the parentheses are still required.
+
+#### Example
 
 Here is an example of a class with 1 [constructor](#constructors) and 2 methods:
 
