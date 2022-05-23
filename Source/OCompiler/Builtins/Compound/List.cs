@@ -20,7 +20,12 @@ public class List<T> : Class
 
     public void RemoveAt(Integer index) => _list.RemoveAt(index.Value);
     
-    public void Pop() => _list.RemoveAt(_list.Count - 1);
+    public T Pop() {
+        var lastIndex = _list.Count - 1;
+        var item = _list[lastIndex];
+        _list.RemoveAt(lastIndex);
+        return item;
+    }
     
     public Integer Search(T item) => new(_list.IndexOf(item));
 }
