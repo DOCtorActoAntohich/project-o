@@ -117,7 +117,7 @@ internal partial class AnnotatedSyntaxTreeV2
 
             if (field.Type != null)
             {
-                var fieldType = TypeReferenceFromTypeAnnotation(declaration, field.Type);
+                memberField.Type = TypeReferenceFromTypeAnnotation(declaration, field.Type);
             }
             
             declaration.AddField(memberField);
