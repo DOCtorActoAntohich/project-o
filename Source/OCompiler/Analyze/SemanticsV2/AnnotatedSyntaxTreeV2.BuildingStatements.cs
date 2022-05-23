@@ -204,13 +204,13 @@ internal partial class AnnotatedSyntaxTreeV2
             return new ReturnStatement();
         }
         
-        var expression = ParseRValueExpression(returnStatement.ReturnValue);
+        var expression = ParseExpression(returnStatement.ReturnValue);
         return new ReturnStatement(expression);
     }
     
     private DomStatement ParseIfStatement(ICanHaveStatements holder, If ifStatement)
     {
-        var condition = ParseRValueExpression(ifStatement.Condition);
+        var condition = ParseExpression(ifStatement.Condition);
         var @if = new ConditionStatement(condition);
         FillBlock(@if, ifStatement.Body);
         
@@ -224,7 +224,7 @@ internal partial class AnnotatedSyntaxTreeV2
 
     private DomStatement ParseWhileLoop(ICanHaveStatements holder, While whileLoop)
     {
-        var condition = ParseRValueExpression(whileLoop.Condition);
+        var condition = ParseExpression(whileLoop.Condition);
         var @while = new LoopStatement(condition);
         FillBlock(@while, whileLoop.Body);
 
@@ -233,7 +233,7 @@ internal partial class AnnotatedSyntaxTreeV2
 
     private DomStatement ParseRValueExpressionStatement(ICanHaveStatements holder, SyntaxExpression expression)
     {
-        return new ExpressionStatement(ParseRValueExpression(expression));
+        return new ExpressionStatement(ParseExpression(expression));
     }
 
     private DomStatement ParseVariableDeclaration(ICanHaveStatements holder, Variable variable)
@@ -246,15 +246,15 @@ internal partial class AnnotatedSyntaxTreeV2
             declaration.Type = TypeReferenceFromTypeAnnotation(root, variable.Type);
         }
 
-        declaration.InitExpression = ParseRValueExpression(variable.Expression);
+        declaration.InitExpression = ParseExpression(variable.Expression);
         
         return declaration;
     }
     
     private DomStatement ParseAssignmentStatement(ICanHaveStatements holder, Assignment assignment)
     {
-        var lvalue = ParseLValueExpression(assignment.Variable);
-        var rvalue = ParseRValueExpression(assignment.Value);
+        var lvalue = ParseExpression(assignment.Variable);
+        var rvalue = ParseExpression(assignment.Value);
         return new AssignStatement(lvalue, rvalue);
     }
 

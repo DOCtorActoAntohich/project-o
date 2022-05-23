@@ -2,20 +2,18 @@ using System.Collections.Generic;
 
 namespace OCompiler.Analyze.SemanticsV2.Dom.Expression;
 
-internal class MethodCallExpression : Expression, ICanHaveArguments
+internal class MethodCallExpression : CallExpression
 {
-    public Expression ObjectReference { get; set; }
+    public Expression? ObjectReference { get; set; }
 
-    public List<Expression> Arguments { get; } = new();
-    
-    
-    public MethodCallExpression(Expression @object, string name) : base(name)
+
+    public MethodCallExpression(Expression? @object, string name) : base(name)
     {
         ObjectReference = @object;
     }
 
     public MethodCallExpression(
-        Expression @object, 
+        Expression? @object, 
         string name, 
         IEnumerable<Expression> arguments) 
         : this(@object, name)
