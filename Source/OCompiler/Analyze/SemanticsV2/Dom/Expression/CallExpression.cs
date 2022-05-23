@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Text;
 
 namespace OCompiler.Analyze.SemanticsV2.Dom.Expression;
 
@@ -21,5 +22,14 @@ internal abstract class CallExpression : Expression, ICanHaveArguments
         {
             AddArgument(argument);
         }
+    }
+
+    public override string ToString()
+    {
+        return new StringBuilder(Name)
+            .Append('(')
+            .Append(string.Join(", ", Arguments))
+            .Append(')')
+            .ToString();
     }
 }

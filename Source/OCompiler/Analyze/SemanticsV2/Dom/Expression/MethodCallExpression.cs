@@ -4,20 +4,25 @@ namespace OCompiler.Analyze.SemanticsV2.Dom.Expression;
 
 internal class MethodCallExpression : CallExpression
 {
-    public Expression? ObjectReference { get; set; }
+    public Expression? SourceObject { get; set; }
 
 
-    public MethodCallExpression(Expression? @object, string name) : base(name)
+    public MethodCallExpression(Expression? sourceObject, string name) : base(name)
     {
-        ObjectReference = @object;
+        SourceObject = sourceObject;
     }
 
     public MethodCallExpression(
-        Expression? @object, 
+        Expression? sourceObject, 
         string name, 
         IEnumerable<Expression> arguments) 
-        : this(@object, name)
+        : this(sourceObject, name)
     {
         Arguments.AddRange(arguments);
+    }
+
+    public override string ToString()
+    {
+        return $"{SourceObject}.{base.ToString()}";
     }
 }

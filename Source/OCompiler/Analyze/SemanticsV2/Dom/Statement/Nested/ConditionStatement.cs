@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Text;
 using DomExpression = OCompiler.Analyze.SemanticsV2.Dom.Expression.Expression;
 
 namespace OCompiler.Analyze.SemanticsV2.Dom.Statement.Nested;
@@ -11,6 +12,7 @@ internal class ConditionStatement : Statement, ICanHaveStatements
     public List<Statement> Statements { get; } = new();
 
     public List<Statement> ElseStatements { get; } = new();
+    public bool HasElseBlock => ElseStatements.Count > 0;
 
     public ConditionStatement(DomExpression condition)
     {
@@ -44,5 +46,25 @@ internal class ConditionStatement : Statement, ICanHaveStatements
         {
             AddElseStatement(statement);
         }
+    }
+
+    public new string ToString(string prefix = "", string nestedPrefix = "")
+    {
+        var stringBuilder = new StringBuilder(prefix)
+            .Append($"if ({Condition})\n")
+            .Append(ICanHaveStatements.StatementsString(Statements, nestedPrefix));
+        
+
+        if (!HasElseBlock)
+        {
+            return stringBuilder.ToString();
+        }
+
+        stringBuilder
+            .Append('\n').Append(prefix)
+            .Append("else\n")
+            .Append(ICanHaveStatements.StatementsString(ElseStatements, nestedPrefix));
+
+        return stringBuilder.ToString();
     }
 }

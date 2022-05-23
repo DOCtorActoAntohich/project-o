@@ -7,4 +7,9 @@ internal class ThisReferenceExpression : Expression
     public ThisReferenceExpression() : base(ThisToken.Literal)
     {
     }
+
+    public override string ToString()
+    {
+        return Name;
+    }
 }

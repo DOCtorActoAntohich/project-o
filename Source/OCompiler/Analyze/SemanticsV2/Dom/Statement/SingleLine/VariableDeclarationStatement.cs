@@ -1,3 +1,4 @@
+using System.Text;
 using OCompiler.Analyze.SemanticsV2.Dom.Type;
 using DomExpression = OCompiler.Analyze.SemanticsV2.Dom.Expression.Expression;
 
@@ -35,5 +36,23 @@ internal class VariableDeclarationStatement : Statement
     {
         Type = type;
         InitExpression = initExpression;
+    }
+
+    public string ToString(string prefix = "")
+    {
+        var stringBuilder = new StringBuilder(prefix)
+            .Append(Name);
+
+        if (Type != null)
+        {
+            stringBuilder.Append($": {Type}");
+        }
+
+        if (InitExpression != null)
+        {
+            stringBuilder.Append($" = {InitExpression}");
+        }
+
+        return stringBuilder.ToString();
     }
 }

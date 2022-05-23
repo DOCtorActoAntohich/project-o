@@ -37,6 +37,8 @@ internal partial class AnnotatedSyntaxTreeV2
             CreateBaseTypeReference(declaration, parsedClass.Extends);
 
             CreateConstructors(declaration, parsedClass);
+            CreateMethods(declaration, parsedClass);
+            CreateFields(declaration, parsedClass);
         }
     }
 
@@ -106,9 +108,19 @@ internal partial class AnnotatedSyntaxTreeV2
 
     private void CreateFields(ClassDeclaration declaration, ParsedClassData parsedClass)
     {
-        foreach (var fieldDeclaration in parsedClass.Fields)
+        foreach (var field in parsedClass.Fields)
         {
-            // TODO create fields.
+            var memberField = new MemberField(field.Identifier.Literal)
+            {
+                InitExpression = ParseExpression(field.Expression)
+            };
+
+            if (field.Type != null)
+            {
+                var fieldType = TypeReferenceFromTypeAnnotation(declaration, field.Type);
+            }
+            
+            declaration.AddField(memberField);
         }
     }
     
@@ -133,13 +145,7 @@ internal partial class AnnotatedSyntaxTreeV2
         foreach (var parameter in parameters)
         {
             var parameterType = TypeReferenceFromTypeAnnotation(declaration, parameter.Type);
-            /*if (!IsValid(parameterType))
-            {
-                throw new AnalyzeError(
-                    parameter.Name.Position,
-                    $"Parameter type {parameterType} in constructor" +
-                    $"{declaration.Name}({constructor.Parameters.Count}) is not found");
-            }*/
+
             var parameterDeclaration = new ParameterDeclarationExpression(parameter.Name.Literal, parameterType);
             callable.AddParameter(parameterDeclaration);
         }
@@ -151,7 +157,13 @@ internal partial class AnnotatedSyntaxTreeV2
         {
             var memberMethod = new MemberMethod(declaration.Name);
             CreateParameters(declaration, memberMethod, method.Parameters);
-            // TODO return type, generics.
+            
+            // TODO generics.
+            
+            if (method.ReturnType != null)
+            {
+                memberMethod.ReturnType = TypeReferenceFromTypeAnnotation(declaration, method.ReturnType);
+            }
             
             FillBlock(memberMethod, method.Body);
 

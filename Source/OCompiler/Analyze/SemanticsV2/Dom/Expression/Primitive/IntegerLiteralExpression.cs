@@ -8,4 +8,9 @@ internal class IntegerLiteralExpression : PrimitiveLiteralExpression
     {
         Value = value;
     }
+
+    public override string ToString()
+    {
+        return Value.ToString();
+    }
 }

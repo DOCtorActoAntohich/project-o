@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using OCompiler.Analyze.SemanticsV2.Dom.Expression;
 using OCompiler.Analyze.SemanticsV2.Dom.Type;
 using OCompiler.Analyze.SemanticsV2.Dom.Type.Member;
@@ -72,5 +73,17 @@ internal partial class AnnotatedSyntaxTreeV2
     public bool HasClass(string name)
     {
         return BuiltinClasses.ContainsKey(name) || ParsedClasses.ContainsKey(name);
+    }
+
+    public override string ToString()
+    {
+        var stringBuilder = new StringBuilder();
+
+        foreach (var declaration in ParsedClasses.Values)
+        {
+            stringBuilder.AppendLine(declaration.ToString());
+        }
+        
+        return stringBuilder.ToString();
     }
 }

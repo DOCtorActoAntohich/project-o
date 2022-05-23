@@ -19,4 +19,9 @@ internal class LoopStatement : Statement, ICanHaveStatements
     {
         (this as ICanHaveStatements).AddStatements(statements);
     }
+
+    public override string ToString()
+    {
+        return $"while ({Condition})";
+    }
 }

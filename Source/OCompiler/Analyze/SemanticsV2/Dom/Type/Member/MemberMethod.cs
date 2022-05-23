@@ -1,5 +1,7 @@
 using System.Collections.Generic;
+using System.Text;
 using OCompiler.Analyze.SemanticsV2.Dom.Expression;
+using OCompiler.Analyze.SemanticsV2.Dom.Statement;
 using DomStatement = OCompiler.Analyze.SemanticsV2.Dom.Statement.Statement;
 
 namespace OCompiler.Analyze.SemanticsV2.Dom.Type.Member;
@@ -23,5 +25,25 @@ internal class MemberMethod : CallableMember, ICanHaveGenericTypes
         ) : this(name, returnType)
     {
         AddParameters(parameters);
+    }
+
+    public string ToString(string prefix = "", string nestedPrefix = "")
+    {
+        var stringBuilder = new StringBuilder(prefix)
+            .Append(Name)
+            .Append('(')
+            .Append(string.Join(", ", Parameters))
+            .Append(')');
+
+        if (ReturnType != null)
+        {
+            stringBuilder.Append($": {ReturnType}");
+        }
+
+        stringBuilder.Append('\n');
+        
+        stringBuilder.Append(ICanHaveStatements.StatementsString(Statements, nestedPrefix));
+
+        return stringBuilder.ToString();
     }
 }

@@ -15,4 +15,9 @@ internal class AssignStatement : Statement
         LValue.Holder = this;
         RValue.Holder = this;
     }
+
+    public string ToString(string prefix = "")
+    {
+        return $"{prefix}{LValue} = {RValue}";
+    }
 }

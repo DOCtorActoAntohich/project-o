@@ -8,4 +8,9 @@ internal class FieldReferenceExpression : Expression
     {
         SourceObject = sourceObject;
     }
+
+    public override string ToString()
+    {
+        return $"{SourceObject}.{Name}";
+    }
 }
