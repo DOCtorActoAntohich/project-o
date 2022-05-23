@@ -98,6 +98,10 @@ var number = 125
 var fromReal = Integer(1.5)  // or Real(1.5).ToInteger()
 ```
 
+Since the `Integer` type is a standard [**.NET 32-bit signed integer**](https://docs.microsoft.com/en-us/dotnet/api/system.int32?view=net-6.0), values of this type should comply with the following rule:
+
+> $-2^{32} \leq n \leq 2^{32}$, where $n$ is the `Integer` value
+
 #### `Integer` Methods
 
 - Arithmetics
@@ -149,6 +153,12 @@ Floating-point number, that is, a number with a decimal point.
 var realNumber = 3.1415
 var fromInt = Real(123)
 ```
+
+Since the `Real` type is a standard [**.NET 64-bit double precision floating-point number**](https://docs.microsoft.com/en-us/dotnet/api/system.double?view=net-6.0), the values it can represent should comply with the following rule:
+
+> $-1.79769313486232 \cdot 10^{308} \leq p \leq 1.79769313486232 \cdot 10^{308}$, where $p$ is the `Real` value
+
+Note that, however, it can hold only *15 decimal digits of precision*.
 
 #### `Real` Methods
 

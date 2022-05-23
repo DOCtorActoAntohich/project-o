@@ -180,30 +180,43 @@ true false
 
 Literal is a source code representation of a value of a primitive type.
 
-Each literal belongs to one and only one of the built-in types.
+Each literal belongs to one and only one of the [built-in types](3_Types.md#built-in-types).
 
 ### Integer
 
 Integer literal is a sequence of digits that represents integer value.
 
-Since the `Integer` type is a standard **.NET 32-bit signed integer**, the values of integer literal should comply with the following rule:
-> $-2^{32} \leq n \leq 2^{32}$, where $n$ is the `Integer` value
+Some examples:
+
+```ts
+19
+293
+35437
+```
+
+See the value range and other information on the `Integer` type [here](3_Types.md#integer).
 
 ### Real (floating point)
 
 Real literal represents floating point values.
 
-It is represented with a sequence of two or more digits separated by the dot `.`, for example: `0.0` or `59009.1707`.
+It is represented with a sequence of two or more digits separated by the dot `.`.
+
+Examples:
+
+```ts
+0.0
+13.37
+59009.1707
+```
 
 For the clarity sake, C-style shortcuts such as `.5` and `5.` are not permitted.
 
-Since the `Real` type is a standard **.NET 32-bit single precision floating-point number**, positive values it can represent should comply with the following rule:
-
-> $1.175494351 \cdot 10^{-38} \leq p \leq 3.402823466 \cdot 10^{38}$, where $p$ is the `Real` value
+See the value range and other information on the `Real` type [here](3_Types.md#real).
 
 ### Boolean
 
-A `Boolean` type has only two values: `true` and `false`. Both of them consist of **Latin ASCII letters**.
+A [`Boolean` type](3_Types.md#boolean) has only two values: `true` and `false`. Both of them consist of **Latin ASCII letters**.
 
 These two literals are **reserved**, and **cannot be used as identifiers**.
 
@@ -233,7 +246,7 @@ Note that line feed character in the string is completely valid:
 spans across multiple lines"
 ```
 
-String literals are always of a `String` type.
+String literals are always of a [`String` type](3_Types.md#string).
 
 ## Separators
 
