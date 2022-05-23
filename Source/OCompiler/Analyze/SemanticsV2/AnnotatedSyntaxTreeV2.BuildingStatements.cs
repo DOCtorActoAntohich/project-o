@@ -104,7 +104,10 @@ internal partial class AnnotatedSyntaxTreeV2
 
     private void CreateFields(ClassDeclaration declaration, ParsedClassData parsedClass)
     {
-        
+        foreach (var fieldDeclaration in parsedClass.Fields)
+        {
+            
+        }
     }
     
     private void CreateConstructors(ClassDeclaration declaration, ParsedClassData parsedClass)
@@ -146,7 +149,7 @@ internal partial class AnnotatedSyntaxTreeV2
         
         foreach (var parsedStatement in parsedBody)
         {
-            var statement = ParseStatement(parsedStatement);
+            var statement = ParseStatement(block, parsedStatement);
             block.AddStatement(statement);
         }
     }
@@ -155,26 +158,26 @@ internal partial class AnnotatedSyntaxTreeV2
     {
         foreach (var parsedStatement in parsedBody)
         {
-            var statement = ParseStatement(parsedStatement);
+            var statement = ParseStatement(@if, parsedStatement);
             @if.AddElseStatement(statement);
         }
     }
 
-    private DomStatement ParseStatement(IBodyStatement statement)
+    private DomStatement ParseStatement(ICanHaveStatements holder, IBodyStatement statement)
     {
         return statement switch
         {
-            Return @return => ParseReturnStatement(@return),
-            If @if => ParseIfStatement(@if),
-            While @while => ParseWhileLoop(@while),
-            Assignment assignment => ParseAssignment(assignment),
-            Field field => ParseField(field),
-            Variable variable => ParseVariable(variable),
+            Return @return => ParseReturnStatement(holder, @return),
+            If @if => ParseIfStatement(holder, @if),
+            While @while => ParseWhileLoop(holder, @while),
+            Assignment assignment => ParseAssignmentStatement(holder, assignment),
+            Variable variable => ParseVariableDeclaration(holder, variable),
+            SyntaxExpression rvalueExpression => ParseRValueExpressionStatement(holder, rvalueExpression),
             _ => throw new CompilerInternalError("Unknown statement type")
         };
     }
 
-    private DomStatement ParseReturnStatement(Return returnStatement)
+    private DomStatement ParseReturnStatement(ICanHaveStatements holder, Return returnStatement)
     {
         if (returnStatement.ReturnValue == null)
         {
@@ -185,7 +188,7 @@ internal partial class AnnotatedSyntaxTreeV2
         return new ReturnStatement(expression);
     }
     
-    private DomStatement ParseIfStatement(If ifStatement)
+    private DomStatement ParseIfStatement(ICanHaveStatements holder, If ifStatement)
     {
         var condition = ParseRValueExpression(ifStatement.Condition);
         var @if = new ConditionStatement(condition);
@@ -199,7 +202,7 @@ internal partial class AnnotatedSyntaxTreeV2
         return @if;
     }
 
-    private DomStatement ParseWhileLoop(While whileLoop)
+    private DomStatement ParseWhileLoop(ICanHaveStatements holder, While whileLoop)
     {
         var condition = ParseRValueExpression(whileLoop.Condition);
         var @while = new LoopStatement(condition);
@@ -208,51 +211,40 @@ internal partial class AnnotatedSyntaxTreeV2
         return @while;
     }
 
-    private DomExpression ParseRValueExpression(SyntaxExpression expression)
+    private DomStatement ParseRValueExpressionStatement(ICanHaveStatements holder, SyntaxExpression expression)
     {
-        return expression switch
+        return new ExpressionStatement(ParseRValueExpression(expression));
+    }
+
+    private DomStatement ParseVariableDeclaration(ICanHaveStatements holder, Variable variable)
+    {
+        var declaration = new VariableDeclarationStatement(variable.Identifier.Literal);
+        
+        if (variable.Type != null)
         {
-            DictDefinition dictDefinition => throw new NotImplementedException(),
-            Call call => throw new NotImplementedException(),
-            ListDefinition listDefinition => throw new NotImplementedException(),
-            SimpleExpression simpleExpression => throw new NotImplementedException(),
-            _ => throw new ArgumentOutOfRangeException(nameof(expression))
-        };
+            var root = GetRootHolder(holder);
+            declaration.Type = TypeReferenceFromTypeAnnotation(root, variable.Type);
+        }
+
+        declaration.InitExpression = ParseRValueExpression(variable.Expression);
+        
+        return declaration;
     }
     
-    
-    private DomStatement ParseMethodCall(ICanHaveStatements owningBlock, Call call)
+    private DomStatement ParseAssignmentStatement(ICanHaveStatements holder, Assignment assignment)
     {
-        return new ReturnStatement(new ThisReferenceExpression());
+        var lvalue = ParseLValueExpression(assignment.Variable);
+        var rvalue = ParseRValueExpression(assignment.Value);
+        return new AssignStatement(lvalue, rvalue);
     }
 
-    private DomStatement ParseDictDefinition(ICanHaveStatements owningBlock, DictDefinition call)
+    private ClassDeclaration GetRootHolder(ICanHaveStatements holder)
     {
-        return new ReturnStatement(new ThisReferenceExpression());
-    }
-    
-    private DomStatement ParseListDefinition(ICanHaveStatements owningBlock, ListDefinition call)
-    {
-        return new ReturnStatement(new ThisReferenceExpression());
-    }
-    
-    private DomStatement ParseSimpleExpression(ICanHaveStatements owningBlock, SimpleExpression call)
-    {
-        return new ReturnStatement(new ThisReferenceExpression());
-    }
-    
-    private DomStatement ParseField(ICanHaveStatements owningBlock, Field call)
-    {
-        return new ReturnStatement(new ThisReferenceExpression());
-    }
-    
-    private DomStatement ParseAssignment(ICanHaveStatements owningBlock, Assignment call)
-    {
-        return new ReturnStatement(new ThisReferenceExpression());
-    }
-
-    private DomStatement ParseVariable(ICanHaveStatements owningBlock, Variable call)
-    {
-        return new ReturnStatement(new ThisReferenceExpression());
+        return (holder switch
+        {
+            Statement statement => GetRootHolder(statement.Holder!),
+            TypeMember typeMember => typeMember.Owner,
+            _ => throw new ArgumentOutOfRangeException(nameof(holder), holder, null)
+        })!;
     }
 }
