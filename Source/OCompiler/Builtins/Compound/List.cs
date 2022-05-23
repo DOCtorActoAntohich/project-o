@@ -1,12 +1,14 @@
-﻿using OCompiler.Builtins.Primitives;
+﻿using System.Collections.Generic;
 
-using System.Collections.Generic;
+using OCompiler.Builtins.Primitives;
 
 namespace OCompiler.Builtins.Compound;
 
 public class List<T> : Class
 {
     private readonly System.Collections.Generic.List<T> _list = new();
+
+    public List() => _list = new();
 
     public List(IEnumerable<T> items) => _list = new(items);
 
