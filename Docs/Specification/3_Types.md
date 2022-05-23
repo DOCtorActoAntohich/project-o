@@ -31,8 +31,8 @@ The O language has several built-in types:
   - [`Real`](#real)
   - [`Boolean`](#boolean)
   - [Special primitives](#special-types)
-    - [Class](#class)
-    - [Void](#void)
+    - [`Class`](#class)
+    - [`Void`](#void)
 - Compound types:
   - [`List<T>`](#list)
   - [`Dict<K, V>`](#dict)
@@ -98,45 +98,28 @@ var number = 125
 var fromReal = Integer(1.5)  // or Real(1.5).ToInteger()
 ```
 
-Has 2 methods to retrieve the maximum and minimum possible values:
-
-```ts
-var big = Integer().Max() // any Integer variable also has this method
-
-var bigButNegative = Integer().Min()
-```
-
-Supports a set of operations:
+#### `Integer` Methods
 
 - Arithmetics
   
-  - May take both `Real` and `Integer` as an argument
+  All methods with an argument accept both `Real` and `Integer`.
 
-    ```ts
-    var a = number.Plus(1)   // will store 126
-    var b = number.Minus(1)  // will store 123
-    var c = number.Mult(2)   // will store 250
-    var d = number.Div(5)    // will store 25
+  When `Real` is passed as an argument, the result is also going to be of type `Real` (unless this is a comparison, which always returns a `Boolean` value)
 
-    // Comparison
-    var v = number.Less(125)         // false
-    var w = number.LessEqual(125)    // true
-    var x = number.Greater(125)      // false
-    var y = number.GreaterEqual(125) // true
-    var z = number.Equal(125.0)      // true
-    ```
-  
-  - May take only `Integer` as an argument
-  
-    ```ts
-    var mod = number.Mod(3)    // will store 2
-    ```
+  ```ts
+  var a: Integer = number.Plus(1)     // will store 126
+  var b: Real    = number.Minus(1.0)  // will store 123.0
+  var c: Integer = number.Mult(2)     // will store 250
+  var d: Real    = number.Div(5.0)    // will store 25.0
+  var negative = number.UnaryMinus()  // will store -125
 
-  - No parameters
-  
-    ```ts
-    var negative = number.UnaryMinus()   // will store -125
-    ```
+  // Comparison
+  var v = number.Less(125)         // false
+  var w = number.LessEqual(125)    // true
+  var x = number.Greater(125)      // false
+  var y = number.GreaterEqual(125) // true
+  var z = number.Equal(125.0)      // true
+  ```
 
 - Conversion to other primitives
   
@@ -148,6 +131,16 @@ Supports a set of operations:
   var realNumber: Real = number.ToReal()
   ```
 
+- Other
+
+  Has 2 methods to retrieve the maximum and minimum possible values:
+
+  ```ts
+  var big = Integer().Max() // any Integer variable also has this method
+
+  var bigButNegative = Integer().Min()
+  ```
+
 ### Real
 
 Floating-point number, that is, a number with a decimal point.
@@ -157,20 +150,39 @@ var realNumber = 3.1415
 var fromInt = Real(123)
 ```
 
-Has the same methods as `Integer`, but also has an `Epsilon()` method, which returns the smallest possible `Real` number.
+#### `Real` Methods
 
-```ts
-var smallest = Real().Epsilon()
-```
+- Arithmetics
 
-*Epsilon* value is also used to determine if the `Real` is approximately equal to zero, when converting the value to `Boolean`.
+  Has all the arithmetic methods from `Integer`, but the calculations return `Real`, no matter if the argument is `Integer` or `Real`.
 
-```ts
-// realNumber has a value of 3.1415
-var truth = realNumber.ToBoolean() // true
+- Conversions
+  
+  ```ts
+  // false, any other value would give true
+  var falsity: Boolean = Real(0).ToBoolean()
+  
+  var strValue: String   = realNumber.ToString()
+  var intNumber: Integer = realNumber.ToInteger() // Truncating, 3.1415 becomes 3
+  ```
 
-// If realNumber was close to zero, the variable would have stored Boolean false.
-```
+- Other
+
+  Similarly to `Integer`, has 2 methods to retrieve the maximum and minimum possible values:
+
+  ```ts
+  var big = Real().Max() // any Real variable also has this method
+
+  var bigButNegative = Real().Min()
+  ```
+
+  Also has an `Epsilon()` method, which returns the smallest possible **positive** `Real` number.
+
+  ```ts
+  var smallest = Real().Epsilon()
+  ```
+
+  *Epsilon* value is also used to determine if the `Real` is approximately equal to zero, when converting the value to `Boolean`.
 
 ### Boolean
 
