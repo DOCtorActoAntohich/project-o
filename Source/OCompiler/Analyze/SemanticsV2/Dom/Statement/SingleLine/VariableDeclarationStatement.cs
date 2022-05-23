@@ -7,7 +7,20 @@ internal class VariableDeclarationStatement : Statement
 {
     public TypeReference? Type { get; set; }
 
-    public DomExpression? InitExpression { get; set; }
+    private DomExpression? _initExpression;
+
+    public DomExpression? InitExpression
+    {
+        get => _initExpression;
+        set
+        {
+            _initExpression = value;
+            if (_initExpression != null)
+            {
+                _initExpression.Holder = this;
+            }
+        }
+    }
 
 
     public VariableDeclarationStatement(string name)

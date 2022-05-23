@@ -9,5 +9,7 @@ internal class ExpressionStatement : Statement
     public ExpressionStatement(DomExpression expression)
     {
         Expression = expression;
+
+        Expression.Holder = this;
     }
 }
