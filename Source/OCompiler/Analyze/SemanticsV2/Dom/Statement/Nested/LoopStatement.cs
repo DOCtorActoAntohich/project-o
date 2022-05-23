@@ -12,10 +12,11 @@ internal class LoopStatement : Statement, ICanHaveStatements
     public LoopStatement(DomExpression condition)
     {
         Condition = condition;
+        condition.Holder = this;
     }
     
     public LoopStatement(DomExpression condition, IEnumerable<Statement> statements) : this(condition)
     {
-        Statements.AddRange(statements);
+        (this as ICanHaveStatements).AddStatements(statements);
     }
 }

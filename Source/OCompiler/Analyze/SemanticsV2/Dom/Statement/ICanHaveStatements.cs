@@ -11,4 +11,12 @@ internal interface ICanHaveStatements
         Statements.Add(statement);
         statement.Holder = this;
     }
+
+    public void AddStatements(IEnumerable<Statement> statements)
+    {
+        foreach (var statement in statements)
+        {
+            AddStatement(statement);
+        }
+    }
 }

@@ -15,11 +15,12 @@ internal class ConditionStatement : Statement, ICanHaveStatements
     public ConditionStatement(DomExpression condition)
     {
         Condition = condition;
+        Condition.Holder = this;
     }
     
     public ConditionStatement(DomExpression condition, IEnumerable<Statement> statements) : this(condition)
     {
-        Statements.AddRange(statements);
+        (this as ICanHaveStatements).AddStatements(statements);
     }
     
     public ConditionStatement(
@@ -28,12 +29,20 @@ internal class ConditionStatement : Statement, ICanHaveStatements
         IEnumerable<Statement> elseStatements
         ) : this(condition, statements)
     {
-        ElseStatements.AddRange(elseStatements);
+        AddElseStatements(elseStatements);
     }
 
     public void AddElseStatement(Statement statement)
     {
         ElseStatements.Add(statement);
         statement.Holder = this;
+    }
+    
+    public void AddElseStatements(IEnumerable<Statement> statements)
+    {
+        foreach (var statement in statements)
+        {
+            AddElseStatement(statement);
+        }
     }
 }
