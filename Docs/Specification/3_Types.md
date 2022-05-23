@@ -13,9 +13,17 @@ class Main is
 end
 ```
 
+## Type definition
+
+For the sake of simplicity, the O Language does not define any way to combine types, that is, **types are defined only by classes**, and the type variety is constrained by the number of classes defined in the program.
+
+Class definition has been described in the previous chapter, see [Class definition](2_Syntax_and_semantics.md#class-definition).
+
+However, there are some [built-in types](#built-in-types) that give the basic functionality available for use in your source code.
+
 ## Built-in types
 
-Language has several builtin types:
+The O language has several built-in types:
 
 - Primitive types:
   - [`String`](#string)
