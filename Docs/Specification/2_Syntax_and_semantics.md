@@ -307,7 +307,7 @@ end
   
 Methods of objects are called using the name of the object, followed by a dot `.`, and the method name.
 
-Arguments passed in parentheses `(` `)` after the method name. If there are no arguments to pass, the parentheses are still required.
+Arguments passed in parentheses `(` `)` after the method name, the list is separated with comma `,`. If there are no arguments to pass, the parentheses are still required.
 
 ```ts
 var n = NumberWrapper(10)  // Create a new NumberWrapper, passing 10 as argument
