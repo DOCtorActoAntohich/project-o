@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using OCompiler.Analyze.SemanticsV2.Dom.Expression;
 using OCompiler.Analyze.SemanticsV2.Dom.Statement;
 using OCompiler.Analyze.SemanticsV2.Dom.Statement.Nested;
@@ -8,6 +9,7 @@ using OCompiler.Analyze.SemanticsV2.Dom.Type.Member;
 using OCompiler.Analyze.SemanticsV2.Tree;
 using OCompiler.Analyze.Syntax.Declaration;
 using OCompiler.Analyze.Syntax.Declaration.Class.Member;
+using OCompiler.Analyze.Syntax.Declaration.Class.Member.Method;
 using OCompiler.Analyze.Syntax.Declaration.Expression;
 using OCompiler.Analyze.Syntax.Declaration.Statement;
 using OCompiler.Exceptions;
@@ -106,7 +108,7 @@ internal partial class AnnotatedSyntaxTreeV2
     {
         foreach (var fieldDeclaration in parsedClass.Fields)
         {
-            
+            // TODO create fields.
         }
     }
     
@@ -115,28 +117,46 @@ internal partial class AnnotatedSyntaxTreeV2
         foreach (var constructor in parsedClass.Constructors)
         {
             var memberConstructor = new MemberConstructor(declaration.Name);
-            foreach (var parameter in constructor.Parameters)
-            {
-                var parameterType = TypeReferenceFromTypeAnnotation(declaration, parameter.Type);
-                /*if (!IsValid(parameterType))
-                {
-                    throw new AnalyzeError(
-                        parameter.Name.Position,
-                        $"Parameter type {parameterType} in constructor" +
-                        $"{declaration.Name}({constructor.Parameters.Count}) is not found");
-                }*/
-                
-                var parameterDeclaration = new ParameterDeclarationExpression(parameter.Name.Literal, parameterType);
-                memberConstructor.AddParameter(parameterDeclaration);
-            }
+            CreateParameters(declaration, memberConstructor, constructor.Parameters);
             
+            FillBlock(memberConstructor, constructor.Body);
+
             declaration.AddConstructor(memberConstructor);
+        }
+    }
+
+    private void CreateParameters(
+        ClassDeclaration declaration,
+        CallableMember callable,
+        IEnumerable<Parameter> parameters)
+    {
+        foreach (var parameter in parameters)
+        {
+            var parameterType = TypeReferenceFromTypeAnnotation(declaration, parameter.Type);
+            /*if (!IsValid(parameterType))
+            {
+                throw new AnalyzeError(
+                    parameter.Name.Position,
+                    $"Parameter type {parameterType} in constructor" +
+                    $"{declaration.Name}({constructor.Parameters.Count}) is not found");
+            }*/
+            var parameterDeclaration = new ParameterDeclarationExpression(parameter.Name.Literal, parameterType);
+            callable.AddParameter(parameterDeclaration);
         }
     }
 
     private void CreateMethods(ClassDeclaration declaration, ParsedClassData parsedClass)
     {
-        
+        foreach (var method in parsedClass.Methods)
+        {
+            var memberMethod = new MemberMethod(declaration.Name);
+            CreateParameters(declaration, memberMethod, method.Parameters);
+            // TODO return type, generics.
+            
+            FillBlock(memberMethod, method.Body);
+
+            declaration.AddMethod(memberMethod);
+        }
     }
     
     private void FillBlock(ICanHaveStatements block, Body parsedBody, bool alternative = false)
