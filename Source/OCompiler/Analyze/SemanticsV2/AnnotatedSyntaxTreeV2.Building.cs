@@ -1,6 +1,7 @@
 using System;
 using OCompiler.Analyze.SemanticsV2.Dom.Expression;
 using OCompiler.Analyze.SemanticsV2.Dom.Statement;
+using OCompiler.Analyze.SemanticsV2.Dom.Statement.Nested;
 using OCompiler.Analyze.SemanticsV2.Dom.Statement.SingleLine;
 using OCompiler.Analyze.SemanticsV2.Dom.Type;
 using OCompiler.Analyze.SemanticsV2.Dom.Type.Member;
@@ -14,7 +15,8 @@ using OCompiler.Exceptions.Semantic;
 using ParsedClassData = OCompiler.Analyze.Syntax.Declaration.Class.Class;
 using ParsedConstructorData = OCompiler.Analyze.Syntax.Declaration.Class.Member.Constructor;
 using DomStatement = OCompiler.Analyze.SemanticsV2.Dom.Statement.Statement;
-using Expression = OCompiler.Analyze.Syntax.Declaration.Expression.Expression;
+using DomExpression = OCompiler.Analyze.SemanticsV2.Dom.Expression.Expression;
+using SyntaxExpression = OCompiler.Analyze.Syntax.Declaration.Expression.Expression;
 
 namespace OCompiler.Analyze.SemanticsV2;
 
@@ -134,32 +136,91 @@ internal partial class AnnotatedSyntaxTreeV2
         
     }
     
-    private void FillConstructor(MemberConstructor constructor, ParsedConstructorData parsedConstructor)
+    private void FillBlock(ICanHaveStatements block, Body parsedBody, bool alternative = false)
     {
-        foreach (var parsedStatement in parsedConstructor.Body)
+        if (alternative && block is ConditionStatement @if)
         {
-            var statement = ParseStatement(constructor, parsedStatement);
+            FillElseBody(@if, parsedBody);
+            return;
+        }
+        
+        foreach (var parsedStatement in parsedBody)
+        {
+            var statement = ParseStatement(parsedStatement);
+            block.AddStatement(statement);
         }
     }
 
-    private DomStatement ParseStatement(ICanHaveStatements owningBlock, IBodyStatement statement)
+    private void FillElseBody(ConditionStatement @if, Body parsedBody)
+    {
+        foreach (var parsedStatement in parsedBody)
+        {
+            var statement = ParseStatement(parsedStatement);
+            @if.AddElseStatement(statement);
+        }
+    }
+
+    private DomStatement ParseStatement(IBodyStatement statement)
     {
         return statement switch
         {
-            Call call => ParseMethodCall(owningBlock, call),
-            DictDefinition dictDefinition => ParseDictDefinition(owningBlock, dictDefinition),
-            ListDefinition listDefinition => ParseListDefinition(owningBlock, listDefinition),
-            SimpleExpression simpleExpression => ParseSimpleExpression(owningBlock, simpleExpression),
-            Field field => ParseField(owningBlock, field),
-            Assignment assignment => ParseAssignment(owningBlock, assignment),
-            If @if => ParseIfStatement(owningBlock, @if),
-            Return @return => ParseReturnStatement(owningBlock, @return),
-            While @while => ParseWhileLoop(owningBlock, @while),
-            Variable variable => ParseVariable(owningBlock, variable),
-            _ => throw new ArgumentOutOfRangeException(nameof(statement))
+            Return @return => ParseReturnStatement(@return),
+            If @if => ParseIfStatement(@if),
+            While @while => ParseWhileLoop(@while),
+            Assignment assignment => ParseAssignment(assignment),
+            Field field => ParseField(field),
+            Variable variable => ParseVariable(variable),
+            _ => throw new CompilerInternalError("Unknown statement type")
         };
     }
 
+    private DomStatement ParseReturnStatement(Return returnStatement)
+    {
+        if (returnStatement.ReturnValue == null)
+        {
+            return new ReturnStatement();
+        }
+        
+        var expression = ParseRValueExpression(returnStatement.ReturnValue);
+        return new ReturnStatement(expression);
+    }
+    
+    private DomStatement ParseIfStatement(If ifStatement)
+    {
+        var condition = ParseRValueExpression(ifStatement.Condition);
+        var @if = new ConditionStatement(condition);
+        FillBlock(@if, ifStatement.Body);
+        
+        if (!ifStatement.ElseBody.IsEmpty)
+        {
+            FillBlock(@if, ifStatement.ElseBody, alternative: true);
+        }
+
+        return @if;
+    }
+
+    private DomStatement ParseWhileLoop(While whileLoop)
+    {
+        var condition = ParseRValueExpression(whileLoop.Condition);
+        var @while = new LoopStatement(condition);
+        FillBlock(@while, whileLoop.Body);
+
+        return @while;
+    }
+
+    private DomExpression ParseRValueExpression(SyntaxExpression expression)
+    {
+        return expression switch
+        {
+            DictDefinition dictDefinition => throw new NotImplementedException(),
+            Call call => throw new NotImplementedException(),
+            ListDefinition listDefinition => throw new NotImplementedException(),
+            SimpleExpression simpleExpression => throw new NotImplementedException(),
+            _ => throw new ArgumentOutOfRangeException(nameof(expression))
+        };
+    }
+    
+    
     private DomStatement ParseMethodCall(ICanHaveStatements owningBlock, Call call)
     {
         return new ReturnStatement(new ThisReferenceExpression());
@@ -189,22 +250,7 @@ internal partial class AnnotatedSyntaxTreeV2
     {
         return new ReturnStatement(new ThisReferenceExpression());
     }
-    
-    private DomStatement ParseIfStatement(ICanHaveStatements owningBlock, If call)
-    {
-        return new ReturnStatement(new ThisReferenceExpression());
-    }
-    
-    private DomStatement ParseReturnStatement(ICanHaveStatements owningBlock, Return call)
-    {
-        return new ReturnStatement(new ThisReferenceExpression());
-    }
-    
-    private DomStatement ParseWhileLoop(ICanHaveStatements owningBlock, While call)
-    {
-        return new ReturnStatement(new ThisReferenceExpression());
-    }
-    
+
     private DomStatement ParseVariable(ICanHaveStatements owningBlock, Variable call)
     {
         return new ReturnStatement(new ThisReferenceExpression());

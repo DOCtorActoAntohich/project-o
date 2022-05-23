@@ -30,4 +30,10 @@ internal class ConditionStatement : Statement, ICanHaveStatements
     {
         ElseStatements.AddRange(elseStatements);
     }
+
+    public void AddElseStatement(Statement statement)
+    {
+        ElseStatements.Add(statement);
+        statement.Holder = this;
+    }
 }
