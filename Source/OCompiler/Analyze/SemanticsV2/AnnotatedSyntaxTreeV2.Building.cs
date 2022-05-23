@@ -1,6 +1,7 @@
 using System;
 using OCompiler.Analyze.SemanticsV2.Dom.Expression;
 using OCompiler.Analyze.SemanticsV2.Dom.Statement;
+using OCompiler.Analyze.SemanticsV2.Dom.Statement.SingleLine;
 using OCompiler.Analyze.SemanticsV2.Dom.Type;
 using OCompiler.Analyze.SemanticsV2.Dom.Type.Member;
 using OCompiler.Analyze.SemanticsV2.Tree;
@@ -145,18 +146,67 @@ internal partial class AnnotatedSyntaxTreeV2
     {
         return statement switch
         {
-            Call call => throw new NotImplementedException(),
-            DictDefinition dictDefinition => throw new NotImplementedException(),
-            ListDefinition listDefinition => throw new NotImplementedException(),
-            SimpleExpression simpleExpression => throw new NotImplementedException(),
-            Expression expression => throw new NotImplementedException(),
-            Field field => throw new NotImplementedException(),
-            Assignment assignment => throw new NotImplementedException(),
-            If @if => throw new NotImplementedException(),
-            Return @return => throw new NotImplementedException(),
-            While @while => throw new NotImplementedException(),
-            Variable variable => throw new NotImplementedException(),
+            Call call => ParseMethodCall(owningBlock, call),
+            DictDefinition dictDefinition => ParseDictDefinition(owningBlock, dictDefinition),
+            ListDefinition listDefinition => ParseListDefinition(owningBlock, listDefinition),
+            SimpleExpression simpleExpression => ParseSimpleExpression(owningBlock, simpleExpression),
+            Field field => ParseField(owningBlock, field),
+            Assignment assignment => ParseAssignment(owningBlock, assignment),
+            If @if => ParseIfStatement(owningBlock, @if),
+            Return @return => ParseReturnStatement(owningBlock, @return),
+            While @while => ParseWhileLoop(owningBlock, @while),
+            Variable variable => ParseVariable(owningBlock, variable),
             _ => throw new ArgumentOutOfRangeException(nameof(statement))
         };
+    }
+
+    private DomStatement ParseMethodCall(ICanHaveStatements owningBlock, Call call)
+    {
+        return new ReturnStatement(new ThisReferenceExpression());
+    }
+
+    private DomStatement ParseDictDefinition(ICanHaveStatements owningBlock, DictDefinition call)
+    {
+        return new ReturnStatement(new ThisReferenceExpression());
+    }
+    
+    private DomStatement ParseListDefinition(ICanHaveStatements owningBlock, ListDefinition call)
+    {
+        return new ReturnStatement(new ThisReferenceExpression());
+    }
+    
+    private DomStatement ParseSimpleExpression(ICanHaveStatements owningBlock, SimpleExpression call)
+    {
+        return new ReturnStatement(new ThisReferenceExpression());
+    }
+    
+    private DomStatement ParseField(ICanHaveStatements owningBlock, Field call)
+    {
+        return new ReturnStatement(new ThisReferenceExpression());
+    }
+    
+    private DomStatement ParseAssignment(ICanHaveStatements owningBlock, Assignment call)
+    {
+        return new ReturnStatement(new ThisReferenceExpression());
+    }
+    
+    private DomStatement ParseIfStatement(ICanHaveStatements owningBlock, If call)
+    {
+        return new ReturnStatement(new ThisReferenceExpression());
+    }
+    
+    private DomStatement ParseReturnStatement(ICanHaveStatements owningBlock, Return call)
+    {
+        return new ReturnStatement(new ThisReferenceExpression());
+    }
+    
+    private DomStatement ParseWhileLoop(ICanHaveStatements owningBlock, While call)
+    {
+        return new ReturnStatement(new ThisReferenceExpression());
+    }
+    
+    private DomStatement ParseVariable(ICanHaveStatements owningBlock, Variable call)
+    {
+        return new ReturnStatement(new ThisReferenceExpression());
     }
 }

@@ -4,14 +4,21 @@ namespace OCompiler.Analyze.SemanticsV2.Dom.Expression;
 
 internal class MethodCallExpression : Expression, ICanHaveArguments
 {
+    public Expression ObjectReference { get; set; }
+
     public List<Expression> Arguments { get; } = new();
     
     
-    public MethodCallExpression(string name) : base(name)
+    public MethodCallExpression(Expression @object, string name) : base(name)
     {
+        ObjectReference = @object;
     }
 
-    public MethodCallExpression(string name, IEnumerable<Expression> arguments) : base(name)
+    public MethodCallExpression(
+        Expression @object, 
+        string name, 
+        IEnumerable<Expression> arguments) 
+        : this(@object, name)
     {
         Arguments.AddRange(arguments);
     }
