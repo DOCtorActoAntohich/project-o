@@ -33,4 +33,14 @@ internal class MemberField : TypeMember
 
         return stringBuilder.ToString();
     }
+
+    public bool SameNameAs(MemberField other)
+    {
+        return Name == other.Name;
+    }
+
+    public bool DifferentNameFrom(MemberField other)
+    {
+        return !SameNameAs(other);
+    }
 }

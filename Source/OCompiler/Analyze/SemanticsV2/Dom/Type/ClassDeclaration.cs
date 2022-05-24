@@ -17,6 +17,7 @@ internal class ClassDeclaration : TypeMember, ICanHaveGenericTypes
     public List<MemberMethod> Methods { get; } = new();
     public List<MemberConstructor> Constructors { get; } = new();
 
+    public Dictionary<string, TypeReference> Context { get; } = new();
 
     public ClassDeclaration(string name) : base(name)
     {

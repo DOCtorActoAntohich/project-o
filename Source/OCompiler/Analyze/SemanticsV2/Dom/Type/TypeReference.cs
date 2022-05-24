@@ -36,4 +36,39 @@ internal class TypeReference : CodeObject, ICanHaveGenericTypes
             .Append('>')
             .ToString();
     }
+
+    public bool SameAs(TypeReference other)
+    {
+        if (IsGeneric ^ other.IsGeneric)
+        {
+            return false;
+        }
+
+        if (Name != other.Name)
+        {
+            return false;
+        }
+
+        if (GenericTypes.Count != other.GenericTypes.Count)
+        {
+            return false;
+        }
+
+        for (var i = 0; i < GenericTypes.Count; ++i)
+        {
+            var type = GenericTypes[i];
+            var otherType = other.GenericTypes[i];
+            if (type.DifferentFrom(otherType))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public bool DifferentFrom(TypeReference other)
+    {
+        return !SameAs(other);
+    }
 }

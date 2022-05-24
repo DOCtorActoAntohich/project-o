@@ -1,11 +1,14 @@
 using System.Collections.Generic;
 using System.Text;
+using OCompiler.Analyze.SemanticsV2.Dom.Type;
 
 namespace OCompiler.Analyze.SemanticsV2.Dom.Statement;
 
 internal interface ICanHaveStatements
 {
     public List<Statement> Statements { get; }
+    
+    public Dictionary<string, TypeReference> Context { get; }
 
     public void AddStatement(Statement statement)
     {

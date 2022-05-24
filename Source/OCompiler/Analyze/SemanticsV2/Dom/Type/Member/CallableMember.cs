@@ -11,7 +11,9 @@ internal class CallableMember : TypeMember, ICanHaveParameters, ICanHaveStatemen
     public List<ParameterDeclarationExpression> Parameters { get; } = new();
 
     public List<DomStatement> Statements { get; } = new();
-    
+
+    public Dictionary<string, TypeReference> Context { get; } = new();
+
     public CallableMember(string name) : base(name)
     {
     }
@@ -28,5 +30,30 @@ internal class CallableMember : TypeMember, ICanHaveParameters, ICanHaveStatemen
         {
             AddParameter(parameter);
         }
+    }
+    
+    public bool SameSignatureAs(CallableMember other)
+    {
+        if (Name != other.Name)
+        {
+            return false;
+        }
+        
+        if (Parameters.Count != other.Parameters.Count)
+        {
+            return false;
+        }
+
+        for (var i = 0; i < Parameters.Count; ++i)
+        {
+            var type = Parameters[i].Type;
+            var otherType = other.Parameters[i].Type;
+            if (type.DifferentFrom(otherType))
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 }
