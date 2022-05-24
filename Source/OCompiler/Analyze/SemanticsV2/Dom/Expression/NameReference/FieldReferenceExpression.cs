@@ -1,4 +1,4 @@
-namespace OCompiler.Analyze.SemanticsV2.Dom.Expression;
+namespace OCompiler.Analyze.SemanticsV2.Dom.Expression.NameReference;
 
 internal class FieldReferenceExpression : Expression
 {

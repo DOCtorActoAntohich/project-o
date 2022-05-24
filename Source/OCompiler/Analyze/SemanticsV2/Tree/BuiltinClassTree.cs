@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using OCompiler.Analyze.SemanticsV2.Dom.Expression;
+using OCompiler.Analyze.SemanticsV2.Dom.Expression.Special;
 using OCompiler.Analyze.SemanticsV2.Dom.Type;
 using OCompiler.Analyze.SemanticsV2.Dom.Type.Member;
 

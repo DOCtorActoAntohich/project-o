@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using OCompiler.Analyze.SemanticsV2.Dom.Expression;
+using OCompiler.Analyze.SemanticsV2.Dom.Expression.Special;
 using OCompiler.Analyze.SemanticsV2.Dom.Statement;
 using OCompiler.Analyze.SemanticsV2.Dom.Statement.Nested;
 using OCompiler.Analyze.SemanticsV2.Dom.Statement.SingleLine;

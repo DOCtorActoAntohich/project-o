@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace OCompiler.Analyze.SemanticsV2.Dom.Expression;
+namespace OCompiler.Analyze.SemanticsV2.Dom.Expression.Call;
 
 internal abstract class CallExpression : Expression, ICanHaveArguments
 {

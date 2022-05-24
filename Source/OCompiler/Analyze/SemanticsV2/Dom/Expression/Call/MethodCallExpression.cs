@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace OCompiler.Analyze.SemanticsV2.Dom.Expression;
+namespace OCompiler.Analyze.SemanticsV2.Dom.Expression.Call;
 
 internal class MethodCallExpression : CallExpression
 {

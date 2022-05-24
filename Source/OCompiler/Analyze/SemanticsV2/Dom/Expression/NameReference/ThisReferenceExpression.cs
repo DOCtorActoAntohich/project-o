@@ -1,6 +1,6 @@
 using ThisToken = OCompiler.Analyze.Lexical.Tokens.Keywords.This;
 
-namespace OCompiler.Analyze.SemanticsV2.Dom.Expression;
+namespace OCompiler.Analyze.SemanticsV2.Dom.Expression.NameReference;
 
 internal class ThisReferenceExpression : Expression
 {
