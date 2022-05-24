@@ -21,7 +21,7 @@ namespace OCompiler.Analyze.SemanticsV2.Tree;
 
 internal partial class ParsedClassTree
 {
-        private void CreateDeclarationsFrom(Syntax.Tree syntaxTree)
+    private void CreateDeclarationsFrom(Syntax.Tree syntaxTree)
     {
         foreach (var parsedClass in syntaxTree)
         {

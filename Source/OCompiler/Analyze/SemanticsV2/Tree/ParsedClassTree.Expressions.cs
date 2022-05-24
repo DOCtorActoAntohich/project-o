@@ -18,7 +18,7 @@ namespace OCompiler.Analyze.SemanticsV2.Tree;
 
 internal partial class ParsedClassTree
 {
-        private DomExpression ParseExpression(SyntaxExpression expression)
+    private DomExpression ParseExpression(SyntaxExpression expression)
     {
         var sourceObject = ParseExpression(expression, null);
         while (expression.Child != null)
