@@ -105,17 +105,15 @@ internal partial class ParsedClassTree
     {
         foreach (var field in parsedClass.Fields)
         {
-            var memberField = new MemberField(field.Identifier.Literal)
-            {
-                InitExpression = ParseExpression(field.Expression)
-            };
+            var memberField = new MemberField(field.Identifier.Literal);
+            declaration.AddField(memberField);
+
+            memberField.InitExpression = ParseExpression(field.Expression);
 
             if (field.Type != null)
             {
                 memberField.Type = TypeReferenceFromTypeAnnotation(declaration, field.Type);
             }
-            
-            declaration.AddField(memberField);
         }
     }
     
@@ -124,11 +122,10 @@ internal partial class ParsedClassTree
         foreach (var constructor in parsedClass.Constructors)
         {
             var memberConstructor = new MemberConstructor(declaration.Name);
-            CreateParameters(declaration, memberConstructor, constructor.Parameters);
-            
-            FillBlock(memberConstructor, constructor.Body);
-
             declaration.AddConstructor(memberConstructor);
+            
+            CreateParameters(declaration, memberConstructor, constructor.Parameters);
+            FillBlock(memberConstructor, constructor.Body);
         }
     }
 
@@ -151,6 +148,8 @@ internal partial class ParsedClassTree
         foreach (var method in parsedClass.Methods)
         {
             var memberMethod = new MemberMethod(declaration.Name);
+            declaration.AddMethod(memberMethod);
+            
             CreateParameters(declaration, memberMethod, method.Parameters);
             
             // TODO generics.
@@ -161,8 +160,6 @@ internal partial class ParsedClassTree
             }
             
             FillBlock(memberMethod, method.Body);
-
-            declaration.AddMethod(memberMethod);
         }
     }
     

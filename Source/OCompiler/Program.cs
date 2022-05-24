@@ -18,6 +18,7 @@ namespace OCompiler
             catch (Exception exception)
             {
                 Console.WriteLine($"Exception: {exception.GetType().Name}(\"{exception.Message}\")");
+                throw;
             }
         }
     }

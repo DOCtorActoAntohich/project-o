@@ -38,8 +38,8 @@ internal partial class ParsedClassTree
         {
             Call call => ParseCallExpression(call, sourceObject),
             SimpleExpression simpleExpression => ParseSimpleExpression(simpleExpression, sourceObject),
-            DictDefinition dictDefinition => throw new NotImplementedException(),
-            ListDefinition listDefinition => throw new NotImplementedException(),
+            ListDefinition listDefinition => ParseListInitExpression(listDefinition, sourceObject),
+            DictDefinition dictDefinition => ParseDictInitExpression(dictDefinition, sourceObject),
             _ => throw new ArgumentOutOfRangeException(nameof(expression))
         };
     }
@@ -81,5 +81,15 @@ internal partial class ParsedClassTree
     private IEnumerable<DomExpression> ParseArguments(Call call)
     {
         return call.Arguments.Select(ParseExpression);
+    }
+
+    private DomExpression ParseListInitExpression(ListDefinition listDefinition, DomExpression? sourceObject)
+    {
+        throw new NotImplementedException();
+    }
+    
+    private DomExpression ParseDictInitExpression(DictDefinition dictDefinition, DomExpression? sourceObject)
+    {
+        throw new NotImplementedException();
     }
 }
