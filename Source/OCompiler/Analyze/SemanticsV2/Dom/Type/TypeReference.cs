@@ -11,6 +11,7 @@ internal class TypeReference : CodeObject, ICanHaveGenericTypes
     public bool IsGeneric { get; set; }
     
     public List<TypeReference> GenericTypes { get; } = new();
+    public bool HasGenerics => GenericTypes.Count > 0;
 
     public MemberInfo? DotnetType;
     

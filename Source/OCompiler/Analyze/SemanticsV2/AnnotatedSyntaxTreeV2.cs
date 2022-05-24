@@ -1,14 +1,7 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using OCompiler.Analyze.SemanticsV2.Dom.Expression;
 using OCompiler.Analyze.SemanticsV2.Dom.Type;
-using OCompiler.Analyze.SemanticsV2.Dom.Type.Member;
 using OCompiler.Analyze.SemanticsV2.Tree;
-using OCompiler.Analyze.Syntax.Declaration;
-using OCompiler.Exceptions;
-using OCompiler.Exceptions.Semantic;
 using ParsedClassData = OCompiler.Analyze.Syntax.Declaration.Class.Class;
 
 namespace OCompiler.Analyze.SemanticsV2;
@@ -27,6 +20,8 @@ internal partial class AnnotatedSyntaxTreeV2
         ParsedClasses = parsedClassTree.ParsedClasses;
 
         var inheritanceTree = new InheritanceTree(this);
+
+        ValidateTree();
     }
 
     public IEnumerable<string> AllNames()

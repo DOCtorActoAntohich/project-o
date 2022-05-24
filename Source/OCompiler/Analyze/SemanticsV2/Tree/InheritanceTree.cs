@@ -11,8 +11,8 @@ using ClassDict = Dictionary<string, ClassDeclaration>;
 
 internal class InheritanceTree
 {
-    public static readonly string RootClassName = "Class";
-    private static readonly string DotnetRootType = "Object";
+    public const string RootClassName = "Class";
+    private const string DotnetRootType = "Object";
 
     public bool IsValid { get; private set; }
 
@@ -50,13 +50,8 @@ internal class InheritanceTree
             if (potentialChild.BaseType == null || potentialChild.BaseType.Name == DotnetRootType)
             {
                 continue;
-            }
-            
-            if (!_ast.IsValid(potentialChild.BaseType))
-            {
-                throw new AnalyzeError($"Invalid type reference: {potentialChild.BaseType}");
-            }
-            
+            } 
+
             if (potentialChild.BaseType.Name != @class)
             {
                 continue;
