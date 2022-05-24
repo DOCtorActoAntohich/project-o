@@ -46,6 +46,6 @@ internal class MemberField : TypeMember
 
     public override int GetHashCode()
     {
-        return Owner.GetHashCode() + Name.GetHashCode();
+        return Owner.GetHashCode() ^ Name.GetHashCode();
     }
 }
