@@ -7,6 +7,7 @@ using OCompiler.Analyze.Lexical.Tokens.Keywords;
 using OCompiler.Analyze.SemanticsV2.Dom.Expression.Call;
 using OCompiler.Analyze.SemanticsV2.Dom.Expression.NameReference;
 using OCompiler.Analyze.SemanticsV2.Dom.Expression.Primitive;
+using OCompiler.Analyze.SemanticsV2.Dom.Type;
 using OCompiler.Analyze.Syntax.Declaration.Expression;
 using OCompiler.Exceptions;
 using ParsedClassData = OCompiler.Analyze.Syntax.Declaration.Class.Class;
@@ -49,7 +50,8 @@ internal partial class ParsedClassTree
         return call.Token switch
         {
             Base => new BaseConstructorCallExpression(arguments),
-            Identifier when call.Parent == null => new ObjectCreateExpression(call.Token.Literal, arguments),
+            Identifier when call.Parent == null => 
+                new ObjectCreateExpression(new TypeReference(call.Token.Literal), arguments),
             _ => new MethodCallExpression(sourceObject, call.Token.Literal, arguments)
         };
     }

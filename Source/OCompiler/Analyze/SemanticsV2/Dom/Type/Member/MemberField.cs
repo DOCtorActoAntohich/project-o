@@ -43,4 +43,9 @@ internal class MemberField : TypeMember
     {
         return !SameNameAs(other);
     }
+
+    public override int GetHashCode()
+    {
+        return Owner.GetHashCode() + Name.GetHashCode();
+    }
 }

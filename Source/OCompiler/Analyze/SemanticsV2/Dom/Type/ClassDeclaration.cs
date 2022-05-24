@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
+using OCompiler.Analyze.SemanticsV2.Dom.Expression.Special;
 using OCompiler.Analyze.SemanticsV2.Dom.Type.Member;
+using OCompiler.Exceptions;
 
 namespace OCompiler.Analyze.SemanticsV2.Dom.Type;
 
@@ -59,6 +62,73 @@ internal class ClassDeclaration : TypeMember, ICanHaveGenericTypes
         return GetGenericType(name) != null;
     }
 
+    public static bool AreParametersSame(List<TypeReference> left, List<TypeReference> right)
+    {
+        if (left.Count != right.Count)
+        {
+            return false;
+        }
+
+        
+        for (var i = 0; i < left.Count; ++i)
+        {
+            if (left[i].DifferentFrom(right[i]))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+    
+    public MemberConstructor GetConstructor(List<TypeReference> parameters)
+    {
+        foreach (var constructor in Constructors)
+        {
+            var ctorParameterTypes = constructor.Parameters
+                .Select(t => t.Type).ToList();
+            if (AreParametersSame(ctorParameterTypes, parameters))
+            {
+                return constructor;
+            }
+        }
+
+        throw new AnalyzeError($"Couldn't find constructor: {Name}({parameters.Count})");
+    }
+    
+    public MemberMethod GetMethod(string targetMethodName, List<TypeReference> parameters)
+    {
+        foreach (var method in Methods)
+        {
+            if (method.Name != targetMethodName)
+            {
+                continue;
+            }
+            
+            var methodParameterTypes = method.Parameters
+                .Select(t => t.Type).ToList();
+            if (AreParametersSame(methodParameterTypes, parameters))
+            {
+                return method;
+            }
+        }
+
+        throw new AnalyzeError($"Couldn't find method: {Name}::{targetMethodName}({parameters.Count})");
+    }
+
+    public MemberField GetField(string targetFieldName)
+    {
+        foreach (var field in Fields)
+        {
+            if (field.Name == targetFieldName)
+            {
+                return field;
+            }
+        }
+
+        throw new AnalyzeError($"Couldn't find field: {Name}::{targetFieldName}");
+    }
+    
     public override string ToString()
     {
         var stringBuilder = new StringBuilder(Name);
@@ -118,5 +188,10 @@ internal class ClassDeclaration : TypeMember, ICanHaveGenericTypes
         }
 
         return stringBuilder.ToString();
+    }
+    
+    public override int GetHashCode()
+    {
+        return Name.GetHashCode();
     }
 }
