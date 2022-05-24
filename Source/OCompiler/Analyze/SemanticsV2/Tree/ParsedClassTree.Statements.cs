@@ -6,11 +6,7 @@ using OCompiler.Analyze.SemanticsV2.Dom.Statement.Nested;
 using OCompiler.Analyze.SemanticsV2.Dom.Statement.SingleLine;
 using OCompiler.Analyze.SemanticsV2.Dom.Type;
 using OCompiler.Analyze.SemanticsV2.Dom.Type.Member;
-using OCompiler.Analyze.SemanticsV2.Tree;
 using OCompiler.Analyze.Syntax.Declaration;
-using OCompiler.Analyze.Syntax.Declaration.Class.Member;
-using OCompiler.Analyze.Syntax.Declaration.Class.Member.Method;
-using OCompiler.Analyze.Syntax.Declaration.Expression;
 using OCompiler.Analyze.Syntax.Declaration.Statement;
 using OCompiler.Exceptions;
 using OCompiler.Exceptions.Semantic;
@@ -19,14 +15,13 @@ using ParsedConstructorData = OCompiler.Analyze.Syntax.Declaration.Class.Member.
 using DomStatement = OCompiler.Analyze.SemanticsV2.Dom.Statement.Statement;
 using DomExpression = OCompiler.Analyze.SemanticsV2.Dom.Expression.Expression;
 using SyntaxExpression = OCompiler.Analyze.Syntax.Declaration.Expression.Expression;
+using CallableParameter = OCompiler.Analyze.Syntax.Declaration.Class.Member.Method.Parameter;
 
-namespace OCompiler.Analyze.SemanticsV2;
+namespace OCompiler.Analyze.SemanticsV2.Tree;
 
-internal partial class AnnotatedSyntaxTreeV2
+internal partial class ParsedClassTree
 {
-    private delegate DomStatement StatementParsingMethod(ICanHaveStatements owner, IBodyStatement statement);
-    
-    private void CreateDeclarationsFrom(Syntax.Tree syntaxTree)
+        private void CreateDeclarationsFrom(Syntax.Tree syntaxTree)
     {
         foreach (var parsedClass in syntaxTree)
         {
@@ -140,7 +135,7 @@ internal partial class AnnotatedSyntaxTreeV2
     private void CreateParameters(
         ClassDeclaration declaration,
         CallableMember callable,
-        IEnumerable<Parameter> parameters)
+        IEnumerable<CallableParameter> parameters)
     {
         foreach (var parameter in parameters)
         {

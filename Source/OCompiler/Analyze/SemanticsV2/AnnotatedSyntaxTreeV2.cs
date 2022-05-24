@@ -16,15 +16,15 @@ namespace OCompiler.Analyze.SemanticsV2;
 internal partial class AnnotatedSyntaxTreeV2
 {
     public Dictionary<string, ClassDeclaration> BuiltinClasses { get; }
-    public Dictionary<string, ClassDeclaration> ParsedClasses { get; } = new();
+    public Dictionary<string, ClassDeclaration> ParsedClasses { get; }
 
     public int ClassesCount => BuiltinClasses.Count + ParsedClasses.Count;
 
     public AnnotatedSyntaxTreeV2(Syntax.Tree syntaxTree)
     {
-        BuiltinClasses = new BuiltinClassTree().Classes;
-        
-        CreateDeclarationsFrom(syntaxTree);
+        var parsedClassTree = new ParsedClassTree(syntaxTree);
+        BuiltinClasses = parsedClassTree.BuiltinClasses;
+        ParsedClasses = parsedClassTree.ParsedClasses;
 
         var inheritanceTree = new InheritanceTree(this);
     }

@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using OCompiler.Analyze.Lexical.Tokens;
@@ -15,11 +14,11 @@ using DomStatement = OCompiler.Analyze.SemanticsV2.Dom.Statement.Statement;
 using DomExpression = OCompiler.Analyze.SemanticsV2.Dom.Expression.Expression;
 using SyntaxExpression = OCompiler.Analyze.Syntax.Declaration.Expression.Expression;
 
-namespace OCompiler.Analyze.SemanticsV2;
+namespace OCompiler.Analyze.SemanticsV2.Tree;
 
-internal partial class AnnotatedSyntaxTreeV2
+internal partial class ParsedClassTree
 {
-    private DomExpression ParseExpression(SyntaxExpression expression)
+        private DomExpression ParseExpression(SyntaxExpression expression)
     {
         var sourceObject = ParseExpression(expression, null);
         while (expression.Child != null)
