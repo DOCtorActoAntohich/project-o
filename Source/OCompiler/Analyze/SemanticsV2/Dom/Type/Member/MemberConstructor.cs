@@ -29,19 +29,6 @@ internal class MemberConstructor : CallableMember
             .Append('\n');
 
         stringBuilder.Append(ICanHaveStatements.StatementsString(Statements, nestedPrefix));
-        /*for (var i = 0; i < Statements.Count; ++i)
-        {
-            var isLast = (i + 1 == Statements.Count);
-            var firstLinePrefix = isLast ? nestedPrefix + "└── " : nestedPrefix + "├── ";
-            stringBuilder.Append(
-                Statements[i].ToString(firstLinePrefix, nestedPrefix + "    "));
-            if (!isLast)
-            {
-                stringBuilder.Append('\n');
-            }
-
-            ICanHaveStatements.StatementsString(Statements, "");
-        }*/
 
         return stringBuilder.ToString();
     }
