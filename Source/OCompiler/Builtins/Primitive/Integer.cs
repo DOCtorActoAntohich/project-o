@@ -109,6 +109,11 @@ public class Integer : Class
         return new Integer(Value % p.Value);
     }
 
+    public Real Mod(Real p)
+    {
+        return new Real(Value % p.Value);
+    }
+
 
     public Boolean Less(Integer p)
     {

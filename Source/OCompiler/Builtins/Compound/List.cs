@@ -1,12 +1,14 @@
-﻿using OCompiler.Builtins.Primitives;
+﻿using System.Collections.Generic;
 
-using System.Collections.Generic;
+using OCompiler.Builtins.Primitives;
 
 namespace OCompiler.Builtins.Compound;
 
 public class List<T> : Class
 {
     private readonly System.Collections.Generic.List<T> _list = new();
+
+    public List() => _list = new();
 
     public List(IEnumerable<T> items) => _list = new(items);
 
@@ -20,7 +22,12 @@ public class List<T> : Class
 
     public void RemoveAt(Integer index) => _list.RemoveAt(index.Value);
     
-    public void Pop() => _list.RemoveAt(_list.Count - 1);
+    public T Pop() {
+        var lastIndex = _list.Count - 1;
+        var item = _list[lastIndex];
+        _list.RemoveAt(lastIndex);
+        return item;
+    }
     
     public Integer Search(T item) => new(_list.IndexOf(item));
 }

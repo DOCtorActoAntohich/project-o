@@ -1,5 +1,5 @@
 class Main is
-    this is
+    this() is
         var cat = SuperCat("James", "LaserEyes")
         
         IO().WriteLine(cat.Fight())
