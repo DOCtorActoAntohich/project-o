@@ -2,9 +2,9 @@ namespace OCompiler.Analyze.SemanticsV2.Dom.Expression.NameReference;
 
 internal class FieldReferenceExpression : Expression
 {
-    public Expression? SourceObject { get; set; }
+    public Expression SourceObject { get; set; }
     
-    public FieldReferenceExpression(Expression? sourceObject, string name) : base(name)
+    public FieldReferenceExpression(Expression sourceObject, string name) : base(name)
     {
         SourceObject = sourceObject;
     }

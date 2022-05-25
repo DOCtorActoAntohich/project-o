@@ -1,7 +1,11 @@
 using System.Collections.Generic;
 using System.Linq;
+using OCompiler.Analyze.SemanticsV2.Dom.Expression.Call;
+using OCompiler.Analyze.SemanticsV2.Dom.Expression.NameReference;
+using OCompiler.Analyze.SemanticsV2.Dom.Expression.Primitive;
 using OCompiler.Analyze.SemanticsV2.Dom.Type;
 using OCompiler.Analyze.SemanticsV2.Dom.Type.Member;
+using OCompiler.Builtins.Primitives;
 using OCompiler.Exceptions;
 using OCompiler.Exceptions.Semantic;
 using DomExpression = OCompiler.Analyze.SemanticsV2.Dom.Expression.Expression;
@@ -188,5 +192,157 @@ internal partial class AnnotatedSyntaxTreeV2
     private void ValidateMethodReturnType(ClassDeclaration @class, MemberMethod method)
     {
         ValidateTypeReference(@class, method.ReturnType);
+    }
+    
+    private void ValidateFields(ClassDeclaration @class)
+    {
+        foreach (var field in @class.Fields)
+        {
+            DetermineFieldType(field);
+        }
+
+        foreach (var field in @class.Fields)
+        {
+            if (!IsUnique(@class.Fields, field))
+            {
+                throw new AnalyzeError($"Duplicate field: {@class.Name}::{field.Name}");
+            }
+        }
+    }
+    
+    private void DetermineFieldType(MemberField field)
+    {
+        if (_fieldsValidationState[field] == ValidationState.Valid)
+        {
+            return;
+        }
+
+        if (_fieldsValidationState[field] == ValidationState.InProgress)
+        {
+            throw new AnalyzeError(
+                $"Circular dependency while resolving type of field {field.Owner!.Name}::{field.Name}");
+        }
+
+        _fieldsValidationState[field] = ValidationState.InProgress;
+        
+        if (!field.HasTypeAnnotation && !field.HasInitExpression)
+        {
+            throw new AnalyzeError(
+                $"The type of field {field.Owner!.Name}{field.Name} was not specified.");
+        }
+        
+        if (!field.HasTypeAnnotation && field.HasInitExpression)
+        {
+            DetermineExpressionType(field.InitExpression);
+            field.Type = field.InitExpression.Type;
+            _fieldsValidationState[field] = ValidationState.Valid;
+            return;
+        }
+        
+        if (field.HasTypeAnnotation && !field.HasInitExpression)
+        {
+            ValidateTypeReference(field.Owner!, field.Type);
+            field.InitExpression = new ObjectCreateExpression(field.Type);
+            DetermineExpressionType(field.InitExpression);
+            _fieldsValidationState[field] = ValidationState.Valid;
+            return;
+        }
+
+        DetermineExpressionType(field.InitExpression);
+        ValidateTypeReference(field.Owner!, field.Type);
+        if (field.Type.DifferentFrom(field.InitExpression.Type))
+        {
+            throw new AnalyzeError(
+                $"Types of annotation and init expression don't match: {field.Owner!.Name}::{field.Name}");
+        }
+
+        _fieldsValidationState[field] = ValidationState.Valid;
+    }
+    
+    private void DetermineExpressionType(DomExpression expression)
+    {
+        switch (expression)
+        {
+            case IntegerLiteralExpression:
+                expression.Type = new TypeReference(nameof(Integer));
+                break;
+            
+            case RealLiteralExpression:
+                expression.Type = new TypeReference(nameof(Real));
+                break;
+            
+            case BooleanLiteralExpression:
+                expression.Type = new TypeReference(nameof(Boolean));
+                break;
+            
+            case StringLiteralExpression:
+                expression.Type = new TypeReference(nameof(String));
+                break;
+            
+            case MethodCallExpression methodCallExpression:
+                DetermineMethodCallType(methodCallExpression);
+                break;
+            
+            case ObjectCreateExpression objectCreateExpression:
+                DetermineObjectCreationType(objectCreateExpression);
+                break;
+            
+            case FieldReferenceExpression fieldReferenceExpression:
+                DetermineFieldReferenceType(fieldReferenceExpression);
+                break;
+            
+            default:
+                throw new AnalyzeError($"Impossible to initialize field with this expression: {expression}");
+        }
+    }
+    
+    private List<TypeReference> GetTypesOfArguments(List<DomExpression> arguments)
+    {
+        foreach (var argument in arguments)
+        {
+            DetermineExpressionType(argument);
+        }
+
+        return arguments.Select(arg => arg.Type).ToList();
+    }
+    
+    private void DetermineMethodCallType(MethodCallExpression call)
+    {
+        DetermineExpressionType(call.SourceObject);
+        var @class = GetClass(call.SourceObject.Type.Name);
+
+        var argumentTypes = GetTypesOfArguments(call.Arguments);
+        var method = @class.GetMethod(call.Name, argumentTypes);
+
+        call.Type = method.ReturnType;
+    }
+    
+    private void DetermineObjectCreationType(ObjectCreateExpression objectCreation)
+    {
+        if (!HasClass(objectCreation.Name))
+        {
+            throw new AnalyzeError($"Unknown type name: {objectCreation.Name}");
+        }
+
+        var @class = GetClass(objectCreation.Name); 
+
+        var argumentTypes = GetTypesOfArguments(objectCreation.Arguments);
+        var constructor = @class.GetConstructor(argumentTypes);
+
+        objectCreation.Type = new TypeReference(constructor.Owner!.Name);
+        objectCreation.Type.GenericTypes.AddRange(objectCreation.GenericTypes);
+    }
+
+    private void DetermineFieldReferenceType(FieldReferenceExpression fieldReference)
+    {
+        DetermineExpressionType(fieldReference.SourceObject);
+        
+        var @class = GetClass(fieldReference.SourceObject.Name);
+
+        var field = @class.GetField(fieldReference.Name);
+        
+        DetermineFieldType(field);
+
+        fieldReference.Type = field.Type;
     }
 }
