@@ -120,11 +120,13 @@ end
 ```
 
 ```java
-method number(): Integer is
-    return 42
-end
-
-IO().Write(this.number()) // error: IO().Write expected String as first argument, found Integer
+class Main is
+    method number(): Integer is
+        return 42
+    end
+    this is
+        IO().Write(this.number()) // error: IO().Write expected String as first argument, found Integer
+    end
 ```
 
 ```java
@@ -134,6 +136,8 @@ end
 
 ```java
 class Tuple<A, B> is
+    first: A
+    second: B
     this (first: A, second: B) is
         this.first = first
         this.second = second
