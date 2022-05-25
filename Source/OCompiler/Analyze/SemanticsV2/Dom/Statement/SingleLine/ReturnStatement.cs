@@ -14,7 +14,7 @@ internal class ReturnStatement : Statement
         {
             _expression = value;
             _expression.ParentStatement = this;
-            HasValue = false;
+            HasValue = true;
         }
     }
     public bool HasValue { get; set; }
@@ -22,10 +22,10 @@ internal class ReturnStatement : Statement
 
     public ReturnStatement()
     {
-        HasValue = true;
+        HasValue = false;
     }
     
-    public ReturnStatement(DomExpression expression)
+    public ReturnStatement(DomExpression expression) : this()
     {
         Expression = expression;
     }
