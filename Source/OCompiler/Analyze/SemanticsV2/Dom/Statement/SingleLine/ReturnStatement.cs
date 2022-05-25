@@ -35,7 +35,7 @@ internal class ReturnStatement : Statement
         var stringBuilder = new StringBuilder(prefix)
             .Append("return");
 
-        if (HasValue)
+        if (!HasValue)
         {
             return stringBuilder.ToString();
         }
