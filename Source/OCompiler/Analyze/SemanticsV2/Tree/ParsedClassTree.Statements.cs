@@ -1,8 +1,6 @@
-using System;
 using System.Collections.Generic;
 using OCompiler.Analyze.SemanticsV2.Dom;
 using OCompiler.Analyze.SemanticsV2.Dom.Expression.Special;
-using OCompiler.Analyze.SemanticsV2.Dom.Statement;
 using OCompiler.Analyze.SemanticsV2.Dom.Statement.Nested;
 using OCompiler.Analyze.SemanticsV2.Dom.Statement.SingleLine;
 using OCompiler.Analyze.SemanticsV2.Dom.Type;
@@ -81,39 +79,9 @@ internal partial class ParsedClassTree
             declaration.BaseType = new TypeReference(InheritanceTree.RootClassName);
             return;
         }
-
-        /*var baseTypeReference = new TypeReference(baseType.Name.Literal);
-        foreach (var parentGenericType in baseType.GenericTypes)
-        {
-            var typeReference = TypeReferenceFromTypeAnnotation(declaration, parentGenericType);
-            baseTypeReference.GenericTypes.Add(typeReference);
-        }
-
-        declaration.BaseType = baseTypeReference;*/
+        
         declaration.BaseType = ParseRawTypeReference(baseType);
     }
-
-    // TODO remove ?
-    /*private static TypeReference TypeReferenceFromTypeAnnotation(ClassDeclaration declaration, TypeAnnotation type)
-    {
-        if (declaration.HasGenericType(type.Name.Literal))
-        {
-            return declaration.GetGenericType(type.Name.Literal)!;
-        }
-        
-        return SpecializedGenericType(declaration, type);
-    }
-    
-    private static TypeReference SpecializedGenericType(ClassDeclaration declaration, TypeAnnotation specializedType)
-    {
-        var reference = new TypeReference(specializedType.Name.Literal);
-        foreach (var specialization in specializedType.GenericTypes)
-        {
-            reference.GenericTypes.Add(TypeReferenceFromTypeAnnotation(declaration, specialization));
-        }
-
-        return reference;
-    }*/
 
     private void CreateFields(ClassDeclaration declaration, ParsedClassData parsedClass)
     {
@@ -126,8 +94,6 @@ internal partial class ParsedClassTree
 
             if (field.Type != null)
             {
-                // TODO remove ?
-                // memberField.Type = TypeReferenceFromTypeAnnotation(declaration, field.Type);
                 memberField.Type = ParseRawTypeReference(field.Type);
             }
         }
@@ -158,8 +124,6 @@ internal partial class ParsedClassTree
             
             if (method.ReturnType != null)
             {
-                // TODO remove ?
-                //memberMethod.ReturnType = TypeReferenceFromTypeAnnotation(declaration, method.ReturnType);
                 memberMethod.ReturnType = ParseRawTypeReference(method.ReturnType);
             }
             
@@ -171,8 +135,6 @@ internal partial class ParsedClassTree
     {
         foreach (var parameter in parameters)
         {
-            // TODO remove ?
-            //var parameterType = TypeReferenceFromTypeAnnotation(declaration, parameter.Type);
             var parameterType = ParseRawTypeReference(parameter.Type);
 
             var parameterDeclaration = new ParameterDeclarationExpression(parameter.Name.Literal, parameterType);
