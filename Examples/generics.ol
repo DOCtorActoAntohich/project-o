@@ -1,5 +1,5 @@
 class Main is
-    this is
+    this() is
         var list: List<Dictionary<String, Pair<Integer, String>>> = []
         list.Append({})
         var pair = Pair(42, "Amogus")

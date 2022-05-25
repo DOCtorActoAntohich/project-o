@@ -20,7 +20,7 @@ class Main is
             this.fib(this.pred(this.pred(num)))
         )
     end
-    this is
+    this() is
         IO().Write("You need to pass an Integer as an argument")
     end
     this(N: Integer) is

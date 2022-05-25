@@ -1,13 +1,14 @@
-﻿using OCompiler.Builtins.Primitives;
+﻿using System.Collections.Generic;
 
-using System.Collections.Generic;
-using System.Linq;
+using OCompiler.Builtins.Primitives;
 
 namespace OCompiler.Builtins.Compound;
 
 public class Dict<K, V> : Class where K : notnull
 {
-    private readonly Dictionary<K, V> _dictionary = new();
+    private readonly Dictionary<K, V> _dictionary;
+
+    public Dict() => _dictionary = new();
 
     public Dict(IEnumerable<KeyValuePair<K, V>> items) => _dictionary = new(items);
 

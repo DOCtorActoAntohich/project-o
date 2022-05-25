@@ -36,7 +36,7 @@ class Main is
     IO().Write("}")
   end
 
-  this is
+  this() is
     var lst: List<Integer> = [1, 2, 3]
     PrintList(lst)
     var reversed_list = ReverseList(lst)

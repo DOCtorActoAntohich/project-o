@@ -51,8 +51,14 @@ public class Real : Class
     {
         return new String(Value.ToString(CultureInfo.CurrentCulture));
     }
-    
-    
+
+
+    public Real UnaryMinus()
+    {
+        return new Real(-Value);
+    }
+
+
     public Real Plus(Integer p)
     {
         return new Real(Value + p.Value);
@@ -95,14 +101,19 @@ public class Real : Class
     {
         return new Real(Value / p.Value);
     }
-    
-    
+
+
     public Real Mod(Integer p)
     {
         return new Real(Value % p.Value);
     }
-    
-    
+
+    public Real Mod(Real p)
+    {
+        return new Real(Value % p.Value);
+    }
+
+
     public Boolean Less(Integer p)
     {
         return new Boolean(Value < p.Value);
