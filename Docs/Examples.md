@@ -13,21 +13,19 @@ end
 ## Valid examples
 
 1. Lists
-```ts
-var fibs = []
-var a = 1
-var b = 1
-while a.Less(10000) loop
-    var t = a
-    a = a.Plus(b)
-    b = t
-    fibs.Append(b)
-end
 
-IO().WriteLine(fibs.Get(3).ToString())
-```
+    ```ts
+    var fibs = []
+    var a = 1
+    var b = 1
+    while a.Less(10000) loop
+        var t = a
+        a = a.Plus(b)
+        b = t
+        fibs.Append(b)
+    end
 
-    IO().WriteLine(fibs.Sum().ToString())
+    IO().WriteLine(fibs.Get(3).ToString())
     ```
 
 2. Counting letters in the sentence using `Dict`
@@ -64,10 +62,38 @@ IO().WriteLine(fibs.Get(3).ToString())
 ## Invalid examples (compile time errors)
 
 ```ts
+/*
+  This comment is not closed until the end of the file
+*
+class Main is
+  this is
+    // Create a string and print some symbols
+    var hello = "hello world"
+    IO().WriteLine(hello.At(0))
+    IO().WriteLine(hello.At(5))
+  end
+end // <-- error: Unterminated comment
+```
+
+```ts
+/*
+  Example with strings and comments
+  (both multiline and single-line)
+*/
+class Main is
+  this is
+    // The string below is not closed until the end of the file
+    var hello = "hello\" world
+    IO().WriteLine(hello.At(0))
+    IO().WriteLine(hello.At(5))
+  end
+end // <-- error: Unterminated string
+```
+
+```ts
 var lst = [] // <-- error: cannot infer type of `lst`, provide type hint
 var a = lst.Get(0)
 ```
-
 
 ```ts
 var fibs = []
