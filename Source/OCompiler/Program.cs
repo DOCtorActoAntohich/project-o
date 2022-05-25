@@ -8,9 +8,9 @@ namespace OCompiler
     {
         private static void Main(string[] args)
         {
-                var assembly = new Compiler(sourceFilePath: args[0]).Run();
             try
             {
+                var assembly = new Compiler(sourceFilePath: args[0]).Run();
 
                 Console.WriteLine("Program output:");
                 new Invoker(assembly, args[1], args[2..]).Run();
@@ -18,7 +18,6 @@ namespace OCompiler
             catch (Exception exception)
             {
                 Console.WriteLine($"Exception: {exception.GetType().Name}(\"{exception.Message}\")");
-                throw;
             }
         }
     }
