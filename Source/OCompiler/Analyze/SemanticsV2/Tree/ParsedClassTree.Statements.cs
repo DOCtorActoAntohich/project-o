@@ -109,6 +109,22 @@ internal partial class ParsedClassTree
             CreateParameters(memberConstructor, constructor.Parameters);
             FillBlock(memberConstructor.Statements, constructor.Body);
         }
+        
+        CreateDefaultConstructor(declaration);
+    }
+
+    private void CreateDefaultConstructor(ClassDeclaration declaration)
+    {
+        foreach (var constructor in declaration.Constructors)
+        {
+            if (constructor.Parameters.Count == 0)
+            {
+                return;
+            }
+        }
+
+        var defaultConstructor = new MemberConstructor(declaration.Name);
+        declaration.AddConstructor(defaultConstructor);
     }
 
     private void CreateMethods(ClassDeclaration declaration, ParsedClassData parsedClass)
