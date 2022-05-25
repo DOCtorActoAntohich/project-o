@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Text;
 using OCompiler.Analyze.SemanticsV2.Dom.Expression.Special;
@@ -48,6 +49,7 @@ internal class MemberMethod : CallableMember
     public string ToString(string prefix = "", string nestedPrefix = "")
     {
         var stringBuilder = new StringBuilder(prefix)
+            .Append(Owner != null ? $"{Owner.Name}::" : "")
             .Append(Name)
             .Append('(')
             .Append(Parameters)
@@ -58,9 +60,11 @@ internal class MemberMethod : CallableMember
             stringBuilder.Append($": {ReturnType}");
         }
 
-        stringBuilder.Append('\n');
-
-        stringBuilder.Append(Statements.ToString(nestedPrefix));
+        if (Statements.Count > 0)
+        {
+            stringBuilder.Append('\n')
+                .Append(Statements.ToString(nestedPrefix));
+        }
 
         return stringBuilder.ToString();
     }

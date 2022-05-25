@@ -47,9 +47,13 @@ internal class ConditionStatement : Statement
     public new string ToString(string prefix = "", string nestedPrefix = "")
     {
         var stringBuilder = new StringBuilder(prefix)
-            .Append($"if ({Condition})\n")
-            .Append(Statements.ToString(nestedPrefix));
+            .Append($"if ({Condition})");
 
+        if (Statements.Count > 0)
+        {
+            stringBuilder.Append('\n')
+                .Append(Statements.ToString(nestedPrefix));
+        }
 
         if (!HasElseBlock)
         {

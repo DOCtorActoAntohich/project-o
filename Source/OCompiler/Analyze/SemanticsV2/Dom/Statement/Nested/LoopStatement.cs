@@ -32,8 +32,12 @@ internal class LoopStatement : Statement
     public new string ToString(string prefix = "", string nestedPrefix = "")
     {
         var stringBuilder = new StringBuilder(prefix)
-            .Append($"while ({Condition})\n")
-            .Append(Statements.ToString(nestedPrefix));
+            .Append($"while ({Condition})");
+
+        if (Statements.Count > 0)
+        {
+            stringBuilder.Append('\n').Append(Statements.ToString(nestedPrefix));
+        }
 
         return stringBuilder.ToString();
     }

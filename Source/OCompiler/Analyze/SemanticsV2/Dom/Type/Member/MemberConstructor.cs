@@ -25,10 +25,13 @@ internal class MemberConstructor : CallableMember
             .Append($"::{Name}")
             .Append('(')
             .Append(string.Join(", ", Parameters))
-            .Append(')')
-            .Append('\n');
+            .Append(')');
 
-        stringBuilder.Append(Statements.ToString(nestedPrefix));
+        if (Statements.Count > 0)
+        {
+            stringBuilder.Append('\n')
+                .Append(Statements.ToString(nestedPrefix));
+        }
 
         return stringBuilder.ToString();
     }
