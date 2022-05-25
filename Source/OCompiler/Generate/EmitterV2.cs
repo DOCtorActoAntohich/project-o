@@ -200,15 +200,16 @@ internal class EmitterV2
     
     private void EmitMethod(MemberMethod method)
     {
-        EmitBody(method.Statements, new ScopeV2());
+        EmitBody(((MethodBuilder) method.DotnetType!).GetILGenerator(), method.Statements, new ScopeV2());
     }
 
     private void EmitConstructor(MemberConstructor constructor)
     {
-        EmitBody(constructor.Statements, new ScopeV2());   
+        EmitBody(((ConstructorBuilder) constructor.DotnetType!).GetILGenerator(), constructor.Statements, 
+            new ScopeV2());   
     }
     
-    private void EmitBody(StatementsCollection statements, ScopeV2 parentScope)
+    private void EmitBody(ILGenerator generator, StatementsCollection statements, ScopeV2 parentScope)
     {
         if (statements.Count == 0)
         {
@@ -218,7 +219,7 @@ internal class EmitterV2
         var scope = parentScope.GetChild();
         foreach (var statement in statements)
         {
-            EmitStatement(statement, scope);
+            EmitStatement(generator, statement, scope);
         }
         
         if (scope.StackSize != 0)
@@ -227,23 +228,21 @@ internal class EmitterV2
         }
     }
 
-    private void EmitStatement(Statement statement, ScopeV2 scope)
+    private void EmitStatement(ILGenerator generator, Statement statement, ScopeV2 scope)
     {
-        var generator = GetIlGenerator(statement);
-        
         switch (statement)
         {
             case AssignStatement {LValue: VariableReferenceExpression} assignStatement:
-                EmitExpression(assignStatement.RValue, scope);
+                EmitExpression(generator, assignStatement.RValue, scope);
 
                 generator.Emit(OpCodes.Stloc, scope.GetVariable(assignStatement.LValue.Name));
                 scope.DecreaseStackSize();
                 break;
             
             case AssignStatement {LValue: FieldReferenceExpression} assignStatement:
-                EmitExpression(((FieldReferenceExpression) assignStatement.LValue).SourceObject, scope);
-                EmitExpression(assignStatement.RValue, scope);
-                
+                EmitExpression(generator, ((FieldReferenceExpression) assignStatement.LValue).SourceObject, scope);
+                EmitExpression(generator, assignStatement.RValue, scope);
+  
                 generator.Emit(OpCodes.Stfld,
                     (FieldBuilder) ((FieldReferenceExpression) assignStatement.LValue).Field.DotnetType!);
                 scope.DecreaseStackSize();
@@ -255,20 +254,20 @@ internal class EmitterV2
                 var variable = generator.DeclareLocal((Type) variableDeclarationStatement.Type.DotnetType!);
                 scope.SetVariable(variableDeclarationStatement.Name, variable);
                 
-                EmitExpression(variableDeclarationStatement.InitExpression, scope);
+                EmitExpression(generator, variableDeclarationStatement.InitExpression, scope);
 
                 generator.Emit(OpCodes.Stloc, variable);
                 scope.DecreaseStackSize();
                 break;
             
             case ExpressionStatement expressionStatement:
-                EmitExpression(expressionStatement.Expression, scope);
+                EmitExpression(generator, expressionStatement.Expression, scope);
                 break;
             
             case ReturnStatement returnStatement:
                 if (GetTypeMember(returnStatement) is not MemberConstructor)
                 {
-                    EmitExpression(returnStatement.Expression, scope);
+                    EmitExpression(generator, returnStatement.Expression, scope);
                     scope.DecreaseStackSize();
                 }
                 
@@ -280,7 +279,7 @@ internal class EmitterV2
                 Label end = generator.DefineLabel();
                 
                 // Emit condition.
-                EmitExpression(conditionStatement.Condition, scope);
+                EmitExpression(generator, conditionStatement.Condition, scope);
                 // Access real value.
                 generator.Emit(OpCodes.Ldfld, typeof(Boolean).GetField("_value")!);
                 
@@ -289,12 +288,12 @@ internal class EmitterV2
                 scope.DecreaseStackSize();
                 
                 // If.
-                EmitBody(conditionStatement.Statements, scope);
+                EmitBody(generator, conditionStatement.Statements, scope);
                 generator.Emit(OpCodes.Br, end);
                 
                 // Else.
                 generator.MarkLabel(@else);
-                EmitBody(conditionStatement.ElseStatements, scope);
+                EmitBody(generator, conditionStatement.ElseStatements, scope);
                 
                 // End.
                 generator.MarkLabel(end);
@@ -308,7 +307,7 @@ internal class EmitterV2
                 generator.MarkLabel(begin);
                 
                 // Emit condition.
-                EmitExpression(loopStatement.Condition, scope);
+                EmitExpression(generator, loopStatement.Condition, scope);
                 // Access real value.
                 generator.Emit(OpCodes.Ldfld, typeof(Boolean).GetField("_value")!);
                 
@@ -316,7 +315,7 @@ internal class EmitterV2
                 generator.Emit(OpCodes.Brfalse, exit);
                 scope.DecreaseStackSize();
                 
-                EmitBody(loopStatement.Statements, scope);
+                EmitBody(generator, loopStatement.Statements, scope);
                 generator.Emit(OpCodes.Br, begin);
                 
                 // Exit.
@@ -335,10 +334,8 @@ internal class EmitterV2
         }
     }
     
-    private void EmitExpression(Expression expression, ScopeV2 scope)
+    private void EmitExpression(ILGenerator generator, Expression expression, ScopeV2 scope)
     {
-        var generator = GetIlGenerator(expression.ParentStatement);
-
         switch (expression)
         {
             case ThisReferenceExpression:
@@ -360,7 +357,7 @@ internal class EmitterV2
                 break;
             
             case FieldReferenceExpression fieldReferenceExpression:
-                EmitExpression(fieldReferenceExpression.SourceObject, scope);
+                EmitExpression(generator, fieldReferenceExpression.SourceObject, scope);
                 generator.Emit(OpCodes.Ldfld, (FieldBuilder) fieldReferenceExpression.Field.DotnetType!);
                 break;
 
@@ -369,7 +366,7 @@ internal class EmitterV2
                 
                 foreach (var argument in baseConstructorCallExpression.Arguments)
                 {
-                    EmitExpression(argument, scope);
+                    EmitExpression(generator, argument, scope);
                     scope.DecreaseStackSize();
                 }
 
@@ -378,12 +375,12 @@ internal class EmitterV2
                 break;
             
             case MethodCallExpression methodCallExpression:
-                EmitExpression(methodCallExpression.SourceObject, scope);
+                EmitExpression(generator, methodCallExpression.SourceObject, scope);
                 scope.DecreaseStackSize();
                 
                 foreach (var argument in methodCallExpression.Arguments)
                 {
-                    EmitExpression(argument, scope);
+                    EmitExpression(generator, argument, scope);
                     scope.DecreaseStackSize();
                 }
                 
@@ -401,7 +398,7 @@ internal class EmitterV2
             case ObjectCreateExpression objectCreateExpression:
                 foreach (var argument in objectCreateExpression.Arguments)
                 {
-                    EmitExpression(argument, scope);
+                    EmitExpression(generator, argument, scope);
                     scope.DecreaseStackSize();
                 }
                 
@@ -441,26 +438,16 @@ internal class EmitterV2
 
     private int? IndexOfParameter(VariableReferenceExpression expression)
     {
-        return ((CallableMember) expression.ParentStatement.Holder).Parameters.IndexOf(expression.Name) + 1;
+        var index = ((CallableMember) expression.ParentStatement.Holder).Parameters.IndexOf(expression.Name);
+
+        if (index == -1)
+        {
+            return null;
+        }
+        
+        return index + 1;
     }
     
-    private ILGenerator GetIlGenerator(Statement statement)
-    {
-        var memberInfo = GetTypeMember(statement).DotnetType;
-        
-        if (memberInfo is MethodBuilder method)
-        {
-            return method.GetILGenerator();
-        }
-        
-        if (memberInfo is ConstructorBuilder constructor)
-        {
-            return constructor.GetILGenerator();
-        }
-        
-        throw new CompilerInternalError("Cannot identify holder of statement.");
-    }
-
     private TypeMember GetTypeMember(Statement statement)
     {
         if (statement.Holder is TypeMember member)
