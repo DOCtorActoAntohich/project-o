@@ -5,6 +5,10 @@
       "commandName": "Project",
       "commandLineArgs": "$(SolutionDir)/Examples/tic-tac-toe.ol TicTacToe"
     },
+    "Access outer scope": {
+      "commandName": "Project",
+      "commandLineArgs": "$(SolutionDir)/Examples/access_outer_scope.ol Main"
+    },
     "String and comments": {
       "commandName": "Project",
       "commandLineArgs": "$(SolutionDir)/Examples/strings.ol Main"
