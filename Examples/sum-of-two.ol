@@ -1,5 +1,5 @@
 class Main is
-  this is
+  this() is
     IO().WriteLine("Please, input 2 integers as parameters")
   end
 

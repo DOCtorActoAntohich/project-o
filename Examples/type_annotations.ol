@@ -1,5 +1,5 @@
 class Main is
-    this is
+    this() is
         // Explicit type annotation
         var list1: List<Integer> = []
         list1.Append(20)
