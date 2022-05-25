@@ -229,8 +229,11 @@ internal partial class ParsedClassTree
             variableDeclaration.Type = ParseRawTypeReference(variable.Type);
         }
 
-        variableDeclaration.InitExpression = ParseExpression(variable.Expression);
-        
+        if (variable.Expression != null)
+        {
+            variableDeclaration.InitExpression = ParseExpression(variable.Expression);
+        }
+
         return variableDeclaration;
     }
     
