@@ -343,6 +343,7 @@ internal partial class AnnotatedSyntaxTreeV2
         var argumentTypes = GetTypesOfArguments(objectCreation.Arguments);
         var constructor = @class.GetConstructor(argumentTypes);
 
+        objectCreation.Constructor = constructor;
         objectCreation.Type = new TypeReference(constructor.Owner!.Name);
         objectCreation.Type.GenericTypes.AddRange(objectCreation.GenericTypes);
     }
