@@ -27,6 +27,12 @@ internal class StatementsCollection : IEnumerable<DomStatement>
         AddRange(statements);
     }
 
+    public void InsertFirst(DomStatement statement)
+    {
+        _body.Insert(0, statement);
+        statement.ParentBody = this;
+    }
+    
     public void Add(DomStatement statement)
     {
         _body.Add(statement);
