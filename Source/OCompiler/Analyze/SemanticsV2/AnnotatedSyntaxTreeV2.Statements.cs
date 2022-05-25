@@ -165,6 +165,11 @@ internal partial class AnnotatedSyntaxTreeV2
             throw new AnalyzeError($"Cannot return a value from the constructor: {@return.Expression}");
         }
 
+        if (rootHolder is MemberConstructor && !@return.HasValue)
+        {
+            return;
+        }
+
         if (!@return.HasValue)
         {
             var voidReference = new TypeReference(nameof(Void));
