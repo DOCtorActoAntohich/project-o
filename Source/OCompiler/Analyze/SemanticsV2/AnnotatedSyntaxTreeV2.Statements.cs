@@ -8,6 +8,7 @@ using OCompiler.Analyze.SemanticsV2.Dom.Statement.SingleLine;
 using OCompiler.Analyze.SemanticsV2.Dom.Type;
 using OCompiler.Analyze.SemanticsV2.Dom.Type.Member;
 using OCompiler.Exceptions;
+using Boolean = OCompiler.Builtins.Primitives.Boolean;
 using DomExpression = OCompiler.Analyze.SemanticsV2.Dom.Expression.Expression;
 using DomStatement = OCompiler.Analyze.SemanticsV2.Dom.Statement.Statement;
 using Void = OCompiler.Builtins.Primitives.Void;
@@ -162,12 +163,24 @@ internal partial class AnnotatedSyntaxTreeV2
 
     private void ValidateConditionStatement(ConditionStatement @if)
     {
+        DetermineExpressionType(@if.Condition);
+        if (@if.Condition.Type.DifferentFrom(new TypeReference(nameof(Boolean))))
+        {
+            throw new AnalyzeError("Condition in `if` statement must be of type Boolean");
+        }
+        
         ValidateBody(@if.Statements);
         ValidateBody(@if.ElseStatements);
     }
 
     private void ValidateLoopStatement(LoopStatement @while)
     {
+        DetermineExpressionType(@while.Condition);
+        if (@while.Condition.Type.DifferentFrom(new TypeReference(nameof(Boolean))))
+        {
+            throw new AnalyzeError("Condition in `while` statement must be of type Boolean");
+        }
+        
         ValidateBody(@while.Statements);
     }
 }
