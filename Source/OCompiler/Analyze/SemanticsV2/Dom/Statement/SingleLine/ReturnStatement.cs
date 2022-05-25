@@ -13,15 +13,15 @@ internal class ReturnStatement : Statement
         set
         {
             _expression = value;
-            IsVoidMethodReturn = false;
+            HasValue = false;
         }
     }
-    public bool IsVoidMethodReturn { get; set; }
+    public bool HasValue { get; set; }
 
 
     public ReturnStatement()
     {
-        IsVoidMethodReturn = true;
+        HasValue = true;
     }
     
     public ReturnStatement(DomExpression expression)
@@ -35,7 +35,7 @@ internal class ReturnStatement : Statement
         var stringBuilder = new StringBuilder(prefix)
             .Append("return");
 
-        if (IsVoidMethodReturn)
+        if (HasValue)
         {
             return stringBuilder.ToString();
         }
