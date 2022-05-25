@@ -20,9 +20,48 @@ However, the fields and methods can actually be overriden in the child class, if
 
 When an instance of a class is created, all the base classes up to `Class` are also initialized. If not specified otherwise, an empty constructor of the base class is called for initializing the parent class.
 
-This behaviour can be changed in the constructor of the child class: it is necessary to use `base` keyword, followed by a list of [arguments](2_Syntax_and_semantics.md#method-calls) to the base class, in parentheses `(` `)`. This can also be useful to postpone initialization of the base class — by default, the base class constructor is called first.
+This behaviour can be changed **in the constructor** of the child class: it is necessary to use `base` keyword, followed by a list of [arguments](2_Syntax_and_semantics.md#method-calls) to the base class, in parentheses `(` `)`. This can also be useful to postpone initialization of the base class — by default, the base class constructor is called first.
 
 ### Inheritance example
+
+```ts
+class Main is
+    this() is
+        var cat = Cat("James")
+        IO().WriteLine(cat.name)      // prints "James"
+        IO().WriteLine(cat.Sound())   // prints "Meow"
+        IO().WriteLine(cat.Action())  // prints "Idling" (from the base class)
+    end
+end
+
+class Animal is                  // base class
+    var name = String()
+    
+    this(name: String) is
+        this.name = name
+    end
+    
+    method Sound() : String is
+        return "Unknown"
+    end
+    
+    method Action() : String is
+        return "Idling"
+    end
+end
+
+
+class Cat extends Animal is      // child class
+    this(name: String) i
+        // initialize the base class with a non-empty constructor
+        base(name)
+    end
+
+    method Sound() : String is  // override the method of the base class
+        return "Meow"
+    end
+end
+```
 
 ## Abstraction
 
@@ -45,6 +84,51 @@ The O language freely supports upcasting, so using base classes to refer to obje
 However, downcasting cannot be performed.
 
 ### Polymorphism examples
+
+```ts
+class Main is
+    this() is
+        var cat = Cat("James")
+        PrintAnimalInfo(cat) // Prints "James says Meow and is idling"
+    end
+
+    method PrintAnimalInfo(animal: Animal) is
+        IO().WriteLine(animal.name
+            .Concatenate(" says ")
+            .Concatenate(animal.Sound())
+            .Concatenate(" and is ")
+            .Concatenate(animal.Action())
+        )
+    end
+end
+
+class Animal is
+    var name = String()
+    
+    this(name: String) is
+        this.name = name
+    end
+    
+    method Sound() : String is
+        return "Unknown"
+    end
+    
+    method Action() : String is
+        return "Idling"
+    end
+end
+
+
+class Cat extends Animal is
+    this(name: String) i
+        base(name)
+    end
+
+    method Sound() : String is
+        return "Meow"
+    end
+end
+```
 
 ## Static members
 
