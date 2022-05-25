@@ -365,7 +365,7 @@ internal class EmitterV2
                 break;
 
             case BaseConstructorCallExpression baseConstructorCallExpression:
-                EmitExpression(new ThisReferenceExpression(), scope);
+                generator.Emit(OpCodes.Ldarg_0); 
                 scope.DecreaseStackSize();
                 
                 foreach (var argument in baseConstructorCallExpression.Arguments)
