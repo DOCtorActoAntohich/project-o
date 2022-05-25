@@ -92,7 +92,7 @@ internal class ClassDeclaration : TypeMember
         }
         
 
-        throw new AnalyzeError($"Couldn't find constructor: {Name}({parameters.Count})");
+        throw new AnalyzeError($"Couldn't find suitable constructor with {parameters.Count} parameters");
     }
     
     public MemberMethod GetMethod(string targetMethodName, List<TypeReference> parameters)
@@ -118,7 +118,7 @@ internal class ClassDeclaration : TypeMember
             return parentClass.GetMethod(targetMethodName, parameters);
         }
 
-        throw new AnalyzeError($"Couldn't find method: {Name}::{targetMethodName}({parameters.Count})");
+        throw new AnalyzeError($"Couldn't find method: {targetMethodName}({parameters.Count})");
     }
 
     public MemberField GetField(string targetFieldName)
@@ -137,7 +137,7 @@ internal class ClassDeclaration : TypeMember
             return parentClass.GetField(targetFieldName);
         }
 
-        throw new AnalyzeError($"Couldn't find field: {Name}::{targetFieldName}");
+        throw new AnalyzeError($"Couldn't find field: {targetFieldName}");
     }
     
     public override string ToString()

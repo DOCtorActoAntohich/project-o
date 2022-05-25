@@ -54,7 +54,7 @@ internal class BuiltinClassTree
             type.GetGenericArguments().Select(
                 genericType => new TypeReference(genericType.Name, dotnetType: genericType)));
         
-        if (type.BaseType != null)
+        if (type.BaseType != null && type.BaseType.Name != nameof(Object))
         {
             declaration.BaseType = new TypeReference(TrimGrave(type.BaseType.Name), dotnetType: type.BaseType);
         }

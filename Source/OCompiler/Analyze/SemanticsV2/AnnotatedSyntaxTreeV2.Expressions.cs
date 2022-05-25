@@ -350,7 +350,7 @@ internal partial class AnnotatedSyntaxTreeV2
     {
         DetermineExpressionType(fieldReference.SourceObject);
         
-        var @class = GetClass(fieldReference.SourceObject.Name);
+        var @class = GetClass(fieldReference.SourceObject.Type.Name);
 
         var field = @class.GetField(fieldReference.Name);
         
