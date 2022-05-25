@@ -12,7 +12,7 @@ internal class ParameterDeclarationExpression : Expression
     
     
     // Always set when added to parameters collection.
-    public ParametersCollection ParentCollection { get; set; }
+    public ParametersCollection ParentCollection { get; set; } = null!;
     public CallableMember Owner => ParentCollection.Holder;
 
     public ParameterDeclarationExpression(string name, TypeReference type) : base(name)
