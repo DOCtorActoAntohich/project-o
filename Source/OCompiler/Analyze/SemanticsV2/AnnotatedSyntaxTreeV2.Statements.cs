@@ -21,6 +21,7 @@ internal partial class AnnotatedSyntaxTreeV2
         {
             CheckIfBaseCallIsFirst(@class);
             InsertFieldsInitialization(@class);
+            AddTrailingReturns(@class);
             
             ValidateConstructorBodies(@class);
             ValidateMethodBodies(@class);
@@ -75,6 +76,27 @@ internal partial class AnnotatedSyntaxTreeV2
                 var assignment = new AssignStatement(fieldReference, field.InitExpression);
                 constructor.Statements.InsertFieldInitialization(assignment);
             }
+        }
+    }
+
+    private void AddTrailingReturns(ClassDeclaration @class)
+    {
+        foreach (var constructor in @class.Constructors)
+        {
+            AddTrailingReturn(constructor.Statements);
+        }
+
+        foreach (var method in @class.Methods)
+        {
+            AddTrailingReturn(method.Statements);
+        }
+    }
+
+    private void AddTrailingReturn(StatementsCollection body)
+    {
+        if (body.LastStatement() is not ReturnStatement)
+        {
+            body.Add(new ReturnStatement());
         }
     }
     

@@ -1,9 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
-using OCompiler.Analyze.SemanticsV2.Dom.Expression.Call;
-using OCompiler.Analyze.SemanticsV2.Dom.Statement.SingleLine;
-using OCompiler.Analyze.SemanticsV2.Dom.Type;
 using DomStatement = OCompiler.Analyze.SemanticsV2.Dom.Statement.Statement;
 
 namespace OCompiler.Analyze.SemanticsV2.Dom;
@@ -58,6 +56,11 @@ internal class StatementsCollection : IEnumerable<DomStatement>
     public bool Contains(DomStatement targetStatement)
     {
         return _body.Contains(targetStatement);
+    }
+
+    public DomStatement LastStatement()
+    {
+        return _body.Last();
     }
 
     public IEnumerator<DomStatement> GetEnumerator()
