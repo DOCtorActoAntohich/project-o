@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using OCompiler.Analyze.SemanticsV2.Dom.Expression.Special;
@@ -39,6 +38,24 @@ internal class ParametersCollection : IEnumerable<ParameterDeclarationExpression
         {
             Add(parameter);
         }
+    }
+
+    public int IndexOf(string name)
+    {
+        for (var i = 0; i < _parameters.Count; ++i)
+        {
+            if (_parameters[i].Name == name)
+            {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    public int IndexOf(ParameterDeclarationExpression parameter)
+    {
+        return IndexOf(parameter.Name);
     }
 
     public bool SameAs(ParametersCollection other)
