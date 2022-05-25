@@ -76,6 +76,8 @@ internal class EmitterV2
             {
                 EmitConstructor(constructor);
             }
+
+            ((TypeBuilder) @class.DotnetType!).CreateType();
         }
     }
     
@@ -194,17 +196,6 @@ internal class EmitterV2
         
         field.DotnetType = ((TypeBuilder) field.Owner!.DotnetType!).DefineField(
             field.Name, (Type) field.Type.DotnetType!, FieldAttributes.Public);
-        
-        // Create reference expression.
-        var fieldReferenceExpression = new FieldReferenceExpression(
-            new ThisReferenceExpression(), field.Name);
-        
-        // Add initialization to each constructor.
-        foreach (var constructor in field.Owner.Constructors)
-        {
-            constructor.Statements.InsertFirst(new AssignStatement(
-                fieldReferenceExpression, field.InitExpression));
-        }
     }
     
     private void EmitMethod(MemberMethod method)
@@ -340,6 +331,7 @@ internal class EmitterV2
         if (scope.StackSize != 0)
         {
             generator.Emit(OpCodes.Pop);
+            scope.DecreaseStackSize();
         }
     }
     
@@ -417,7 +409,6 @@ internal class EmitterV2
                 generator.Emit(OpCodes.Newobj, 
                     (ConstructorInfo) objectCreateExpression.Constructor.DotnetType!);
                 scope.IncreaseStackSize();
-                
                 break;
             
             case BooleanLiteralExpression booleanLiteralExpression:
