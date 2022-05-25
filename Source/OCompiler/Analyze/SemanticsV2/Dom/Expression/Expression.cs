@@ -5,7 +5,7 @@ namespace OCompiler.Analyze.SemanticsV2.Dom.Expression;
 
 internal abstract class Expression : CodeObject
 {
-    public DomStatement ParentStatement { get; set; } = null!;
+    public virtual DomStatement ParentStatement { get; set; } = null!;
 
     private TypeReference _type = null!;
     public TypeReference Type
