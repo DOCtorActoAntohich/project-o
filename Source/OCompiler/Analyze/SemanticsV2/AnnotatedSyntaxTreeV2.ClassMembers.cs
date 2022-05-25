@@ -18,7 +18,7 @@ internal partial class AnnotatedSyntaxTreeV2
 {
     private readonly Dictionary<MemberField, ValidationState> _fieldsValidationState = new();
     
-    private void InferTypes()
+    private void InferTypesOfClassMembers()
     {
         foreach (var @class in ParsedClasses.Values)
         {
