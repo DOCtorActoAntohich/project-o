@@ -344,5 +344,6 @@ internal partial class AnnotatedSyntaxTreeV2
         DetermineFieldType(field);
 
         fieldReference.Type = field.Type;
+        fieldReference.Field = field;
     }
 }
