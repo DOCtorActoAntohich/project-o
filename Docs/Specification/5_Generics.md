@@ -10,6 +10,12 @@ To create a generic class, just list the names of generic types to be used insid
 
 To use the defined generic type, just pass it where needed, the same way as usual types (`String`, `Real`, etc.) would be passed.
 
+## Type inference
+
+The actual type will be inferred by a simple substitution on each object creation.
+
+If the type fails the requirements (e.g. does not have methods or fields of the generic type), an error will occur during the static type checking.
+
 ## Example of a generic class
 
 ```ts

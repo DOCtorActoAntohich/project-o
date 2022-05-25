@@ -490,4 +490,4 @@ All the classes in the program in O Language inherit `Class` directly, unless th
 
 #### `Void`
 
-This type has no logic at all, and represents an absence of the return value of a function.
+This type has no behavior at all, and represents an absence of the return value of a function.
