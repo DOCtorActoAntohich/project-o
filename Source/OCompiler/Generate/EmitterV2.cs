@@ -383,18 +383,20 @@ internal class EmitterV2
                 }
 
                 generator.Emit(OpCodes.Call, 
-                    (ConstructorBuilder) baseConstructorCallExpression.Constructor.DotnetType!);
+                    (ConstructorInfo) baseConstructorCallExpression.Constructor.DotnetType!);
                 break;
             
             case MethodCallExpression methodCallExpression:
                 EmitExpression(methodCallExpression.SourceObject, scope);
+                scope.DecreaseStackSize();
+                
                 foreach (var argument in methodCallExpression.Arguments)
                 {
                     EmitExpression(argument, scope);
                     scope.DecreaseStackSize();
                 }
                 
-                generator.Emit(OpCodes.Callvirt, (MethodBuilder) methodCallExpression.Method.DotnetType!);
+                generator.Emit(OpCodes.Callvirt, (MethodInfo) methodCallExpression.Method.DotnetType!);
                 scope.IncreaseStackSize();
                 
                 if (methodCallExpression.Method.ReturnType.Name == nameof(Void))
@@ -413,7 +415,7 @@ internal class EmitterV2
                 }
                 
                 generator.Emit(OpCodes.Newobj, 
-                    (ConstructorBuilder) objectCreateExpression.Constructor.DotnetType!);
+                    (ConstructorInfo) objectCreateExpression.Constructor.DotnetType!);
                 scope.IncreaseStackSize();
                 
                 break;
@@ -426,7 +428,7 @@ internal class EmitterV2
             
             case IntegerLiteralExpression integerLiteralExpression:
                 generator.Emit(OpCodes.Ldc_I4, integerLiteralExpression.Value);
-                generator.Emit(OpCodes.Newobj, typeof(int).GetConstructor(new []{typeof(int)})!);
+                generator.Emit(OpCodes.Newobj, typeof(Integer).GetConstructor(new []{typeof(int)})!);
                 scope.IncreaseStackSize();
                 break;
             
