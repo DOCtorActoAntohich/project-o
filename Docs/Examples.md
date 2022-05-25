@@ -83,7 +83,7 @@ fibs.Append("2") // <- error: List<Integer>.Append
 ```
 
 ```java
-lst = [1, False] // <-- error: cannot construct lists of different type
+lst = [1, False] // <-- error: cannot construct a list from elements of different types
 ```
 
 ```java
@@ -124,7 +124,7 @@ method number(): Integer is
     return 42
 end
 
-IO().Write(number()) // error: IO().Write expected String as first argument, found Integer
+IO().Write(this.number()) // error: IO().Write expected String as first argument, found Integer
 ```
 
 ```java
