@@ -13,7 +13,7 @@ class Main is
 
 ## Valid examples
 
-1. Lists and `Sum()`
+1. Lists
 ```ts
 var fibs = []
 var a = 1
@@ -25,7 +25,7 @@ while a.Less(10000) loop
     fibs.Append(b)
 end
 
-IO().WriteLine(fibs.Sum().ToString())
+IO().WriteLine(fibs.Get(3).ToString())
 ```
 
 2. Dicts
