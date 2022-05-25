@@ -104,7 +104,7 @@ internal class BuiltinClassTree
         foreach (var constructor in builtinClass.GetConstructors())
         {
             var parameters = ExtractParameters(declaration, constructor);
-            var memberConstructor = new MemberConstructor(parameters)
+            var memberConstructor = new MemberConstructor(declaration.Name, parameters)
             {
                 DotnetType = constructor
             };

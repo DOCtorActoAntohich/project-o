@@ -1,14 +1,20 @@
 using OCompiler.Analyze.SemanticsV2.Dom.Type;
 using OCompiler.Analyze.SemanticsV2.Dom.Type.Member;
+using DomStatement = OCompiler.Analyze.SemanticsV2.Dom.Statement.Statement;
 
 namespace OCompiler.Analyze.SemanticsV2.Dom.Expression.Special;
 
 internal class ParameterDeclarationExpression : Expression
 {
     public TypeReference Type { get; set; }
+
+    private new DomStatement ParentStatement { get; set; } = null!; 
     
-    public new TypeMember? Holder { get; set; }
     
+    // Always set when added to parameters collection.
+    public ParametersCollection ParentCollection { get; set; }
+    public CallableMember Owner => ParentCollection.Holder;
+
     public ParameterDeclarationExpression(string name, TypeReference type) : base(name)
     {
         Type = type;

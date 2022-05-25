@@ -3,7 +3,7 @@ using OCompiler.Analyze.SemanticsV2.Dom.Type;
 
 namespace OCompiler.Analyze.SemanticsV2.Dom.Expression.Call;
 
-internal class ObjectCreateExpression : CallExpression, ICanHaveGenericTypes
+internal class ObjectCreateExpression : CallExpression
 {
     public List<TypeReference> GenericTypes { get; } = new();
 

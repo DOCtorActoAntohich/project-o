@@ -5,30 +5,35 @@ using DomExpression = OCompiler.Analyze.SemanticsV2.Dom.Expression.Expression;
 
 namespace OCompiler.Analyze.SemanticsV2.Dom.Statement.Nested;
 
-internal class LoopStatement : Statement, ICanHaveStatements
+internal class LoopStatement : Statement
 {
-    public DomExpression Condition { get; set; }
+    public DomExpression Condition { get; set; } = null!;
 
-    public List<Statement> Statements { get; } = new();
+    public StatementsCollection Statements { get; }
 
     public Dictionary<string, TypeReference> Context { get; } = new();
 
-    public LoopStatement(DomExpression condition)
+    private LoopStatement()
+    {
+        Statements = new StatementsCollection(this);
+    }
+    
+    public LoopStatement(DomExpression condition) : this()
     {
         Condition = condition;
-        condition.Holder = this;
+        condition.ParentStatement = this;
     }
     
     public LoopStatement(DomExpression condition, IEnumerable<Statement> statements) : this(condition)
     {
-        (this as ICanHaveStatements).AddStatements(statements);
+        Statements.AddRange(statements);
     }
 
     public new string ToString(string prefix = "", string nestedPrefix = "")
     {
         var stringBuilder = new StringBuilder(prefix)
             .Append($"while ({Condition})\n")
-            .Append(ICanHaveStatements.StatementsString(Statements, nestedPrefix));
+            .Append(Statements.ToString(nestedPrefix));
 
         return stringBuilder.ToString();
     }

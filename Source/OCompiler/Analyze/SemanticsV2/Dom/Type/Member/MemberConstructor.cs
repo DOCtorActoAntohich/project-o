@@ -9,18 +9,17 @@ namespace OCompiler.Analyze.SemanticsV2.Dom.Type.Member;
 
 internal class MemberConstructor : CallableMember
 {
-    public MemberConstructor(string name = "") : base(name)
+    public MemberConstructor(string name) : base(name)
     {
     }
 
-    public MemberConstructor(IEnumerable<ParameterDeclarationExpression> parameters, string name = "") : this(name)
+    public MemberConstructor(string name, IEnumerable<ParameterDeclarationExpression> parameters) : this(name)
     {
-        AddParameters(parameters);
+        Parameters.AddRange(parameters);
     }
 
     public string ToString(string prefix = "", string nestedPrefix = "")
     {
-        
         var stringBuilder = new StringBuilder(prefix)
             .Append(Owner?.Name ?? Name)
             .Append($"::{Name}")
@@ -29,7 +28,7 @@ internal class MemberConstructor : CallableMember
             .Append(')')
             .Append('\n');
 
-        stringBuilder.Append(ICanHaveStatements.StatementsString(Statements, nestedPrefix));
+        stringBuilder.Append(Statements.ToString(nestedPrefix));
 
         return stringBuilder.ToString();
     }

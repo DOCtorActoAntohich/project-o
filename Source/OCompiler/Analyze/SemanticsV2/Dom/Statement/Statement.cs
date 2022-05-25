@@ -8,10 +8,13 @@ namespace OCompiler.Analyze.SemanticsV2.Dom.Statement;
 
 internal abstract class Statement : CodeObject
 {
-    public ICanHaveStatements? Holder { get; set; }
-    
+    // Always set when adding statement to any body.
+    public StatementsCollection ParentBody { get; set; } = null!;
+    public CodeObject Holder => ParentBody.Holder;
+
     public Statement() : base("")
     {
+        
     }
 
     public string ToString(string prefix = "", string nestedPrefix = "")

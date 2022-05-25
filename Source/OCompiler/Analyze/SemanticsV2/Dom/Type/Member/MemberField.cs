@@ -5,12 +5,49 @@ using DomExpression = OCompiler.Analyze.SemanticsV2.Dom.Expression.Expression;
 
 internal class MemberField : TypeMember
 {
-    public TypeReference? Type { get; set; }
-    
-    public DomExpression? InitExpression { get; set; }
-    public bool IsInitialized => InitExpression != null;
+    private TypeReference _type = null!;
+    private DomExpression _initExpression = null!;
+    public TypeReference Type
+    {
+        get => _type;
+        set
+        {
+            _type = value;
+            HasTypeAnnotation = true;
+        } 
+    }
 
-    public MemberField(string name, TypeReference? type = null, DomExpression? initExpression = null) : base(name)
+    public DomExpression InitExpression
+    {
+        get => _initExpression;
+        set
+        {
+            _initExpression = value;
+            HasInitExpression = true;
+        }
+    }
+
+    public bool HasTypeAnnotation { get; set; }
+    public bool HasInitExpression { get; set; }
+
+
+    public MemberField(string name) : base(name)
+    {
+        HasTypeAnnotation = false;
+        HasInitExpression = false;
+    }
+
+    public MemberField(string name, TypeReference type) : this(name)
+    {
+        Type = type;
+    }
+    
+    public MemberField(string name, DomExpression initExpression) : this(name)
+    {
+        InitExpression = initExpression;
+    }
+
+    public MemberField(string name, TypeReference type, DomExpression initExpression) : this(name)
     {
         Type = type;
         InitExpression = initExpression;
@@ -21,12 +58,12 @@ internal class MemberField : TypeMember
         var stringBuilder = new StringBuilder(prefix)
             .Append(Name);
 
-        if (Type != null)
+        if (HasTypeAnnotation)
         {
             stringBuilder.Append($": {Type}");
         }
 
-        if (IsInitialized)
+        if (HasInitExpression)
         {
             stringBuilder.Append($" = {InitExpression}");
         }

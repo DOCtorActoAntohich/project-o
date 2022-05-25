@@ -10,7 +10,7 @@ internal class ExpressionStatement : Statement
     {
         Expression = expression;
 
-        Expression.Holder = this;
+        Expression.ParentStatement = this;
     }
 
     public string ToString(string prefix = "")

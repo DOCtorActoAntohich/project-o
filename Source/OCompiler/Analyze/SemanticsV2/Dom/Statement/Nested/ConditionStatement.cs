@@ -6,27 +6,33 @@ using DomExpression = OCompiler.Analyze.SemanticsV2.Dom.Expression.Expression;
 namespace OCompiler.Analyze.SemanticsV2.Dom.Statement.Nested;
 
 
-internal class ConditionStatement : Statement, ICanHaveStatements
+internal class ConditionStatement : Statement
 {
-    public DomExpression Condition { get; set; }
+    public DomExpression Condition { get; set; } = null!;
 
-    public List<Statement> Statements { get; } = new();
-    public List<Statement> ElseStatements { get; } = new();
-    
+    public StatementsCollection Statements { get; }
+    public StatementsCollection ElseStatements { get; }
+
     public bool HasElseBlock => ElseStatements.Count > 0;
 
 
     public Dictionary<string, TypeReference> Context { get; } = new();
 
-    public ConditionStatement(DomExpression condition)
+    private ConditionStatement()
+    {
+        Statements = new StatementsCollection(this);
+        ElseStatements = new StatementsCollection(this);
+    }
+    
+    public ConditionStatement(DomExpression condition) : this()
     {
         Condition = condition;
-        Condition.Holder = this;
+        Condition.ParentStatement = this;
     }
     
     public ConditionStatement(DomExpression condition, IEnumerable<Statement> statements) : this(condition)
     {
-        (this as ICanHaveStatements).AddStatements(statements);
+        Statements.AddRange(statements);
     }
     
     public ConditionStatement(
@@ -35,29 +41,15 @@ internal class ConditionStatement : Statement, ICanHaveStatements
         IEnumerable<Statement> elseStatements
         ) : this(condition, statements)
     {
-        AddElseStatements(elseStatements);
-    }
-
-    public void AddElseStatement(Statement statement)
-    {
-        ElseStatements.Add(statement);
-        statement.Holder = this;
-    }
-    
-    public void AddElseStatements(IEnumerable<Statement> statements)
-    {
-        foreach (var statement in statements)
-        {
-            AddElseStatement(statement);
-        }
+        ElseStatements.AddRange(elseStatements);
     }
 
     public new string ToString(string prefix = "", string nestedPrefix = "")
     {
         var stringBuilder = new StringBuilder(prefix)
             .Append($"if ({Condition})\n")
-            .Append(ICanHaveStatements.StatementsString(Statements, nestedPrefix));
-        
+            .Append(Statements.ToString(nestedPrefix));
+
 
         if (!HasElseBlock)
         {
@@ -67,7 +59,7 @@ internal class ConditionStatement : Statement, ICanHaveStatements
         stringBuilder
             .Append('\n').Append(prefix)
             .Append("else\n")
-            .Append(ICanHaveStatements.StatementsString(ElseStatements, nestedPrefix));
+            .Append(ElseStatements.ToString(nestedPrefix));
 
         return stringBuilder.ToString();
     }

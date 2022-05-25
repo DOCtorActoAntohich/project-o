@@ -12,8 +12,8 @@ internal class AssignStatement : Statement
         LValue = lValue;
         RValue = rValue;
 
-        LValue.Holder = this;
-        RValue.Holder = this;
+        LValue.ParentStatement = this;
+        RValue.ParentStatement = this;
     }
 
     public string ToString(string prefix = "")

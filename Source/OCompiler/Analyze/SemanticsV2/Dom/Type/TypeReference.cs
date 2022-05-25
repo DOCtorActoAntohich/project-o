@@ -5,7 +5,7 @@ using System.Text;
 
 namespace OCompiler.Analyze.SemanticsV2.Dom.Type;
 
-internal class TypeReference : CodeObject, ICanHaveGenericTypes
+internal class TypeReference : CodeObject
 {
     // true if this is a generic type like T/K/V, false if concrete name.
     public bool IsGeneric { get; set; }

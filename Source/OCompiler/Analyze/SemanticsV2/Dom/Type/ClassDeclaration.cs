@@ -8,22 +8,21 @@ using OCompiler.Exceptions;
 
 namespace OCompiler.Analyze.SemanticsV2.Dom.Type;
 
-internal class ClassDeclaration : TypeMember, ICanHaveGenericTypes
+internal class ClassDeclaration : TypeMember
 {
-    public List<TypeReference> GenericTypes { get; } = new();
+    public List<TypeReference> GenericTypes { get; private set; } = new();
     public bool HasGenerics => GenericTypes.Count > 0;
 
     public TypeReference? BaseType { get; set; }
 
 
-    public List<MemberField> Fields { get; } = new();
-    public List<MemberMethod> Methods { get; } = new();
-    public List<MemberConstructor> Constructors { get; } = new();
-
-    public Dictionary<string, TypeReference> Context { get; } = new();
+    public List<MemberField> Fields { get; private set; } = new();
+    public List<MemberMethod> Methods { get; private set; } = new();
+    public List<MemberConstructor> Constructors { get; private set; } = new();
 
     public ClassDeclaration(string name) : base(name)
     {
+        Owner = this;
     }
 
     public void AddField(MemberField field)
@@ -46,15 +45,7 @@ internal class ClassDeclaration : TypeMember, ICanHaveGenericTypes
 
     public TypeReference? GetGenericType(string name)
     {
-        foreach (var genericType in GenericTypes)
-        {
-            if (genericType.Name == name)
-            {
-                return genericType;
-            }
-        }
-
-        return null;
+        return GenericTypes.FirstOrDefault(genericType => genericType.Name == name);
     }
 
     public bool HasGenericType(string name)

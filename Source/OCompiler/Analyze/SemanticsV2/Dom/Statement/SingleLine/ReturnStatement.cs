@@ -5,26 +5,29 @@ namespace OCompiler.Analyze.SemanticsV2.Dom.Statement.SingleLine;
 
 internal class ReturnStatement : Statement
 {
-    private DomExpression? _expression;
+    private DomExpression _expression = null!;
 
-    public DomExpression? Expression
+    public DomExpression Expression
     {
         get => _expression;
         set
         {
             _expression = value;
-            if (_expression != null)
-            {
-                _expression.Holder = this;
-            }
+            IsVoidMethodReturn = false;
         }
     }
-    
-    public bool IsVoidMethodReturn => _expression == null;
+    public bool IsVoidMethodReturn { get; set; }
 
-    public ReturnStatement(DomExpression? expression = null)
+
+    public ReturnStatement()
+    {
+        IsVoidMethodReturn = true;
+    }
+    
+    public ReturnStatement(DomExpression expression)
     {
         Expression = expression;
+        Expression.ParentStatement = this;
     }
 
     public string ToString(string prefix = "")

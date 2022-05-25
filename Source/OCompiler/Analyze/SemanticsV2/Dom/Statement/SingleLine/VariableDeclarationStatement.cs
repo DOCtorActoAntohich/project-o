@@ -6,35 +6,54 @@ namespace OCompiler.Analyze.SemanticsV2.Dom.Statement.SingleLine;
 
 internal class VariableDeclarationStatement : Statement
 {
-    public TypeReference? Type { get; set; }
+    private TypeReference _type = null!;
+    private DomExpression _initExpression = null!;
 
-    private DomExpression? _initExpression;
+    public TypeReference Type
+    {
+        get => _type;
+        set
+        {
+            _type = value;
+            HasTypeAnnotation = true;
+        }
+    }
 
-    public DomExpression? InitExpression
+    public DomExpression InitExpression
     {
         get => _initExpression;
         set
         {
             _initExpression = value;
-            if (_initExpression != null)
-            {
-                _initExpression.Holder = this;
-            }
+            HasInitExpression = true;
         }
     }
 
-
+    public bool HasTypeAnnotation { get; set; }
+    public bool HasInitExpression { get; set; }
+    
+    
     public VariableDeclarationStatement(string name)
     {
         Name = name;
+        HasTypeAnnotation = false;
+        HasInitExpression = false;
     }
-    public VariableDeclarationStatement(
-        string name, 
-        TypeReference? type = null, 
-        DomExpression? initExpression = null) 
+
+    public VariableDeclarationStatement(string name, TypeReference typeAnnotation) : this(name)
+    {
+        Type = typeAnnotation;
+    }
+
+    public VariableDeclarationStatement(string name, DomExpression initExpression) : this(name)
+    {
+        InitExpression = initExpression;
+    }
+
+    public VariableDeclarationStatement(string name, TypeReference typeAnnotation, DomExpression initExpression)
         : this(name)
     {
-        Type = type;
+        Type = typeAnnotation;
         InitExpression = initExpression;
     }
 
@@ -43,12 +62,12 @@ internal class VariableDeclarationStatement : Statement
         var stringBuilder = new StringBuilder(prefix)
             .Append(Name);
 
-        if (Type != null)
+        if (HasTypeAnnotation)
         {
             stringBuilder.Append($": {Type}");
         }
 
-        if (InitExpression != null)
+        if (HasInitExpression)
         {
             stringBuilder.Append($" = {InitExpression}");
         }

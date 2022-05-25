@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using OCompiler.Analyze.SemanticsV2.Dom;
 using OCompiler.Analyze.SemanticsV2.Dom.Expression.Special;
 using OCompiler.Analyze.SemanticsV2.Dom.Statement;
 using OCompiler.Analyze.SemanticsV2.Dom.Statement.Nested;
@@ -28,12 +29,12 @@ internal partial class ParsedClassTree
             var declaration = CreateEmptyDeclaration(parsedClass);
             AddClassDeclaration(declaration);
 
-            CreateGenericTypeParametersReferences(declaration, parsedClass);
-            CreateBaseTypeReference(declaration, parsedClass.Extends);
+            AddClassGenericTypes(declaration, parsedClass);
+            AddBaseTypeReference(declaration, parsedClass.Extends);
 
-            CreateConstructors(declaration, parsedClass);
-            CreateMethods(declaration, parsedClass);
             CreateFields(declaration, parsedClass);
+            CreateMethods(declaration, parsedClass);
+            CreateConstructors(declaration, parsedClass);
         }
     }
 
@@ -53,16 +54,27 @@ internal partial class ParsedClassTree
         ParsedClasses.Add(declaration.Name, declaration);
     }
 
-    private static void CreateGenericTypeParametersReferences(ClassDeclaration declaration, ParsedClassData parsedClass)
+    private static void AddClassGenericTypes(ClassDeclaration declaration, ParsedClassData parsedClass)
     {
         foreach (var genericType in parsedClass.Name.GenericTypes)
         {
-            var genericTypeReference = new TypeReference(genericType.Name.Literal, isGeneric: true);
+            var genericTypeReference = ParseRawTypeReference(genericType);
+            genericTypeReference.IsGeneric = true;
             declaration.GenericTypes.Add(genericTypeReference);
         }
     }
 
-    private static void CreateBaseTypeReference(ClassDeclaration declaration, TypeAnnotation? baseType)
+    private static TypeReference ParseRawTypeReference(TypeAnnotation typeAnnotation)
+    {
+        var reference = new TypeReference(typeAnnotation.Name.Literal);
+        foreach (var genericType in typeAnnotation.GenericTypes)
+        {
+            reference.GenericTypes.Add(ParseRawTypeReference(genericType));
+        }
+        return reference;
+    }
+    
+    private static void AddBaseTypeReference(ClassDeclaration declaration, TypeAnnotation? baseType)
     {
         if (baseType == null)
         {
@@ -70,17 +82,19 @@ internal partial class ParsedClassTree
             return;
         }
 
-        var baseTypeReference = new TypeReference(baseType.Name.Literal);
+        /*var baseTypeReference = new TypeReference(baseType.Name.Literal);
         foreach (var parentGenericType in baseType.GenericTypes)
         {
             var typeReference = TypeReferenceFromTypeAnnotation(declaration, parentGenericType);
             baseTypeReference.GenericTypes.Add(typeReference);
         }
 
-        declaration.BaseType = baseTypeReference;
+        declaration.BaseType = baseTypeReference;*/
+        declaration.BaseType = ParseRawTypeReference(baseType);
     }
 
-    private static TypeReference TypeReferenceFromTypeAnnotation(ClassDeclaration declaration, TypeAnnotation type)
+    // TODO remove ?
+    /*private static TypeReference TypeReferenceFromTypeAnnotation(ClassDeclaration declaration, TypeAnnotation type)
     {
         if (declaration.HasGenericType(type.Name.Literal))
         {
@@ -99,7 +113,7 @@ internal partial class ParsedClassTree
         }
 
         return reference;
-    }
+    }*/
 
     private void CreateFields(ClassDeclaration declaration, ParsedClassData parsedClass)
     {
@@ -112,7 +126,9 @@ internal partial class ParsedClassTree
 
             if (field.Type != null)
             {
-                memberField.Type = TypeReferenceFromTypeAnnotation(declaration, field.Type);
+                // TODO remove ?
+                // memberField.Type = TypeReferenceFromTypeAnnotation(declaration, field.Type);
+                memberField.Type = ParseRawTypeReference(field.Type);
             }
         }
     }
@@ -124,22 +140,8 @@ internal partial class ParsedClassTree
             var memberConstructor = new MemberConstructor(declaration.Name);
             declaration.AddConstructor(memberConstructor);
             
-            CreateParameters(declaration, memberConstructor, constructor.Parameters);
-            FillBlock(memberConstructor, constructor.Body);
-        }
-    }
-
-    private void CreateParameters(
-        ClassDeclaration declaration,
-        CallableMember callable,
-        IEnumerable<CallableParameter> parameters)
-    {
-        foreach (var parameter in parameters)
-        {
-            var parameterType = TypeReferenceFromTypeAnnotation(declaration, parameter.Type);
-
-            var parameterDeclaration = new ParameterDeclarationExpression(parameter.Name.Literal, parameterType);
-            callable.AddParameter(parameterDeclaration);
+            CreateParameters(memberConstructor, constructor.Parameters);
+            FillBlock(memberConstructor.Statements, constructor.Body);
         }
     }
 
@@ -150,58 +152,58 @@ internal partial class ParsedClassTree
             var memberMethod = new MemberMethod(declaration.Name);
             declaration.AddMethod(memberMethod);
             
-            CreateParameters(declaration, memberMethod, method.Parameters);
+            CreateParameters(memberMethod, method.Parameters);
             
             // TODO generics.
             
             if (method.ReturnType != null)
             {
-                memberMethod.ReturnType = TypeReferenceFromTypeAnnotation(declaration, method.ReturnType);
+                // TODO remove ?
+                //memberMethod.ReturnType = TypeReferenceFromTypeAnnotation(declaration, method.ReturnType);
+                memberMethod.ReturnType = ParseRawTypeReference(method.ReturnType);
             }
             
-            FillBlock(memberMethod, method.Body);
+            FillBlock(memberMethod.Statements, method.Body);
         }
     }
     
-    private void FillBlock(ICanHaveStatements block, Body parsedBody, bool alternative = false)
+    private void CreateParameters(CallableMember callable, IEnumerable<CallableParameter> parameters)
     {
-        if (alternative && block is ConditionStatement @if)
+        foreach (var parameter in parameters)
         {
-            FillElseBody(@if, parsedBody);
-            return;
-        }
-        
-        foreach (var parsedStatement in parsedBody)
-        {
-            var statement = ParseStatement(block, parsedStatement);
-            block.AddStatement(statement);
+            // TODO remove ?
+            //var parameterType = TypeReferenceFromTypeAnnotation(declaration, parameter.Type);
+            var parameterType = ParseRawTypeReference(parameter.Type);
+
+            var parameterDeclaration = new ParameterDeclarationExpression(parameter.Name.Literal, parameterType);
+            callable.Parameters.Add(parameterDeclaration);
         }
     }
 
-    private void FillElseBody(ConditionStatement @if, Body parsedBody)
+    private void FillBlock(StatementsCollection block, Body parsedBody)
     {
         foreach (var parsedStatement in parsedBody)
         {
-            var statement = ParseStatement(@if, parsedStatement);
-            @if.AddElseStatement(statement);
+            var statement = ParseStatement(parsedStatement);
+            block.Add(statement);
         }
     }
 
-    private DomStatement ParseStatement(ICanHaveStatements holder, IBodyStatement statement)
+    private DomStatement ParseStatement(IBodyStatement statement)
     {
         return statement switch
         {
-            Return @return => ParseReturnStatement(holder, @return),
-            If @if => ParseIfStatement(holder, @if),
-            While @while => ParseWhileLoop(holder, @while),
-            Assignment assignment => ParseAssignmentStatement(holder, assignment),
-            Variable variable => ParseVariableDeclaration(holder, variable),
-            SyntaxExpression rvalueExpression => ParseRValueExpressionStatement(holder, rvalueExpression),
+            Return @return => ParseReturnStatement(@return),
+            If @if => ParseIfStatement(@if),
+            While @while => ParseWhileLoop(@while),
+            Assignment assignment => ParseAssignmentStatement(assignment),
+            Variable variable => ParseVariableDeclaration(variable),
+            SyntaxExpression rvalueExpression => ParseSingleExpressionStatement(rvalueExpression),
             _ => throw new CompilerInternalError("Unknown statement type")
         };
     }
 
-    private DomStatement ParseReturnStatement(ICanHaveStatements holder, Return returnStatement)
+    private DomStatement ParseReturnStatement(Return returnStatement)
     {
         if (returnStatement.ReturnValue == null)
         {
@@ -212,63 +214,52 @@ internal partial class ParsedClassTree
         return new ReturnStatement(expression);
     }
     
-    private DomStatement ParseIfStatement(ICanHaveStatements holder, If ifStatement)
+    private DomStatement ParseIfStatement(If ifStatement)
     {
         var condition = ParseExpression(ifStatement.Condition);
         var @if = new ConditionStatement(condition);
-        FillBlock(@if, ifStatement.Body);
+        FillBlock(@if.Statements, ifStatement.Body);
         
         if (!ifStatement.ElseBody.IsEmpty)
         {
-            FillBlock(@if, ifStatement.ElseBody, alternative: true);
+            FillBlock(@if.ElseStatements, ifStatement.ElseBody);
         }
 
         return @if;
     }
 
-    private DomStatement ParseWhileLoop(ICanHaveStatements holder, While whileLoop)
+    private DomStatement ParseWhileLoop(While whileLoop)
     {
         var condition = ParseExpression(whileLoop.Condition);
         var @while = new LoopStatement(condition);
-        FillBlock(@while, whileLoop.Body);
+        FillBlock(@while.Statements, whileLoop.Body);
 
         return @while;
     }
 
-    private DomStatement ParseRValueExpressionStatement(ICanHaveStatements holder, SyntaxExpression expression)
+    private DomStatement ParseSingleExpressionStatement(SyntaxExpression expression)
     {
         return new ExpressionStatement(ParseExpression(expression));
     }
 
-    private DomStatement ParseVariableDeclaration(ICanHaveStatements holder, Variable variable)
+    private DomStatement ParseVariableDeclaration(Variable variable)
     {
-        var declaration = new VariableDeclarationStatement(variable.Identifier.Literal);
+        var variableDeclaration = new VariableDeclarationStatement(variable.Identifier.Literal);
         
         if (variable.Type != null)
         {
-            var root = GetRootHolder(holder);
-            declaration.Type = TypeReferenceFromTypeAnnotation(root, variable.Type);
+            variableDeclaration.Type = ParseRawTypeReference(variable.Type);
         }
 
-        declaration.InitExpression = ParseExpression(variable.Expression);
+        variableDeclaration.InitExpression = ParseExpression(variable.Expression);
         
-        return declaration;
+        return variableDeclaration;
     }
     
-    private DomStatement ParseAssignmentStatement(ICanHaveStatements holder, Assignment assignment)
+    private DomStatement ParseAssignmentStatement(Assignment assignment)
     {
         var lvalue = ParseExpression(assignment.Variable);
         var rvalue = ParseExpression(assignment.Value);
         return new AssignStatement(lvalue, rvalue);
-    }
-
-    private ClassDeclaration GetRootHolder(ICanHaveStatements holder)
-    {
-        return (holder switch
-        {
-            Statement statement => GetRootHolder(statement.Holder!),
-            TypeMember typeMember => typeMember.Owner,
-            _ => throw new ArgumentOutOfRangeException(nameof(holder), holder, null)
-        })!;
     }
 }
