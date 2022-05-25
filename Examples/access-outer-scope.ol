@@ -6,6 +6,6 @@ class Main is
             num = 1
         end
         
-        IO().WriteLine(num)
+        IO().WriteLine(num.ToString())
     end
 end

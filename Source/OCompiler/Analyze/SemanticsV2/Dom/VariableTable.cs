@@ -23,24 +23,27 @@ internal class VariableTable : IEnumerable<KeyValuePair<string, TypeReference>>
 
     private VariableTable? ParentTable()
     {
-        var parentHolder = Body.Holder switch
+        var currentContextOwner = Body.Holder;
+        var parentContextOwner = currentContextOwner switch
         {
             ConditionStatement @if => @if.Holder,
             LoopStatement @while => @while.Holder,
             _ => null
         };
-        if (parentHolder == null)
+
+        if (parentContextOwner == null)
         {
             return null;
         }
-
-        var parentStatement = parentHolder as DomStatement;
-
-        return parentHolder switch
+        
+        var currentContextStatement = currentContextOwner as DomStatement;
+        
+        return parentContextOwner switch
         {
             LoopStatement @while => @while.Statements.VariableTable,
-            ConditionStatement @if when @if.Statements.Contains(parentStatement!) => @if.Statements.VariableTable,
+            ConditionStatement @if when @if.Statements.Contains(currentContextStatement!) => @if.Statements.VariableTable,
             ConditionStatement @if => @if.ElseStatements.VariableTable,
+            CallableMember callable => callable.Statements.VariableTable,
             _ => null
         };
     }

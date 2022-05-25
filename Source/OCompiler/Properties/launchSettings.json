@@ -7,7 +7,7 @@
     },
     "Access outer scope": {
       "commandName": "Project",
-      "commandLineArgs": "$(SolutionDir)/Examples/access_outer_scope.ol Main"
+      "commandLineArgs": "$(SolutionDir)/Examples/access-outer-scope.ol Main"
     },
     "String and comments": {
       "commandName": "Project",
