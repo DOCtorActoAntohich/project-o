@@ -10,7 +10,7 @@ internal class Variable : IBodyStatement
 {
     public Identifier Identifier { get; }
     public TypeAnnotation? Type { get; }
-    public Expression.Expression Expression { get; }
+    public Expression.Expression? Expression { get; }
 
     public static bool TryParse(TokenEnumerator tokens, out Variable? variable)
     {
@@ -27,7 +27,6 @@ internal class Variable : IBodyStatement
             throw new SyntaxError(tokens.Current().Position, "Expected variable name");
         }
 
-
         // Optional type annotation.
         TypeAnnotation? type = null;
         if (tokens.Next() is Lexical.Tokens.Delimiters.Colon)
@@ -35,12 +34,33 @@ internal class Variable : IBodyStatement
             type = ParseTypeAnnotation(tokens);
         }
 
-        // Assign delimiter.
-        if (tokens.Current() is not Lexical.Tokens.Delimiters.Equals)
+        // Optional assignment.
+        Expression.Expression? expression = null;
+        if (tokens.Current() is Lexical.Tokens.Delimiters.Equals)
         {
-            throw new SyntaxError(tokens.Current().Position, "Expected assignment");
+            expression = ParseAssignment(tokens);
         }
 
+        variable = new Variable(name, type, expression);
+        return true;
+    }
+
+    private static TypeAnnotation? ParseTypeAnnotation(TokenEnumerator tokens)
+    {
+        // Get next token.
+        tokens.Next();
+
+        // Type.
+        if (!TypeAnnotation.TryParse(tokens, out var type))
+        {
+            throw new SyntaxError(tokens.Current().Position, "Expected a type");
+        }
+        
+        return type;
+    }
+
+    private static Expression.Expression? ParseAssignment(TokenEnumerator tokens)
+    {
         // Get next token.
         tokens.Next();
 
@@ -50,22 +70,16 @@ internal class Variable : IBodyStatement
             throw new SyntaxError(tokens.Current().Position, "Expected expression");
         }
 
-        variable = new Variable(name, type, expression!);
-        return true;
+        return expression;
     }
 
-    private static TypeAnnotation? ParseTypeAnnotation(TokenEnumerator tokens)
+    protected Variable(Identifier name, TypeAnnotation? type, Expression.Expression? expression)
     {
-        tokens.Next();
-        if (!TypeAnnotation.TryParse(tokens, out var type))
+        if (type is null && expression is null)
         {
-            throw new SyntaxError(tokens.Current().Position, "Expected a type");
+            throw new SyntaxError(name.Position, "A variable must have either an assigned value or the type annotation");
         }
-        return type;
-    }
 
-    protected Variable(Identifier name, TypeAnnotation? type, Expression.Expression expression)
-    {
         Identifier = name;
         Type = type;
         Expression = expression;
@@ -78,6 +92,16 @@ internal class Variable : IBodyStatement
 
     public override string ToString()
     {
-        return $"var {Identifier.Literal} : {Expression}";
+        var @string = $"var {Identifier.Literal}";
+        if (Type is not null)
+        {
+            @string += $" : {Type}";
+        }
+        if (Expression is not null)
+        {
+            @string += $" = {Expression}";
+        }
+
+        return @string;
     }
 }

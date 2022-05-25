@@ -141,6 +141,13 @@ internal class TreeValidator
             varInfo = new ExpressionInfo(variable.Expression, new Context(classInfo, callable));
             callable.LocalVariables.Add(variableName, varInfo);
         }
+
+        if (variable.Expression is null)
+        {
+            throw new CompilerInternalError(
+                $"Variable {variable.Identifier.Literal} is not assigned. This is not supported in the current version of the compiler."
+            );
+        }
         varInfo.ValidateExpression();
     }
 
