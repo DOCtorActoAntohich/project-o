@@ -131,7 +131,7 @@ internal partial class ParsedClassTree
     {
         foreach (var method in parsedClass.Methods)
         {
-            var memberMethod = new MemberMethod(declaration.Name);
+            var memberMethod = new MemberMethod(method.Name.Literal);
             declaration.AddMethod(memberMethod);
             
             CreateParameters(memberMethod, method.Parameters);
