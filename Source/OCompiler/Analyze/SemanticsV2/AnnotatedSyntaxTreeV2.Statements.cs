@@ -1,8 +1,6 @@
-using System;
-using OCompiler.Analyze.Lexical.Tokens.Keywords;
 using OCompiler.Analyze.SemanticsV2.Dom;
 using OCompiler.Analyze.SemanticsV2.Dom.Expression.Call;
-using OCompiler.Analyze.SemanticsV2.Dom.Expression.Special;
+using OCompiler.Analyze.SemanticsV2.Dom.Expression.NameReference;
 using OCompiler.Analyze.SemanticsV2.Dom.Statement.Nested;
 using OCompiler.Analyze.SemanticsV2.Dom.Statement.SingleLine;
 using OCompiler.Analyze.SemanticsV2.Dom.Type;
@@ -21,11 +19,65 @@ internal partial class AnnotatedSyntaxTreeV2
     {
         foreach (var @class in ParsedClasses.Values)
         {
+            CheckIfBaseCallIsFirst(@class);
+            InsertFieldsInitialization(@class);
+            
             ValidateConstructorBodies(@class);
             ValidateMethodBodies(@class);
         }
     }
 
+    private void CheckIfBaseCallIsFirst(ClassDeclaration @class)
+    {
+        foreach (var constructor in @class.Constructors)
+        {
+            var index = FindBaseCall(constructor.Statements);
+            if (index > 0)
+            {
+                throw new AnalyzeError(
+                    "Call to base constructor must be the first statement of the constructor");
+            }
+
+            if (index != -1)
+            {
+                continue;
+            }
+            
+            var callExpression = new BaseConstructorCallExpression();
+            var baseCallStatement = new ExpressionStatement(callExpression);
+            constructor.Statements.InsertBaseCall(baseCallStatement);
+        }
+    }
+
+    private int FindBaseCall(StatementsCollection constructorBody)
+    {
+        var index = 0;
+        foreach (var statement in constructorBody)
+        {
+            if (statement is ExpressionStatement {Expression: BaseConstructorCallExpression})
+            {
+                return index;
+            }
+
+            ++index;
+        }
+
+        return -1;
+    }
+    
+    private void InsertFieldsInitialization(ClassDeclaration @class)
+    {
+        foreach (var constructor in @class.Constructors)
+        {
+            foreach (var field in @class.Fields)
+            {
+                var fieldReference = new FieldReferenceExpression(new ThisReferenceExpression(), field.Name);
+                var assignment = new AssignStatement(fieldReference, field.InitExpression);
+                constructor.Statements.InsertFieldInitialization(assignment);
+            }
+        }
+    }
+    
     private void ValidateConstructorBodies(ClassDeclaration @class)
     {
         foreach (var constructor in @class.Constructors)

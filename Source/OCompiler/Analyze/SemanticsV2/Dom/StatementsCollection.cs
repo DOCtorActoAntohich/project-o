@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
+using OCompiler.Analyze.SemanticsV2.Dom.Expression.Call;
+using OCompiler.Analyze.SemanticsV2.Dom.Statement.SingleLine;
 using OCompiler.Analyze.SemanticsV2.Dom.Type;
 using DomStatement = OCompiler.Analyze.SemanticsV2.Dom.Statement.Statement;
 
@@ -27,10 +29,16 @@ internal class StatementsCollection : IEnumerable<DomStatement>
         AddRange(statements);
     }
 
-    public void InsertFirst(DomStatement statement)
+    public void InsertFieldInitialization(DomStatement statement)
     {
-        _body.Insert(0, statement);
+        _body.Insert(1, statement);
         statement.ParentBody = this;
+    }
+
+    public void InsertBaseCall(DomStatement baseCall)
+    {
+        _body.Insert(0, baseCall);
+        baseCall.ParentBody = this;
     }
     
     public void Add(DomStatement statement)
