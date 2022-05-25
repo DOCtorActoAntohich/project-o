@@ -25,16 +25,19 @@ namespace OCompiler.Generate;
 internal class EmitterV2
 {
     private readonly AnnotatedSyntaxTreeV2 _tree;
+    private readonly AssemblyBuilder _assemblyBuilder;
     private readonly ModuleBuilder _moduleBuilder;
+
+    public Assembly Assembly => _assemblyBuilder;
     
     public EmitterV2(AnnotatedSyntaxTreeV2 tree)
     {
         _tree = tree;
         
         // Define builders.
-        var assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(
+        _assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(
             new AssemblyName("OCompiler"), AssemblyBuilderAccess.Run);
-        _moduleBuilder = assemblyBuilder.DefineDynamicModule("Runtime");
+        _moduleBuilder = _assemblyBuilder.DefineDynamicModule("Runtime");
         
         // Define types.
         foreach (var @class in tree.ParsedClasses.Values)
@@ -352,15 +355,18 @@ internal class EmitterV2
                 break;
             
             case VariableReferenceExpression variableReferenceExpression:
-                generator.Emit(OpCodes.Ldloc, scope.GetVariable(variableReferenceExpression.Name));
+                if (IndexOfParameter(variableReferenceExpression) is { } indexOfParameter)
+                {
+                    generator.Emit(OpCodes.Ldarg, indexOfParameter);
+                }
+                else
+                {
+                    generator.Emit(OpCodes.Ldloc, scope.GetVariable(variableReferenceExpression.Name));
+                }
+                
                 scope.IncreaseStackSize();
                 break;
             
-            case ParameterReferenceExpression parameterReferenceExpression:
-                generator.Emit(OpCodes.Ldarg, IndexOfParameter(parameterReferenceExpression));
-                scope.IncreaseStackSize();
-                break;
-
             case FieldReferenceExpression fieldReferenceExpression:
                 EmitExpression(fieldReferenceExpression.SourceObject, scope);
                 generator.Emit(OpCodes.Ldfld, (FieldBuilder) fieldReferenceExpression.Field.DotnetType!);
@@ -441,7 +447,7 @@ internal class EmitterV2
         }
     }
 
-    private int IndexOfParameter(ParameterReferenceExpression expression)
+    private int? IndexOfParameter(VariableReferenceExpression expression)
     {
         return ((CallableMember) expression.ParentStatement.Holder).Parameters.IndexOf(expression.Name) + 1;
     }
