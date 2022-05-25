@@ -315,6 +315,7 @@ internal partial class AnnotatedSyntaxTreeV2
         var method = @class.GetMethod(call.Name, argumentTypes);
 
         call.Type = method.ReturnType;
+        call.Method = method;
     }
     
     private void DetermineObjectCreationType(ObjectCreateExpression objectCreation)
