@@ -3,7 +3,7 @@ Examples of O language programs
 
 **note:** unless example is set of methods or classes, it is implies main body:
 
-```java
+```ts
 class Main is
     this is
         // example body
@@ -14,12 +14,12 @@ class Main is
 ## Valid examples
 
 1. Lists and `Sum()`
-```java
-fibs = []
-a = 1
-b = 1
+```ts
+var fibs = []
+var a = 1
+var b = 1
 while a.Less(10000) loop
-    t = a
+    var t = a
     a = a.Plus(b)
     b = t
     fibs.Append(b)
@@ -30,14 +30,14 @@ IO().WriteLine(fibs.Sum().ToString())
 
 2. Dicts
 
-```java
-string = "The quick brown fox jumps over the lazy dog"
-count_dct = {}
-i = 0
+```ts
+var string = "The quick brown fox jumps over the lazy dog"
+var count_dct = {}
+var i = 0
 
 // construct count dict
 while i.Less(string.Length()) loop
-    key = string.At(i)
+    var key = string.At(i)
     if count_dct.Exists(key).Not() then
         count_dct.Set(key, 0)
     end
@@ -63,38 +63,38 @@ IO().Write("}")
 
 ## Invalid examples (compile time errors)
 
-```java
-lst = [] // <-- error: cannot infer type of `lst`, provide type hint
-a = lst.Get(0)
+```ts
+var lst = [] // <-- error: cannot infer type of `lst`, provide type hint
+var a = lst.Get(0)
 ```
 
 
-```java
-fibs = []
+```ts
+var fibs = []
 fibs.Append(1)
 fibs.Append("2") // <- error: List<Integer>.Append 
                  // expects first agrument of type Integer
 ```
 
-```java
-fibs: List<Integer> = []
+```ts
+var fibs: List<Integer> = []
 fibs.Append("2") // <- error: List<Integer>.Append 
                  // expects first agrument of type Integer
 ```
 
-```java
-lst = [1, False] // <-- error: cannot construct a list from elements of different types
+```ts
+var lst = [1, False] // <-- error: cannot construct a list from elements of different types
 ```
 
-```java
-method TakesInts(lst: List<Integer>): Bool is
+```ts
+method TakesInts(lst: List<Integer>): Boolean is
     return lst.Get(0) // <-- error: TakesInt expected 
                       // to return type Boolean, found Integer
 end
 ```
 
-```java
-colors = {
+```ts
+var colors = {
     "red": 0, 
     "blue": 1,
     "green": 2,
@@ -105,21 +105,21 @@ if colors.Exists("haskell").Not() then
 end
 ```
 
-```java
-a = 0
+```ts
+var a = 0
 if a then // <-- error: If expected type Boolean, found Integer
     a = a.Plus(1)
 else
 ```
 
-```java
-a = 0
+```ts
+var a = 0
 if a.Equals(0) then
     a = [1] // <-- error: cannot assign type List<Integer> to type Integer 
 end
 ```
 
-```java
+```ts
 class Main is
     method number(): Integer is
         return 42
@@ -129,15 +129,15 @@ class Main is
     end
 ```
 
-```java
+```ts
 while 1 loop // error: While expected type Boolean, found Integer
 end
 ```
 
-```java
+```ts
 class Tuple<A, B> is
-    first: A
-    second: B
+    var first: A
+    var second: B
     this (first: A, second: B) is
         this.first = first
         this.second = second
@@ -149,18 +149,18 @@ end
 
 class Main is
     this is
-        t = Tuple(False, "cat")
+        var t = Tuple(False, "cat")
         if t then // <-- error: If expected type Boolean, found Tuple<Boolean, String>
             IO().Write(t.second)
         end
 
-        t2 = Tuple(False, "cat") // <-- error: PairOfSame constructor 
-                                 //takes second agrument of type Boolean, found String
+        vat t2 = Tuple(False, "cat") // <-- error: PairOfSame constructor 
+                                     //takes second agrument of type Boolean, found String
     end
 end
 ```
 
-```java
+```ts
 class Operation is
 end
 
@@ -178,10 +178,11 @@ class Main is
 end
 ```
 
-```java
+```ts
 class Storage<T> is
+    var data: Dict<String, T>
     this is
-        this.data: Dict<String, T> = {}
+        this.data = {}
     end
 end
 
@@ -190,7 +191,7 @@ class Main is
         //
     end
     this is
-        s = Storage<List<String>>()
+        var s = Storage<List<String>>()
         s.data.Set("haskel", [1,2,3])   // <---- error: cannot assign List<Integer> to List<String>
                                         //     |
         this.Sum(s.data.Get("haskell")) // <---/
