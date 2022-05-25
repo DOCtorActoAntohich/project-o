@@ -4,11 +4,11 @@ class Random is
     var Mod = 9343
     var value = 0
     
-    this is 
+    this() is 
         this.value = Time().Current().Mod(this.Mod)
     end
     
-    this (seed: Integer) is 
+    this(seed: Integer) is 
         this.value = seed.Mod(this.Mod)
     end
     
@@ -39,7 +39,7 @@ class TicTacToe is
     var level = 0
     var random = Random()
     
-    this is
+    this() is
         this.PrintGuideline()
         
         // Ask hard level.

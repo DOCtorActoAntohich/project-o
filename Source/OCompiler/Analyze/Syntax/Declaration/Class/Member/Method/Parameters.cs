@@ -14,7 +14,7 @@ internal static class Parameters
         var parameters = new List<Parameter>();
         if (tokens.Current() is not Lexical.Tokens.Delimiters.LeftParenthesis)
         {
-            return parameters;
+            throw new SyntaxError(tokens.Current().Position, "Expected parameters or ()");
         }
         
         // Get next token.

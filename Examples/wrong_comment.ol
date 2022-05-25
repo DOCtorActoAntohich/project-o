@@ -3,10 +3,10 @@
   (both multiline and single-line)
 *
 class Main is
-  this is
-    // Create a string and modify some symbols
+  this() is
+    // Create a string and print some symbols
     var hello = "hello world"
-    hello.At(0, "H")
-    hello.At(5, "_")
+    IO().WriteLine(hello.At(0))
+    IO().WriteLine(hello.At(5))
   end
 end

@@ -1,5 +1,5 @@
 class Main is
-	this is
+	this() is
 		var somePhone = NotMyPhone()
 		somePhone.Turn_on()
 	end
@@ -19,14 +19,14 @@ class Phone is
 end
 
 class IPhone extends Phone is
-	this is
+	this() is
 		// basic serial number for all iPhones
 		this.serial = 700000000
 	end
 end
 
 class NotMyPhone extends IPhone is
-	this is
+	this() is
 		this.serial = this.serial.Plus(123456)
 	end
 end

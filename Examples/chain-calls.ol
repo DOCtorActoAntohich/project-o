@@ -1,5 +1,5 @@
 class Main is
-  this is IO().Write("give me one integer pls") end 
+  this() is IO().Write("give me one integer pls") end 
   this(a: Integer) is
     IO().WriteLine(Calculator().magic(a).ToString())
   end

@@ -4,7 +4,7 @@
   (both multiline and single-line)
 */
 class Main is
-  this is
+  this() is
     // Create a string and take some symbols
     var hello = "hello\" world"
     IO().Write(hello)
