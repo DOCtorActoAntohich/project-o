@@ -12,6 +12,13 @@ internal abstract class Statement : CodeObject
     public StatementsCollection ParentBody { get; set; } = null!;
     public CodeObject Holder => ParentBody.Holder;
 
+    public TypeMember RootHolder => Holder switch
+    {
+        TypeMember member => member,
+        Statement holder => holder.RootHolder,
+        _ => throw new CompilerInternalError("Cannot identify holder of statement.")
+    };
+
     public Statement() : base("")
     {
         

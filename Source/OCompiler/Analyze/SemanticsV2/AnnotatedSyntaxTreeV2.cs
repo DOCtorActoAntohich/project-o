@@ -21,7 +21,8 @@ internal partial class AnnotatedSyntaxTreeV2
 
         var inheritanceTree = new InheritanceTree(this);
 
-        InferTypesOfClassMembers();
+        ValidateClassMembers();
+        ValidateMemberBodies();
     }
 
     public IEnumerable<string> AllNames()

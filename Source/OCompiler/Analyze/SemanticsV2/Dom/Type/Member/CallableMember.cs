@@ -1,7 +1,3 @@
-using System.Collections.Generic;
-using OCompiler.Analyze.SemanticsV2.Dom.Expression;
-using OCompiler.Analyze.SemanticsV2.Dom.Expression.Special;
-using OCompiler.Analyze.SemanticsV2.Dom.Statement;
 using DomStatement = OCompiler.Analyze.SemanticsV2.Dom.Statement.Statement;
 
 namespace OCompiler.Analyze.SemanticsV2.Dom.Type.Member;

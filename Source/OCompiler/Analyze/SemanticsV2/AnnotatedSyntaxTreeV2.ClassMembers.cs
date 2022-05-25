@@ -18,7 +18,7 @@ internal partial class AnnotatedSyntaxTreeV2
 {
     private readonly Dictionary<MemberField, ValidationState> _fieldsValidationState = new();
     
-    private void InferTypesOfClassMembers()
+    private void ValidateClassMembers()
     {
         foreach (var @class in ParsedClasses.Values)
         {
@@ -40,8 +40,8 @@ internal partial class AnnotatedSyntaxTreeV2
         
         ValidateBaseTypeReference(@class);
         
-        ValidateConstructorsSignature(@class);
-        ValidateMethodsSignature(@class);
+        ValidateConstructorSignatures(@class);
+        ValidateMethodSignatures(@class);
 
         ValidateFields(@class);
     }
@@ -121,7 +121,7 @@ internal partial class AnnotatedSyntaxTreeV2
         }
     }
     
-    private int CountCallable(IEnumerable<CallableMember> callables, CallableMember target)
+    private int CountCallables(IEnumerable<CallableMember> callables, CallableMember target)
     {
         return callables.Count(callable => callable.SameSignatureAs(target));
     }
@@ -133,7 +133,7 @@ internal partial class AnnotatedSyntaxTreeV2
 
     private bool IsUnique(IEnumerable<CallableMember> callables, CallableMember target)
     {
-        return CountCallable(callables, target) == 1;
+        return CountCallables(callables, target) == 1;
     }
 
     private bool IsUnique(IEnumerable<MemberField> fields, MemberField target)
@@ -141,7 +141,7 @@ internal partial class AnnotatedSyntaxTreeV2
         return CountFields(fields, target) == 1;
     }
     
-    private void ValidateConstructorsSignature(ClassDeclaration @class)
+    private void ValidateConstructorSignatures(ClassDeclaration @class)
     {
         foreach (var constructor in @class.Constructors)
         {
@@ -157,7 +157,7 @@ internal partial class AnnotatedSyntaxTreeV2
         }
     }
     
-    private void ValidateMethodsSignature(ClassDeclaration @class)
+    private void ValidateMethodSignatures(ClassDeclaration @class)
     {
         foreach (var method in @class.Methods)
         {
@@ -291,6 +291,18 @@ internal partial class AnnotatedSyntaxTreeV2
                 DetermineFieldReferenceType(fieldReferenceExpression);
                 break;
             
+            case ThisReferenceExpression thisReferenceExpression:
+                DetermineThisReferenceType(thisReferenceExpression);
+                break;
+            
+            case BaseConstructorCallExpression baseConstructorCallExpression:
+                DetermineBaseConstructorCall(baseConstructorCallExpression);
+                break;
+            
+            case VariableReferenceExpression variableReferenceExpression:
+                DetermineVariableType(variableReferenceExpression);
+                break;
+
             default:
                 throw new AnalyzeError($"Impossible to initialize field with this expression: {expression}");
         }
@@ -346,5 +358,41 @@ internal partial class AnnotatedSyntaxTreeV2
 
         fieldReference.Type = field.Type;
         fieldReference.Field = field;
+    }
+
+    private void DetermineThisReferenceType(ThisReferenceExpression thisReference)
+    {
+        var @class = thisReference.ParentStatement.RootHolder.Owner!;
+
+        thisReference.Type = new TypeReference(@class.Name);
+    }
+
+    private void DetermineBaseConstructorCall(BaseConstructorCallExpression baseCall)
+    {
+        var rootHolder = baseCall.ParentStatement.RootHolder;
+        if (rootHolder is MemberMethod)
+        {
+            throw new AnalyzeError("Cannot call to base constructor from inside the method");
+        }
+
+        var thisClass = rootHolder.Owner!;
+        var baseClass = GetClass(thisClass.BaseType!.Name);
+
+        var argumentTypes = GetTypesOfArguments(baseCall.Arguments);
+        var calledConstructor = baseClass.GetConstructor(argumentTypes);
+
+        baseCall.Constructor = calledConstructor;
+    }
+
+    private void DetermineVariableType(VariableReferenceExpression variableReference)
+    {
+        var statement = variableReference.ParentStatement;
+        var variableTable = statement.ParentBody.VariableTable;
+        if (!variableTable.Has(variableReference.Name))
+        {
+            throw new AnalyzeError($"Referenced an unknown variable: {variableReference.Name}");
+        }
+
+        variableReference.Type = variableTable.GetType(variableReference.Name);
     }
 }
