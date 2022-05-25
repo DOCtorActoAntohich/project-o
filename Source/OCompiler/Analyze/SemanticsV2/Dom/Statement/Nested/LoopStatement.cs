@@ -7,7 +7,17 @@ namespace OCompiler.Analyze.SemanticsV2.Dom.Statement.Nested;
 
 internal class LoopStatement : Statement
 {
-    public DomExpression Condition { get; set; } = null!;
+    private DomExpression _condition = null!;
+
+    public DomExpression Condition
+    {
+        get => _condition;
+        set
+        {
+            _condition = value;
+            _condition.ParentStatement = this;
+        }
+    }
 
     public StatementsCollection Statements { get; }
 
@@ -21,7 +31,6 @@ internal class LoopStatement : Statement
     public LoopStatement(DomExpression condition) : this()
     {
         Condition = condition;
-        condition.ParentStatement = this;
     }
     
     public LoopStatement(DomExpression condition, IEnumerable<Statement> statements) : this(condition)

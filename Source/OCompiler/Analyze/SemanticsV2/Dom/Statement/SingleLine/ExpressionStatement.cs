@@ -4,13 +4,21 @@ namespace OCompiler.Analyze.SemanticsV2.Dom.Statement.SingleLine;
 
 internal class ExpressionStatement : Statement
 {
-    public DomExpression Expression { get; set; }
+    private DomExpression _expression = null!;
+
+    public DomExpression Expression
+    {
+        get => _expression;
+        set
+        {
+            _expression = value;
+            _expression.ParentStatement = this;
+        }
+    }
 
     public ExpressionStatement(DomExpression expression)
     {
         Expression = expression;
-
-        Expression.ParentStatement = this;
     }
 
     public string ToString(string prefix = "")

@@ -8,7 +8,17 @@ namespace OCompiler.Analyze.SemanticsV2.Dom.Statement.Nested;
 
 internal class ConditionStatement : Statement
 {
-    public DomExpression Condition { get; set; } = null!;
+    private DomExpression _condition = null!;
+
+    public DomExpression Condition
+    {
+        get => _condition;
+        set
+        {
+            _condition = value;
+            _condition.ParentStatement = this;
+        }
+    }
 
     public StatementsCollection Statements { get; }
     public StatementsCollection ElseStatements { get; }
@@ -27,7 +37,6 @@ internal class ConditionStatement : Statement
     public ConditionStatement(DomExpression condition) : this()
     {
         Condition = condition;
-        Condition.ParentStatement = this;
     }
     
     public ConditionStatement(DomExpression condition, IEnumerable<Statement> statements) : this(condition)

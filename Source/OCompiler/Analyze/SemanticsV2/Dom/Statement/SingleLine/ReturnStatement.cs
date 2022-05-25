@@ -13,6 +13,7 @@ internal class ReturnStatement : Statement
         set
         {
             _expression = value;
+            _expression.ParentStatement = this;
             HasValue = false;
         }
     }
@@ -27,7 +28,6 @@ internal class ReturnStatement : Statement
     public ReturnStatement(DomExpression expression)
     {
         Expression = expression;
-        Expression.ParentStatement = this;
     }
 
     public string ToString(string prefix = "")

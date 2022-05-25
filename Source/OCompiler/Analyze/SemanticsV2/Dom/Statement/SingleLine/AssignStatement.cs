@@ -4,16 +4,33 @@ namespace OCompiler.Analyze.SemanticsV2.Dom.Statement.SingleLine;
 
 internal class AssignStatement : Statement
 {
-    public DomExpression LValue { get; set; }
-    public DomExpression RValue { get; set; }
-    
+    private DomExpression _lvalue = null!;
+    private DomExpression _rvalue = null!;
+
+    public DomExpression LValue
+    {
+        get => _lvalue;
+        set
+        {
+            _lvalue = value;
+            _lvalue.ParentStatement = this;
+        }
+    }
+
+    public DomExpression RValue
+    {
+        get => _rvalue;
+        set
+        {
+            _rvalue = value;
+            _rvalue.ParentStatement = this;
+        }
+    }
+
     public AssignStatement(DomExpression lValue, DomExpression rValue)
     {
         LValue = lValue;
         RValue = rValue;
-
-        LValue.ParentStatement = this;
-        RValue.ParentStatement = this;
     }
 
     public string ToString(string prefix = "")

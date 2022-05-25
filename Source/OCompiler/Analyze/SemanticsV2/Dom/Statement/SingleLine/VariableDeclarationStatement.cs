@@ -25,6 +25,7 @@ internal class VariableDeclarationStatement : Statement
         set
         {
             _initExpression = value;
+            _initExpression.ParentStatement = this;
             HasInitExpression = true;
         }
     }
