@@ -14,11 +14,12 @@ internal class ClassDeclaration : TypeMember
     public bool HasGenerics => GenericTypes.Count > 0;
 
     public TypeReference? BaseType { get; set; }
-
-
+    
     public List<MemberField> Fields { get; private set; } = new();
     public List<MemberMethod> Methods { get; private set; } = new();
     public List<MemberConstructor> Constructors { get; private set; } = new();
+
+    public AnnotatedSyntaxTreeV2 Ast { get; set; } = null!;
 
     public ClassDeclaration(string name) : base(name)
     {
@@ -84,6 +85,13 @@ internal class ClassDeclaration : TypeMember
             }
         }
 
+        if (BaseType != null)
+        {
+            var parentClass = Ast.GetClass(BaseType.Name);
+            return parentClass.GetConstructor(parameters);
+        }
+        
+
         throw new AnalyzeError($"Couldn't find constructor: {Name}({parameters.Count})");
     }
     
@@ -103,6 +111,12 @@ internal class ClassDeclaration : TypeMember
                 return method;
             }
         }
+        
+        if (BaseType != null)
+        {
+            var parentClass = Ast.GetClass(BaseType.Name);
+            return parentClass.GetMethod(targetMethodName, parameters);
+        }
 
         throw new AnalyzeError($"Couldn't find method: {Name}::{targetMethodName}({parameters.Count})");
     }
@@ -115,6 +129,12 @@ internal class ClassDeclaration : TypeMember
             {
                 return field;
             }
+        }
+        
+        if (BaseType != null)
+        {
+            var parentClass = Ast.GetClass(BaseType.Name);
+            return parentClass.GetField(targetFieldName);
         }
 
         throw new AnalyzeError($"Couldn't find field: {Name}::{targetFieldName}");

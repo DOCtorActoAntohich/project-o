@@ -18,6 +18,14 @@ internal partial class AnnotatedSyntaxTreeV2
         var parsedClassTree = new ParsedClassTree(syntaxTree);
         BuiltinClasses = parsedClassTree.BuiltinClasses;
         ParsedClasses = parsedClassTree.ParsedClasses;
+        foreach (var @class in BuiltinClasses.Values)
+        {
+            @class.Ast = this;
+        }
+        foreach (var @class in ParsedClasses.Values)
+        {
+            @class.Ast = this;
+        }
 
         var inheritanceTree = new InheritanceTree(this);
 

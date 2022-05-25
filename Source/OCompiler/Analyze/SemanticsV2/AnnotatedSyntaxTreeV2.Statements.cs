@@ -1,4 +1,5 @@
 using System;
+using OCompiler.Analyze.Lexical.Tokens.Keywords;
 using OCompiler.Analyze.SemanticsV2.Dom;
 using OCompiler.Analyze.SemanticsV2.Dom.Expression.Call;
 using OCompiler.Analyze.SemanticsV2.Dom.Expression.Special;
@@ -61,14 +62,21 @@ internal partial class AnnotatedSyntaxTreeV2
                 break;
             
             case VariableDeclarationStatement variableDeclarationStatement:
+                ValidateVariableDeclaration(variableDeclarationStatement);
                 break;
             
             case AssignStatement assignStatement:
+                ValidateAssignStatement(assignStatement);
                 break;
+            
             case ConditionStatement conditionStatement:
+                ValidateConditionStatement(conditionStatement);
                 break;
+            
             case LoopStatement loopStatement:
+                ValidateLoopStatement(loopStatement);
                 break;
+            
             default:
                 throw new CompilerInternalError($"Unknown statement type: {statement}");
         }
@@ -101,8 +109,65 @@ internal partial class AnnotatedSyntaxTreeV2
         DetermineExpressionType(expressionStatement.Expression);
     }
 
-    private void ValidateVariableDeclaration()
+    private void ValidateVariableDeclaration(VariableDeclarationStatement variableDeclaration)
     {
+        var variableTable = variableDeclaration.ParentBody.VariableTable;
+        if (variableTable.Has(variableDeclaration.Name))
+        {
+            throw new AnalyzeError($"Redefinition of a variable {variableDeclaration.Name}");
+        }
+
+        if (!variableDeclaration.HasTypeAnnotation && !variableDeclaration.HasInitExpression)
+        {
+            throw new AnalyzeError(
+                $"The type of variable {variableDeclaration.Name} was not specified.");
+        }
+
+        if (!variableDeclaration.HasTypeAnnotation && variableDeclaration.HasInitExpression)
+        {
+            DetermineExpressionType(variableDeclaration.InitExpression);
+            variableDeclaration.Type = variableDeclaration.InitExpression.Type;
+            variableTable.Add(variableDeclaration.Name, variableDeclaration.Type);
+            return;
+        }
+
+        var @class = variableDeclaration.RootHolder.Owner!;
+        ValidateTypeReference(@class, variableDeclaration.Type);
+        if (variableDeclaration.HasTypeAnnotation && !variableDeclaration.HasInitExpression)
+        {
+            variableDeclaration.InitExpression = new ObjectCreateExpression(variableDeclaration.Type);
+        }
         
+        DetermineExpressionType(variableDeclaration.InitExpression);
+        if (variableDeclaration.Type.DifferentFrom(variableDeclaration.InitExpression.Type))
+        {
+            throw new AnalyzeError(
+                $"Types of annotation and init expression don't match: {variableDeclaration.Name}");
+        }
+        
+        variableTable.Add(variableDeclaration.Name, variableDeclaration.Type);
+    }
+
+    private void ValidateAssignStatement(AssignStatement assignment)
+    {
+        DetermineExpressionType(assignment.LValue);
+        DetermineExpressionType(assignment.RValue);
+
+        if (assignment.LValue.Type.DifferentFrom(assignment.RValue.Type))
+        {
+            throw new AnalyzeError($"Couldn't assign value of type {assignment.RValue.Type} " +
+                                   $"to type {assignment.LValue.Type}");
+        }
+    }
+
+    private void ValidateConditionStatement(ConditionStatement @if)
+    {
+        ValidateBody(@if.Statements);
+        ValidateBody(@if.ElseStatements);
+    }
+
+    private void ValidateLoopStatement(LoopStatement @while)
+    {
+        ValidateBody(@while.Statements);
     }
 }

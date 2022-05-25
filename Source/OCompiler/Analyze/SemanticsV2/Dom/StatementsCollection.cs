@@ -47,6 +47,11 @@ internal class StatementsCollection : IEnumerable<DomStatement>
         }
     }
 
+    public bool Contains(DomStatement targetStatement)
+    {
+        return _body.Contains(targetStatement);
+    }
+
     public IEnumerator<DomStatement> GetEnumerator()
     {
         return _body.GetEnumerator();

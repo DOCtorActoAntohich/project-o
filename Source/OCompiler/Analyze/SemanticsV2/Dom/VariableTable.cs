@@ -1,35 +1,50 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using OCompiler.Analyze.Lexical.Tokens.Keywords;
 using OCompiler.Analyze.SemanticsV2.Dom.Statement.Nested;
 using OCompiler.Analyze.SemanticsV2.Dom.Type;
 using OCompiler.Analyze.SemanticsV2.Dom.Type.Member;
 using OCompiler.Exceptions;
+using DomStatement = OCompiler.Analyze.SemanticsV2.Dom.Statement.Statement;
 
 namespace OCompiler.Analyze.SemanticsV2.Dom;
 
 internal class VariableTable : IEnumerable<KeyValuePair<string, TypeReference>>
 {
     private readonly Dictionary<string, TypeReference> _variables = new();
-
-    private readonly VariableTable? _parent;
     
     public StatementsCollection Body { get; set; }
 
     public VariableTable(StatementsCollection body)
     {
         Body = body;
-        
-        _parent = Body.Holder switch
+    }
+
+    private VariableTable? ParentTable()
+    {
+        var parentHolder = Body.Holder switch
         {
-            ConditionStatement @if when @if.Statements == Body => @if.Statements.VariableTable,
-            ConditionStatement @if => @if.ElseStatements.VariableTable,
+            ConditionStatement @if => @if.Holder,
+            LoopStatement @while => @while.Holder,
+            _ => null
+        };
+        if (parentHolder == null)
+        {
+            return null;
+        }
+
+        var parentStatement = parentHolder as DomStatement;
+
+        return parentHolder switch
+        {
             LoopStatement @while => @while.Statements.VariableTable,
-            CallableMember callable => callable.Statements.VariableTable,
+            ConditionStatement @if when @if.Statements.Contains(parentStatement!) => @if.Statements.VariableTable,
+            ConditionStatement @if => @if.ElseStatements.VariableTable,
             _ => null
         };
     }
-
+    
     public bool Has(string name)
     {
         if (_variables.ContainsKey(name))
@@ -37,7 +52,7 @@ internal class VariableTable : IEnumerable<KeyValuePair<string, TypeReference>>
             return true;
         }
 
-        return _parent?.Has(name) ?? false;
+        return ParentTable()?.Has(name) ?? false;
     }
 
     public TypeReference GetType(string name)
@@ -47,7 +62,7 @@ internal class VariableTable : IEnumerable<KeyValuePair<string, TypeReference>>
             return _variables[name];
         }
 
-        return _parent?.GetType(name) ?? throw new CompilerInternalError($"No such field: {name}");
+        return ParentTable()?.GetType(name) ?? throw new CompilerInternalError($"No such field: {name}");
     }
 
     public void Add(string name, TypeReference type)

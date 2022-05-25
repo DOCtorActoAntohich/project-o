@@ -12,6 +12,7 @@ internal abstract class Statement : CodeObject
     public StatementsCollection ParentBody { get; set; } = null!;
     public CodeObject Holder => ParentBody.Holder;
 
+    // Callable or Statement.
     public TypeMember RootHolder => Holder switch
     {
         TypeMember member => member,
