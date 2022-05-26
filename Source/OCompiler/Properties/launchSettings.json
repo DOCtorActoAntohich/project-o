@@ -48,6 +48,10 @@
     "Generic generics": {
       "commandName": "Project",
       "commandLineArgs": "$(SolutionDir)/Examples/generics.ol Main"
+    },
+    "Simple generics": {
+      "commandName": "Project",
+      "commandLineArgs": "$(SolutionDir)/Examples/simple-generics.ol Main"
     }
   }
 }
