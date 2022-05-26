@@ -1,73 +1,99 @@
-Examples of O language programs
-===
+# Examples of O language programs
 
-**note:** unless example is set of methods or classes, it is implies main body:
+**Note:** unless example is a set of methods or classes, it implies that these statements are put inside a main body:
 
 ```ts
 class Main is
     this is
         // example body
     end
+end
 ```
-
 
 ## Valid examples
 
-1. Lists and `Sum()`
-```ts
-var fibs = []
-var a = 1
-var b = 1
-while a.Less(10000) loop
-    var t = a
-    a = a.Plus(b)
-    b = t
-    fibs.Append(b)
-end
+1. Lists
 
-IO().WriteLine(fibs.Sum().ToString())
-```
-
-2. Dicts
-
-```ts
-var string = "The quick brown fox jumps over the lazy dog"
-var count_dct = {}
-var i = 0
-
-// construct count dict
-while i.Less(string.Length()) loop
-    var key = string.At(i)
-    if count_dct.Exists(key).Not() then
-        count_dct.Set(key, 0)
+    ```ts
+    var fibs = []
+    var a = 1
+    var b = 1
+    while a.Less(10000) loop
+        var t = a
+        a = a.Plus(b)
+        b = t
+        fibs.Append(b)
     end
-    count_dct.Set(key, count_dct.Get(key).Plus(1))
-end
 
-// print dict
-IO().Write("{")
-var keys = dict.Keys()
-var i = 0
-while i.Less(keys.Length()) loop
-    var key = keys.Get(i)
-    IO().Write(key)
-    IO().Write(": ")
-    IO().Write(dict.Get(key).ToString())
-    IO().Write(", ")
-    i = i.Plus(1)
-end
-IO().Write("}")
-```
+    IO().WriteLine(fibs.Get(3).ToString())
+    ```
 
+2. Counting letters in the sentence using `Dict`
 
+    ```ts
+    var string = "The quick brown fox jumps over the lazy dog"
+    var count_dct = {}
+    var i = 0
+
+    // construct count dict
+    while i.Less(string.Length()) loop
+        var key = string.At(i)
+        if count_dct.Exists(key).Not() then
+            count_dct.Set(key, 0)
+        end
+        count_dct.Set(key, count_dct.Get(key).Plus(1))
+    end
+
+    // print dict
+    IO().Write("{")
+    var keys = dict.Keys()
+    var i = 0
+    while i.Less(keys.Length()) loop
+        var key = keys.Get(i)
+        IO().Write(key)
+        IO().Write(": ")
+        IO().Write(dict.Get(key).ToString())
+        IO().Write(", ")
+        i = i.Plus(1)
+    end
+    IO().Write("}")
+    ```
 
 ## Invalid examples (compile time errors)
+
+```ts
+/*
+  This comment is not closed until the end of the file
+*
+class Main is
+  this is
+    // Create a string and print some symbols
+    var hello = "hello world"
+    IO().WriteLine(hello.At(0))
+    IO().WriteLine(hello.At(5))
+  end
+end // <-- error: Unterminated comment
+```
+
+```ts
+/*
+  Example with strings and comments
+  (both multiline and single-line)
+*/
+class Main is
+  this is
+    // The string below is not closed until the end of the file
+    var hello = "hello\" world
+    IO().WriteLine(hello.At(0))
+    IO().WriteLine(hello.At(5))
+  end
+end // <-- error: Unterminated string
+```
 
 ```ts
 var lst = [] // <-- error: cannot infer type of `lst`, provide type hint
 var a = lst.Get(0)
 ```
-
 
 ```ts
 var fibs = []
@@ -154,8 +180,8 @@ class Main is
             IO().Write(t.second)
         end
 
-        vat t2 = Tuple(False, "cat") // <-- error: PairOfSame constructor 
-                                     //takes second agrument of type Boolean, found String
+        vat t2 = PairOfSame(False, "cat") // <-- error: PairOfSame constructor 
+                                          // takes second argument of type Boolean, found String
     end
 end
 ```
@@ -170,6 +196,7 @@ end
 class Main is
     method Say(word: Operation): Void is
     end
+
     this is
         var word = War()
         this.Say(word) // <-- error: Say expected first argument of
@@ -187,14 +214,9 @@ class Storage<T> is
 end
 
 class Main is
-    method Sum(lst: List<Integer>): Integer is
-        //
-    end
     this is
         var s = Storage<List<String>>()
-        s.data.Set("haskel", [1,2,3])   // <---- error: cannot assign List<Integer> to List<String>
-                                        //     |
-        this.Sum(s.data.Get("haskell")) // <---/
+        s.data.Set("haskell", [1,2,3]) // error: cannot cast List<Integer> to List<String>
     end
 end
 ```
