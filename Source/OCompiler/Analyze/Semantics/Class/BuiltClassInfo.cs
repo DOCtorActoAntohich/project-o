@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 
@@ -31,7 +31,7 @@ internal class BuiltClassInfo : ClassInfo
     public static BuiltClassInfo GetByType(Type type)
     {
         if (
-            StandardClasses.Values.Where(c => ((BuiltClassInfo)c).Class == type).FirstOrDefault()
+            StandardClasses.Values.FirstOrDefault(c => ((BuiltClassInfo)c).Class == type)
             is not BuiltClassInfo existingClassInfo
         )
         {
@@ -59,26 +59,25 @@ internal class BuiltClassInfo : ClassInfo
 
     public override string? GetMethodReturnType(string name, List<string> argumentTypes)
     {
-        var method = Methods.Where(
-            m => m.Name == name &&
-            m.GetParameters().Select(p => p.ParameterType.Name).SequenceEqual(argumentTypes)
-        ).FirstOrDefault();
+        var method = Methods.FirstOrDefault(
+            m => m.Name == name && 
+                 m.GetParameters().Select(p => p.ParameterType.Name).SequenceEqual(argumentTypes));
 
         return method?.ReturnType.Name;
     }
 
     public override ConstructorInfo? GetConstructor(List<string> argumentTypes)
     {
-        var constructor = Constructors.Where(
-            c => c.GetParameters().Select(p => p.ParameterType.Name).SequenceEqual(argumentTypes)
-        ).FirstOrDefault();
+        var constructor = Constructors.FirstOrDefault(
+            c => c.GetParameters().Select(
+                p => p.ParameterType.Name).SequenceEqual(argumentTypes));
 
         return constructor;
     }
 
     public override string? GetFieldType(string name)
     {
-        var field = Fields.Where(f => f.Name == name).FirstOrDefault();
+        var field = Fields.FirstOrDefault(f => f.Name == name);
         return field?.FieldType.Name;
     }
 

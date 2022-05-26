@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Text;
+using OCompiler.Analyze.Lexical;
 using OCompiler.Analyze.Lexical.Tokens;
 using OCompiler.Analyze.Syntax.Declaration.Class.Member;
 using OCompiler.Analyze.Syntax.Declaration.Class.Member.Method;
@@ -15,6 +16,9 @@ internal class Class
     public List<Field> Fields { get; }
     public List<Method> Methods { get; }
     public List<Constructor> Constructors { get; }
+    
+    public string NameLiteral => Name.Name.Literal;
+    public TokenPosition TokenPosition => Name.Name.Position;
 
     public static Class Parse(TokenEnumerator tokens)
     {

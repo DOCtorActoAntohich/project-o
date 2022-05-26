@@ -2,8 +2,8 @@
 using System.IO;
 using System.Text;
 using System.Collections.Generic;
-using OCompiler.Extensions;
 using OCompiler.Exceptions;
+using OCompiler.Utils;
 
 namespace OCompiler.Analyze.Lexical
 {

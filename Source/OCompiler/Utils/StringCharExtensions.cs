@@ -1,8 +1,6 @@
-﻿using System;
-using System.Globalization;
-using OCompiler.Analyze.Lexical.Tokens;
+﻿using System.Globalization;
 
-namespace OCompiler.Extensions
+namespace OCompiler.Utils
 {
     internal static class StringCharExtensions
     {

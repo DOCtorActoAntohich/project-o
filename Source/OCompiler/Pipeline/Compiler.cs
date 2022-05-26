@@ -4,6 +4,7 @@ using System.Reflection;
 
 using OCompiler.Analyze.Lexical;
 using OCompiler.Analyze.Semantics;
+using OCompiler.Analyze.SemanticsV2;
 using OCompiler.Analyze.Syntax;
 using OCompiler.Exceptions;
 using OCompiler.Generate;
@@ -31,9 +32,10 @@ namespace OCompiler.Pipeline
                 throw new AnalyzeError("No classes.");
             }
 
-            var validator = new TreeValidator(tokenTree);
-            var generator = new Emitter(validator.ValidatedClasses);
-
+            var annotatedSyntaxTree = new AnnotatedSyntaxTreeV2(tokenTree);
+            Console.WriteLine(annotatedSyntaxTree);
+            
+            var generator = new EmitterV2(annotatedSyntaxTree);
             return generator.Assembly;
         }
 
@@ -53,7 +55,7 @@ namespace OCompiler.Pipeline
             Formatter.ShowAST(tokenTree);
             Console.WriteLine();
 
-            var validator = new TreeValidator(tokenTree);
+            var validator = new AnnotatedSyntaxTree(tokenTree);
 
             var generator = new Emitter(validator.ValidatedClasses);
             return generator.Assembly;

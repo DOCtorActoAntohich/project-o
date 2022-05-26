@@ -13,15 +13,15 @@ using OCompiler.Exceptions.Semantic;
 
 namespace OCompiler.Analyze.Semantics;
 
-internal class TreeValidator
+internal class AnnotatedSyntaxTree
 {
-    private readonly ClassTree _knownClasses;
-    public List<ClassInfo> ValidatedClasses => new(_knownClasses);
+    private readonly InheritanceTree _inheritanceTree;
+    public List<ClassInfo> ValidatedClasses => new(_inheritanceTree);
 
-    public TreeValidator(Tree syntaxTree)
+    public AnnotatedSyntaxTree(Tree syntaxTree)
     {
-        _knownClasses = new ClassTree(syntaxTree);
-        foreach (var @class in _knownClasses)
+        _inheritanceTree = new InheritanceTree(syntaxTree);
+        foreach (var @class in _inheritanceTree)
         {
             if (@class is not ParsedClassInfo parsedClass)
             {
@@ -37,7 +37,7 @@ internal class TreeValidator
     {
         StringBuilder @string = new();
         @string.AppendLine("Known classes:");
-        foreach (var classInfo in _knownClasses)
+        foreach (var classInfo in _inheritanceTree)
         {
             @string.Append(classInfo.Name);
             @string.Append(" (");
@@ -47,7 +47,7 @@ internal class TreeValidator
         return @string.ToString();
     }
 
-    public void ValidateConstructors(ParsedClassInfo classInfo)
+    private void ValidateConstructors(ParsedClassInfo classInfo)
     {
         foreach (var constructor in classInfo.Constructors)
         {
@@ -55,7 +55,7 @@ internal class TreeValidator
         }
     }
 
-    public void ValidateMethods(ParsedClassInfo classInfo)
+    private void ValidateMethods(ParsedClassInfo classInfo)
     {
         foreach (var method in classInfo.Methods)
         {
@@ -63,7 +63,7 @@ internal class TreeValidator
         }
     }
 
-    public void ValidateFields(ParsedClassInfo classInfo)
+    private void ValidateFields(ParsedClassInfo classInfo)
     {
         foreach (var field in classInfo.Fields)
         {
@@ -76,7 +76,7 @@ internal class TreeValidator
         }
     }
 
-    public void ValidateConstructor(ParsedConstructorInfo constructor, ParsedClassInfo classInfo)
+    private void ValidateConstructor(ParsedConstructorInfo constructor, ParsedClassInfo classInfo)
     {
         foreach (var statement in constructor.Body)
         {
@@ -84,7 +84,7 @@ internal class TreeValidator
         }
     }
 
-    public void ValidateMethod(ParsedMethodInfo method, ParsedClassInfo classInfo)
+    private void ValidateMethod(ParsedMethodInfo method, ParsedClassInfo classInfo)
     {
         foreach (var statement in method.Body)
         {
@@ -92,7 +92,7 @@ internal class TreeValidator
         }
     }
 
-    public void ValidateStatement(IBodyStatement statement, ParsedClassInfo classInfo, CallableInfo callable)
+    private void ValidateStatement(IBodyStatement statement, ParsedClassInfo classInfo, CallableInfo callable)
     {
         switch (statement)
         {
@@ -119,16 +119,17 @@ internal class TreeValidator
         }
     }
 
-    public void ValidateVariable(Variable variable, ParsedClassInfo classInfo, CallableInfo callable)
+    private void ValidateVariable(Variable variable, ParsedClassInfo classInfo, CallableInfo callable)
     {
         var variableName = variable.Identifier.Literal;
-        if (ClassTree.ClassExists(variableName))
+        if (InheritanceTree.HasClass(variableName))
         {
             throw new NameCollisionError(
                 variable.Identifier.Position,
                 $"Cannot create variable, name {variableName} is already used by a class"
             );
         }
+        
         if (callable.HasParameter(variableName))
         {
             throw new NameCollisionError(
@@ -136,6 +137,7 @@ internal class TreeValidator
                 $"Cannot create variable, name {variable.Identifier.Literal} is already used by a class"
             );
         }
+        
         if (!callable.LocalVariables.TryGetValue(variableName, out var varInfo))
         {
             varInfo = new ExpressionInfo(variable.Expression, new Context(classInfo, callable));
@@ -151,7 +153,7 @@ internal class TreeValidator
         varInfo.ValidateExpression();
     }
 
-    public void ValidateAssignment(Assignment assignment, ParsedClassInfo classInfo, CallableInfo callable)
+    private void ValidateAssignment(Assignment assignment, ParsedClassInfo classInfo, CallableInfo callable)
     {
         var variableOrField = assignment.Variable;
         if (variableOrField.Child == null)
@@ -168,7 +170,7 @@ internal class TreeValidator
         ValidateFieldAssignment(variableOrField.Child.Token.Literal, assignment.Value, classInfo, callable);
     }
 
-    public void ValidateLocalAssignment(
+    private void ValidateLocalAssignment(
         string variableName,
         Syntax.Declaration.Expression.Expression value,
         ParsedClassInfo classInfo,
@@ -191,7 +193,7 @@ internal class TreeValidator
         }
     }
 
-    public void ValidateFieldAssignment(
+    private void ValidateFieldAssignment(
         string fieldName,
         Syntax.Declaration.Expression.Expression value,
         ParsedClassInfo classInfo,
@@ -211,7 +213,7 @@ internal class TreeValidator
         }
     }
 
-    public void ValidateIf(If conditional, ParsedClassInfo classInfo, CallableInfo callable)
+    private void ValidateIf(If conditional, ParsedClassInfo classInfo, CallableInfo callable)
     {
         ValidateCondition(conditional.Condition, classInfo, callable);
         foreach (var statement in conditional.Body)
@@ -224,7 +226,7 @@ internal class TreeValidator
         }
     }
 
-    public void ValidateLoop(While loop, ParsedClassInfo classInfo, CallableInfo callable)
+    private void ValidateLoop(While loop, ParsedClassInfo classInfo, CallableInfo callable)
     {
         ValidateCondition(loop.Condition, classInfo, callable);
         foreach (var statement in loop.Body)
@@ -233,7 +235,7 @@ internal class TreeValidator
         }
     }
 
-    public void ValidateReturn(Return @return, ParsedClassInfo classInfo, CallableInfo callable)
+    private void ValidateReturn(Return @return, ParsedClassInfo classInfo, CallableInfo callable)
     {
         string methodReturnType = callable switch
         {
@@ -260,7 +262,7 @@ internal class TreeValidator
         }
     }
 
-    public void ValidateCondition(Syntax.Declaration.Expression.Expression condition, ParsedClassInfo classInfo, CallableInfo callable)
+    private void ValidateCondition(Syntax.Declaration.Expression.Expression condition, ParsedClassInfo classInfo, CallableInfo callable)
     {
         var conditionInfo = new ExpressionInfo(condition, new Context(classInfo, callable));
         conditionInfo.ValidateExpression();

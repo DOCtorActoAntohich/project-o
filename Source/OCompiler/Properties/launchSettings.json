@@ -5,6 +5,10 @@
       "commandName": "Project",
       "commandLineArgs": "$(SolutionDir)/Examples/tic-tac-toe.ol TicTacToe"
     },
+    "Access outer scope": {
+      "commandName": "Project",
+      "commandLineArgs": "$(SolutionDir)/Examples/access-outer-scope.ol Main"
+    },
     "String and comments": {
       "commandName": "Project",
       "commandLineArgs": "$(SolutionDir)/Examples/strings.ol Main"
@@ -44,6 +48,10 @@
     "Generic generics": {
       "commandName": "Project",
       "commandLineArgs": "$(SolutionDir)/Examples/generics.ol Main"
+    },
+    "Simple generics": {
+      "commandName": "Project",
+      "commandLineArgs": "$(SolutionDir)/Examples/simple-generics.ol Main"
     }
   }
 }
