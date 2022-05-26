@@ -90,11 +90,14 @@ internal partial class ParsedClassTree
             var memberField = new MemberField(field.Identifier.Literal);
             declaration.AddField(memberField);
 
-            memberField.InitExpression = ParseExpression(field.Expression);
-
             if (field.Type != null)
             {
                 memberField.Type = ParseRawTypeReference(field.Type);
+            }
+
+            if (field.Expression != null)
+            {
+                memberField.InitExpression = ParseExpression(field.Expression);
             }
         }
     }
