@@ -34,11 +34,8 @@ namespace OCompiler.Pipeline
 
             var annotatedSyntaxTree = new AnnotatedSyntaxTreeV2(tokenTree);
             Console.WriteLine(annotatedSyntaxTree);
-            //var validator = new AnnotatedSyntaxTree(tokenTree);
             
-            //var generator = new Emitter(validator.ValidatedClasses);
             var generator = new EmitterV2(annotatedSyntaxTree);
-
             return generator.Assembly;
         }
 

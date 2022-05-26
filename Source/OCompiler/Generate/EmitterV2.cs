@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
@@ -91,24 +92,11 @@ internal class EmitterV2
         // Resolve all parents.
         foreach (var genericType in reference.GenericTypes)
         {
-            if (!genericType.IsGeneric)
-            {
-                DefineType(_tree.GetClass(genericType.Name));
-                ResolveReference(genericType);
-            }
+            DefineType(_tree.GetClass(genericType.Name));
+            ResolveReference(genericType);
         }
         
-        // Define DotnetType.
-        var type = _tree.GetClass(reference.Name);
-        if (type.HasGenerics)
-        {
-            reference.DotnetType = ((TypeBuilder) type.DotnetType!).MakeGenericType(
-                reference.GenericTypes.Select(genericType => (Type) genericType.DotnetType!).ToArray());
-        }
-        else
-        {
-            reference.DotnetType = type.DotnetType;
-        }
+        reference.DotnetType = _tree.GetClass(reference.Name).DotnetType;
     }
     
     private void DefineType(ClassDeclaration @class)
@@ -133,19 +121,6 @@ internal class EmitterV2
             TypeAttributes.AutoLayout,
             (Type)@class.BaseType!.DotnetType!
         );
-
-        // Define generic parameters.
-        if (@class.HasGenerics)
-        {
-            GenericTypeParameterBuilder[] genericTypes =
-                ((TypeBuilder)@class.DotnetType).DefineGenericParameters(
-                    @class.GenericTypes.Select(genericType => genericType.Name).ToArray());
-            
-            for (int i = 0; i < genericTypes.Length; i++)
-            {
-                @class.GenericTypes[i].DotnetType = genericTypes[i];
-            }
-        }
     }
     
     private void DefineMethod(MemberMethod method)
@@ -198,6 +173,8 @@ internal class EmitterV2
             field.Name, (Type) field.Type.DotnetType!, FieldAttributes.Public);
     }
     
+    // typeof(Dictionary<,>).MakeGenericType(int, string)
+
     private void EmitMethod(MemberMethod method)
     {
         EmitBody(((MethodBuilder) method.DotnetType!).GetILGenerator(), method.Statements, new ScopeV2());
@@ -438,7 +415,7 @@ internal class EmitterV2
 
     private int? IndexOfParameter(VariableReferenceExpression expression)
     {
-        var index = ((CallableMember) expression.ParentStatement.Holder).Parameters.IndexOf(expression.Name);
+        var index = ((CallableMember) GetTypeMember(expression.ParentStatement)).Parameters.IndexOf(expression.Name);
 
         if (index == -1)
         {
