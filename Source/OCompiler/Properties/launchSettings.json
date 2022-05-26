@@ -45,6 +45,10 @@
       "commandName": "Project",
       "commandLineArgs": "$(SolutionDir)/Examples/type_annotations.ol Main"
     },
+    "Simple type annotations": {
+      "commandName": "Project",
+      "commandLineArgs": "$(SolutionDir)/Examples/simple-type-annotations.ol Main"
+    },
     "Generic generics": {
       "commandName": "Project",
       "commandLineArgs": "$(SolutionDir)/Examples/generics.ol Main"
@@ -52,6 +56,10 @@
     "Simple generics": {
       "commandName": "Project",
       "commandLineArgs": "$(SolutionDir)/Examples/simple-generics.ol Main"
+    },
+    "Non-void constructor return": {
+      "commandName": "Project",
+      "commandLineArgs": "$(SolutionDir)/Examples/nonvoid-ctor-return.ol Main"
     }
   }
 }
